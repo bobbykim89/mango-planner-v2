@@ -9,8 +9,22 @@ export default defineNuxtConfig({
     jwtSecret: process.env.JWT_SECRET,
     openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
   },
-  modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss"],
-  nitro: {
-    plugins: ["~/server/plugin/connectDb.ts"],
+  modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss'],
+  typescript: {
+    typeCheck: true,
+    strict: true,
+    tsConfig: {
+      compilerOptions: {
+        moduleResolution: 'bundler',
+        verbatimModuleSyntax: false,
+        types: ['vite/client'],
+      },
+    },
   },
-});
+  build: {
+    transpile: ['@bobbykim'],
+  },
+  nitro: {
+    plugins: ['~/server/plugin/connectDb.ts'],
+  },
+})
