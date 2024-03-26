@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import MPLogo from '@/assets/images/logo.png'
-import { HeaderHorizontal } from '@bobbykim/manguito-theme'
+import { CtaTarget, HeaderHorizontal } from '@bobbykim/manguito-theme'
 import type { MenuItemType, SocialUrl } from '@bobbykim/mcl-footer'
 import { MclFooterA } from '@bobbykim/mcl-footer'
+
+const router = useRouter()
 
 const footerMenuItems: MenuItemType[] = [
   {
@@ -35,6 +37,19 @@ const menuItemData = reactive<{
     linkedin: 'https://www.linkedin.com/in/sihun-kim-9baa17165/',
   },
 })
+
+const handleTitleClick = (e: Event, url: string, target: CtaTarget) => {
+  e.preventDefault()
+  router.push({ path: url })
+}
+const handleAuthClick = (e: Event, url: string) => {
+  e.preventDefault()
+  router.push({ path: url })
+}
+const handleFooterMenuClick = (e: Event, item: MenuItemType) => {
+  e.preventDefault()
+  router.push({ path: item.url })
+}
 </script>
 
 <template>
@@ -43,7 +58,11 @@ const menuItemData = reactive<{
       <template #content
         ><div class="flex flex-shrink-0 items-center self-center md:py-3xs">
           <div class="h-md md:h-lg mr-2xs md:mr-sm align-middle">
-            <a :href="menuItemData.logoLink" target="_self">
+            <a
+              :href="menuItemData.logoLink"
+              target="_self"
+              @click="handleTitleClick($event, menuItemData.logoLink, '_self')"
+            >
               <img
                 :src="menuItemData.logo"
                 :alt="menuItemData.logoAlt"
@@ -52,7 +71,11 @@ const menuItemData = reactive<{
             </a>
           </div>
           <div class="flex flex-col justify-center ml-2">
-            <a :href="menuItemData.logoLink" target="_self">
+            <a
+              :href="menuItemData.logoLink"
+              target="_self"
+              @click="handleTitleClick($event, menuItemData.logoLink, '_self')"
+            >
               <h2
                 class="inline-block align-middle tracking-wider h2-md text-warning"
               >
@@ -65,14 +88,16 @@ const menuItemData = reactive<{
       <template #content-right
         ><div>
           <LayoutAuthBlock
-            login-url="/login"
-            signup-url="/signup"
+            login-url="/auth/login"
+            signup-url="/auth/signup"
             url-target="_self"
+            @login-click="handleAuthClick"
+            @signup-click="handleAuthClick"
           ></LayoutAuthBlock></div
       ></template>
       <template #mobile-content><div>mewmew</div></template>
     </HeaderHorizontal>
-    <div class="min-h-[70vh] bg-dark-2">
+    <div class="bg-dark-2">
       <slot />
     </div>
     <MclFooterA
@@ -88,6 +113,8 @@ const menuItemData = reactive<{
       social-icon-color="warning"
       highlight-color="warning"
       border-top-color="warning"
+      @logo-click="handleTitleClick"
+      @menu-click="handleFooterMenuClick"
     ></MclFooterA>
   </div>
 </template>
