@@ -5,6 +5,21 @@ const props = defineProps<{
   signupUrl: string
   urlTarget: CtaTarget
 }>()
+type AuthTarget = 'login' | 'signup'
+const emit = defineEmits<{
+  (e: 'login-click', event: Event, url: string): void
+  (e: 'signup-click', event: Event, url: string): void
+}>()
+
+const handleAuthClick = (e: Event, target: AuthTarget): void => {
+  e.preventDefault()
+  const { loginUrl, signupUrl } = props
+  if (target === 'login') {
+    emit('login-click', e, loginUrl)
+  } else {
+    emit('signup-click', e, signupUrl)
+  }
+}
 </script>
 
 <template>
@@ -15,6 +30,7 @@ const props = defineProps<{
     <a
       :href="loginUrl"
       :target="urlTarget"
+      @click="handleAuthClick($event, 'login')"
       class="flex items-center gap-3 text-lg font-bold text-warning hover:opacity-60 transition-opacity duration-300 ease-linear"
     >
       <svg
@@ -34,6 +50,7 @@ const props = defineProps<{
     <a
       :href="signupUrl"
       :target="urlTarget"
+      @click="handleAuthClick($event, 'signup')"
       class="flex items-center gap-3 text-lg font-bold text-warning hover:opacity-60 transition-opacity duration-300 ease-linear"
     >
       <svg
