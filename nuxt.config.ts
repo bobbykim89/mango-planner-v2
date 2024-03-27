@@ -8,6 +8,9 @@ export default defineNuxtConfig({
     mongoDBName: process.env.MONGO_DB_NAME,
     jwtSecret: process.env.JWT_SECRET,
     openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
+    cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+    cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
   },
   modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss'],
   typescript: {

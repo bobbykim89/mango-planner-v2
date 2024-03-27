@@ -1,15 +1,8 @@
-import { useRuntimeConfig } from '#imports'
 import { User, Profile, Plan } from '@/server/models'
-import bcrypt from 'bcryptjs'
 import type { EventHandlerRequest, H3Event } from 'h3'
-import {
-  createError,
-  getResponseStatus,
-  getResponseStatusText,
-  readValidatedBody,
-  setResponseStatus,
-} from 'h3'
+import { createError, readValidatedBody } from 'h3'
 import type { ProfileInput } from './dto'
+import { deleteCloudinaryImage } from '@/server/utils/cloudinary.util'
 
 export class ProfileController {
   public async getCurrentProfile(e: H3Event<EventHandlerRequest>) {
@@ -43,7 +36,7 @@ export class ProfileController {
     }
     // throw error if user already have profile
     const profileCheck = await Profile.findOne({ user: user.id })
-    if (!profileCheck) {
+    if (profileCheck !== null) {
       throw createError({
         status: 401,
         message: 'Unauthorized',
@@ -70,6 +63,7 @@ export class ProfileController {
     return saveData
   }
   public async updateProfilePicture(e: H3Event<EventHandlerRequest>) {
+    const file = e.context.file
     const user = await User.findById(e.context.user.id).select('-password')
     if (!user) {
       throw createError({
@@ -79,13 +73,32 @@ export class ProfileController {
       })
     }
     const profile = await Profile.findOne({ user: user.id })
-    if (!profile) {
+    if (profile === null) {
       throw createError({
         status: 404,
         message: 'Not found',
         statusMessage: 'Profile for Current User not found',
       })
     }
+    if (profile.profilePicture !== '') {
+      await deleteCloudinaryImage(profile.profilePicture)
+    }
+    const updatedProfile = await Profile.findByIdAndUpdate(
+      profile.id,
+      {
+        profilePicture: file.imageId,
+        updatedAt: new Date(),
+      },
+      { new: true, returnDocument: 'after' }
+    )
+    if (!updatedProfile) {
+      throw createError({
+        status: 500,
+        message: 'Server error',
+        statusMessage: 'Unexpected error occurred, please try again.',
+      })
+    }
+    return updatedProfile
   }
   public async updatePlansOrder(e: H3Event<EventHandlerRequest>) {
     const user = await User.findById(e.context.user.id).select('-password')
@@ -97,7 +110,7 @@ export class ProfileController {
       })
     }
     const profile = await Profile.findOne({ user: user.id })
-    if (!profile) {
+    if (profile === null) {
       throw createError({
         status: 404,
         message: 'Not found',
@@ -123,10 +136,14 @@ export class ProfileController {
       }
       return body as ProfileInput
     })
-    const updatedProfile = await Profile.findByIdAndUpdate(user.id, body, {
-      new: true,
-      returnDocument: 'after',
-    })
+    const updatedProfile = await Profile.findByIdAndUpdate(
+      user.id,
+      { ...body, updatedAt: new Date() },
+      {
+        new: true,
+        returnDocument: 'after',
+      }
+    )
     if (!updatedProfile) {
       throw createError({
         status: 500,

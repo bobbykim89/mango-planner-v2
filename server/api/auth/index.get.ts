@@ -1,7 +1,6 @@
-import { authController } from "@/server/controller";
-import { checkAuth } from "@/server/utils/checkAuth.util";
+import { authController } from '@/server/controller'
 
 export default defineEventHandler({
   onRequest: [defineRequestMiddleware(checkAuth)],
   handler: eventHandler(authController.getCurrentUser),
-});
+})
