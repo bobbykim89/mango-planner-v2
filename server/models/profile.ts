@@ -10,7 +10,7 @@ const profileSchema = new Schema({
     default: '',
   },
   plansOrder: {
-    type: Array,
+    type: [String],
     default: [],
   },
   createdAt: {
