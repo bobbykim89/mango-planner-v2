@@ -125,7 +125,7 @@ export class ProfileController {
           statusMessage: 'Invalid client request',
         })
       }
-      const { plansOrder } = body as ProfileInput
+      const { plansOrder } = body as Partial<ProfileInput>
       if (!plansOrder) {
         throw createError({
           status: 403,
@@ -134,10 +134,63 @@ export class ProfileController {
             'Validation error: request body does not have plansOrder.',
         })
       }
-      return body as ProfileInput
+      return body as Partial<ProfileInput>
     })
     const updatedProfile = await Profile.findByIdAndUpdate(
-      user.id,
+      profile.id,
+      { ...body, updatedAt: new Date() },
+      {
+        new: true,
+        returnDocument: 'after',
+      }
+    )
+    if (!updatedProfile) {
+      throw createError({
+        status: 500,
+        message: 'Server error',
+        statusMessage: 'Unexpected error occurred, please try again.',
+      })
+    }
+    return updatedProfile
+  }
+  public async updateDarkMode(e: H3Event<EventHandlerRequest>) {
+    const user = await User.findById(e.context.user.id).select('-password')
+    if (!user) {
+      throw createError({
+        status: 404,
+        message: 'Not found',
+        statusMessage: 'User not found',
+      })
+    }
+    const profile = await Profile.findOne({ user: user.id })
+    if (profile === null) {
+      throw createError({
+        status: 404,
+        message: 'Not found',
+        statusMessage: 'Profile for Current User not found',
+      })
+    }
+    const body = await readValidatedBody(e, (body) => {
+      if (!body) {
+        throw createError({
+          status: 403,
+          message: 'Validation error',
+          statusMessage: 'Invalid client request',
+        })
+      }
+      const { dark } = body as Partial<ProfileInput>
+      if (!dark) {
+        throw createError({
+          status: 403,
+          message: 'Validation error',
+          statusMessage:
+            'Validation error: request body does not have plansOrder.',
+        })
+      }
+      return body as Partial<ProfileInput>
+    })
+    const updatedProfile = await Profile.findByIdAndUpdate(
+      profile.id,
       { ...body, updatedAt: new Date() },
       {
         new: true,
