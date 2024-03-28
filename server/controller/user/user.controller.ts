@@ -11,7 +11,7 @@ import {
   setResponseStatus,
 } from 'h3'
 import jwt from 'jsonwebtoken'
-import type { UserInput, PwUpdateInput } from './dto'
+import type { UserInput, PwUpdateInput, NewUsernameInput } from './dto'
 
 const config = useRuntimeConfig()
 
@@ -173,5 +173,46 @@ export class UserController {
       // access_token: `Bearer ${accessToken}`,
     }
   }
-  public async updateUserName(e: H3Event<EventHandlerRequest>) {}
+  public async updateUserName(e: H3Event<EventHandlerRequest>) {
+    const user = await User.findById(e.context.user.id)
+    if (!user) {
+      throw createError({
+        status: 404,
+        message: 'Not found',
+        statusMessage: 'User not found',
+      })
+    }
+    // validate body
+    const body = await readValidatedBody(e, (body) => {
+      if (!body) {
+        throw createError({
+          status: 403,
+          message: 'Validation error',
+          statusMessage: 'Invalid client request',
+        })
+      }
+      const { username } = body as Partial<NewUsernameInput>
+      if (!username) {
+        throw createError({
+          status: 403,
+          message: 'Validation error',
+          statusMessage: 'Validation error: please fill in your username.',
+        })
+      }
+      return body as Partial<NewUsernameInput>
+    })
+    const updatedUser = await User.findByIdAndUpdate(
+      user.id,
+      { name: body.username },
+      { new: true, returnDocument: 'after' }
+    )
+    if (!updatedUser) {
+      throw createError({
+        status: 500,
+        message: 'Server error',
+        statusMessage: 'Unexpected error occurred, please try again.',
+      })
+    }
+    return updatedUser
+  }
 }
