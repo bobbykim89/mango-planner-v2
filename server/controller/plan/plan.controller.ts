@@ -122,10 +122,14 @@ export class PlanController {
           'Access denied: Current user is not authorized to update this item',
       })
     }
-    const updatedPlan = await Plan.findByIdAndUpdate(planId, body, {
-      new: true,
-      returnDocument: 'after',
-    })
+    const updatedPlan = await Plan.findByIdAndUpdate(
+      planId,
+      { ...body, updatedAt: new Date() },
+      {
+        new: true,
+        returnDocument: 'after',
+      }
+    )
     return updatedPlan
   }
   public async deletePlanById(e: H3Event<EventHandlerRequest>) {

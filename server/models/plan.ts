@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model } from 'mongoose'
 
 const planSchema = new Schema({
   title: {
@@ -10,7 +10,7 @@ const planSchema = new Schema({
   },
   author: {
     type: Schema.Types.ObjectId,
-    ref: "user",
+    ref: 'user',
   },
   complete: {
     type: Boolean,
@@ -24,6 +24,10 @@ const planSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-});
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
+})
 
-export const Plan = model("plan", planSchema);
+export const Plan = model('plan', planSchema)
