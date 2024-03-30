@@ -1,40 +1,47 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { useCookie } from '#imports'
-import { useErrorStore, useUserStore } from './'
+import { useCookie, useFetch } from '#imports'
+import { useUserStore, useAlertStore } from './'
 import { Profile } from '@/server/models'
 
 type ProfileType = InstanceType<typeof Profile>
 
 export const useProfileStore = defineStore('profile', () => {
-  const errorStore = useErrorStore()
+  const alertStore = useAlertStore()
   const userStore = useUserStore()
-  const cookie = useCookie('access_token', {
-    maxAge: 604800,
-    sameSite: true,
-  })
+  const cookie = useCookie('access_token')
   // state
   const userProfile = ref<ProfileType | null>(null)
   // getters
+  const getPlansOrder = computed<string[]>(() => {
+    if (userProfile.value === null) {
+      return []
+    }
+    return userProfile.value.plansOrder
+  })
   // actions
   const getCurrentUserProfile = async () => {
     try {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) {
-        errorStore.setError('No user authentication found, please login')
+        alertStore.setAlert('No user authentication found, please login')
         return
       }
-      const res: ProfileType = await $fetch('/api/profile', {
+      // const res: ProfileType = await $fetch('/api/profile', {
+      //   method: 'GET',
+      //   headers: { Authorization: cookie.value },
+      // })
+      const { data: res, error } = await useFetch<ProfileType>('/api/profile', {
         method: 'GET',
         headers: { Authorization: cookie.value },
       })
-      if (!res) {
+      if (!res.value || error.value !== null) {
         userProfile.value = null
         return
       }
-      userProfile.value = res
+      userProfile.value = res.value
     } catch (error) {
-      errorStore.setError('Authentication error: Cannot bring user profile')
+      alertStore.setAlert('Authentication error: Cannot bring user profile')
       userProfile.value = null
     }
   }
@@ -42,22 +49,27 @@ export const useProfileStore = defineStore('profile', () => {
     try {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) {
-        errorStore.setError('No user authentication found, please login')
+        alertStore.setAlert('No user authentication found, please login')
         return
       }
-      const res: ProfileType = await $fetch('/api/profile', {
+      // const res: ProfileType = await $fetch('/api/profile', {
+      //   method: 'POST',
+      //   headers: { Authorization: cookie.value },
+      // })
+      const { data: res, error } = await useFetch<ProfileType>('/api/profile', {
         method: 'POST',
         headers: { Authorization: cookie.value },
       })
-      if (!res) {
-        errorStore.setError(
+      if (!res.value || error.value !== null) {
+        alertStore.setAlert(
           'Failed to get response from server, please try again'
         )
         return
       }
       await getCurrentUserProfile()
+      alertStore.setAlert('Successfully created user profile!')
     } catch (error) {
-      errorStore.setError(
+      alertStore.setAlert(
         'Failed to create user profile, please try again later.'
       )
       userProfile.value = null
@@ -67,26 +79,38 @@ export const useProfileStore = defineStore('profile', () => {
     try {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) {
-        errorStore.setError('No user authentication found, please login')
+        alertStore.setAlert('No user authentication found, please login')
         return
       }
-      const res: ProfileType = await $fetch('/api/profile/profile-picture', {
-        method: 'PUT',
-        headers: {
-          Authorization: cookie.value,
-          'Content-Type': 'multipart/form-data',
-        },
-        body: payload,
-      })
-      if (!res) {
-        errorStore.setError(
+      // const res: ProfileType = await $fetch('/api/profile/profile-picture', {
+      //   method: 'PUT',
+      //   headers: {
+      //     Authorization: cookie.value,
+      //     'Content-Type': 'multipart/form-data',
+      //   },
+      //   body: payload,
+      // })
+      const { data: res, error } = await useFetch<ProfileType>(
+        '/api/profile/profile-picture',
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: cookie.value,
+            'Content-Type': 'multipart/form-data',
+          },
+          body: payload,
+        }
+      )
+      if (!res.value || error.value !== null) {
+        alertStore.setAlert(
           'Failed to get response from server, please try again'
         )
         return
       }
       await getCurrentUserProfile()
+      alertStore.setAlert('Successfully updated profile picture!')
     } catch (error) {
-      errorStore.setError(
+      alertStore.setAlert(
         'Failed to update user profile, please try again later.'
       )
     }
@@ -96,22 +120,29 @@ export const useProfileStore = defineStore('profile', () => {
       const { plansOrder } = payload
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) {
-        errorStore.setError('No user authentication found, please login')
+        alertStore.setAlert('No user authentication found, please login')
         return
       }
-      const res: ProfileType = await $fetch('/api/profile/plans-order', {
-        method: 'PUT',
-        body: { plansOrder },
-      })
-      if (!res) {
-        errorStore.setError(
+      // const res: ProfileType = await $fetch('/api/profile/plans-order', {
+      //   method: 'PUT',
+      //   body: { plansOrder },
+      // })
+      const { data: res, error } = await useFetch<ProfileType>(
+        '/api/profile/plans-order',
+        {
+          method: 'PUT',
+          body: { plansOrder },
+        }
+      )
+      if (!res.value || error.value !== null) {
+        alertStore.setAlert(
           'Failed to get response from server, please try again'
         )
         return
       }
       await getCurrentUserProfile()
     } catch (error) {
-      errorStore.setError(
+      alertStore.setAlert(
         'Failed to update plans order, please try again later.'
       )
     }
@@ -121,24 +152,43 @@ export const useProfileStore = defineStore('profile', () => {
       const { dark } = payload
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) {
-        errorStore.setError('No user authentication found, please login')
+        alertStore.setAlert('No user authentication found, please login')
         return
       }
-      const res: ProfileType = await $fetch('/api/profile/dark', {
-        method: 'PUT',
-        body: { dark },
-      })
-      if (!res) {
-        errorStore.setError(
+      // const res: ProfileType = await $fetch('/api/profile/dark', {
+      //   method: 'PUT',
+      //   body: { dark },
+      // })
+      const { data: res, error } = await useFetch<ProfileType>(
+        '/api/profile/dark',
+        {
+          method: 'PUT',
+          body: { dark },
+        }
+      )
+      if (!res.value || error.value !== null) {
+        alertStore.setAlert(
           'Failed to get response from server, please try again'
         )
         return
       }
       await getCurrentUserProfile()
+      alertStore.setAlert(
+        `Darkmode ${userProfile.value?.dark ? 'enabled' : 'disabled'}`
+      )
     } catch (error) {
-      errorStore.setError(
+      alertStore.setAlert(
         'Failed to toggle color mode, please try again later.'
       )
     }
+  }
+  return {
+    userProfile,
+    getPlansOrder,
+    getCurrentUserProfile,
+    postNewUserProfile,
+    updateUserProfilePicture,
+    updateUserPlansOrder,
+    toggleUserDarkMode,
   }
 })
