@@ -53,11 +53,10 @@ export class PlanController {
         statusMessage: 'Access denied: user not found',
       })
     }
-    const { title, content, complete, type } = body
+    const { title, content, type } = body
     const newPlan = new Plan({
       title,
       content,
-      complete,
       type,
       author: currentUser.id,
     })
