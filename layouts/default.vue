@@ -3,16 +3,18 @@ import MPLogo from '@/assets/images/logo.png'
 import { CtaTarget, HeaderHorizontal } from '@bobbykim/manguito-theme'
 import type { MenuItemType, SocialUrl } from '@bobbykim/mcl-footer'
 import { MclFooterA } from '@bobbykim/mcl-footer'
-import { useInitPiniaStore, useAlertStore } from '@/stores'
+import { useInitPiniaStore, useAlertStore, useUserStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import AlertBlock from '@/components/layout/AlertBlock.vue'
 
 const router = useRouter()
 const initPiniaStore = useInitPiniaStore()
-const alertStore = useAlertStore()
 await useAsyncData('initPinia', () => initPiniaStore.initStores())
+const alertStore = useAlertStore()
+const userStore = useUserStore()
 const { loading } = storeToRefs(initPiniaStore)
 const { alert } = storeToRefs(alertStore)
+const { currentUser } = storeToRefs(userStore)
 
 const footerMenuItems: MenuItemType[] = [
   {
@@ -107,6 +109,9 @@ const handleFooterMenuClick = (e: Event, item: MenuItemType) => {
     </HeaderHorizontal>
     <div class="bg-dark-2">
       <AlertBlock v-if="alert" :message="alert"></AlertBlock>
+      <div v-if="!loading">
+        {{ currentUser }}
+      </div>
       <slot />
     </div>
     <MclFooterA

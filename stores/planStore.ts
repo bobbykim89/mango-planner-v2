@@ -3,12 +3,9 @@ import { useCookie, useFetch } from '#imports'
 import { useProfileStore, useUserStore, useAlertStore } from './'
 import { Plan } from '@/server/models'
 import { ref, computed } from 'vue'
+import type { PlanInput } from '@/types'
 
 type PlanType = InstanceType<typeof Plan>
-type PlanInputOptions = 'title' | 'content' | 'complete' | 'type'
-type PlanInput = {
-  [key in PlanInputOptions]?: string
-}
 
 export const usePlanStore = defineStore('plan', () => {
   const cookie = useCookie('access_token')
@@ -77,6 +74,7 @@ export const usePlanStore = defineStore('plan', () => {
         return
       }
       await getAllPostByUser()
+      alertStore.setAlert('Successfully created new plan!')
     } catch (error) {
       alertStore.setAlert('Failed to create new plan, please try again later.')
     }
@@ -125,6 +123,7 @@ export const usePlanStore = defineStore('plan', () => {
         return
       }
       await getAllPostByUser()
+      alertStore.setAlert('Successfully deleted plan!')
     } catch (error) {
       alertStore.setAlert('Failed to delete plan, please try again later.')
     }
