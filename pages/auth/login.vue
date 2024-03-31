@@ -37,6 +37,7 @@ const handleFormSubmit = async () => {
               type="email"
               placeholder="example@email.com"
               highlight-color="warning"
+              rounded
               v-model="loginCred.email"
             ></MclInputText>
           </MclFormGroup>
@@ -51,6 +52,7 @@ const handleFormSubmit = async () => {
               id="password"
               type="password"
               highlight-color="warning"
+              rounded
               v-model="loginCred.password"
             ></MclInputText>
           </MclFormGroup>
