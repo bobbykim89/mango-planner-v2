@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import MPLogo from '@/assets/images/logo.png'
-import { CtaTarget, HeaderHorizontal } from '@bobbykim/manguito-theme'
+import { CtaTarget, HeaderHorizontal, Alert } from '@bobbykim/manguito-theme'
 import type { MenuItemType, SocialUrl } from '@bobbykim/mcl-footer'
 import { MclFooterA } from '@bobbykim/mcl-footer'
 import { useInitPiniaStore, useAlertStore, useUserStore } from '@/stores'
 import { storeToRefs } from 'pinia'
-import AlertBlock from '@/components/layout/AlertBlock.vue'
 
 const router = useRouter()
 const initPiniaStore = useInitPiniaStore()
@@ -60,6 +59,9 @@ const handleFooterMenuClick = (e: Event, item: MenuItemType) => {
   e.preventDefault()
   router.push({ path: item.url })
 }
+const onAlertClose = () => {
+  alertStore.clearAlert()
+}
 </script>
 
 <template>
@@ -108,7 +110,24 @@ const handleFooterMenuClick = (e: Event, item: MenuItemType) => {
       <template #mobile-content><div>mewmew</div></template>
     </HeaderHorizontal>
     <div class="bg-dark-2">
-      <AlertBlock v-if="alert" :message="alert"></AlertBlock>
+      <div class="container pt-xs px-xs md:px-0">
+        <Alert :show="alert !== null" dismissible @close="onAlertClose">
+          <div class="flex justify-center text-light-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 512 512"
+              fill="currentColor"
+              class="w-xs mr-2xs"
+            >
+              <!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+              <path
+                d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-144c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z"
+              />
+            </svg>
+            <span>{{ alert }}</span>
+          </div>
+        </Alert>
+      </div>
       <div v-if="!loading">
         {{ currentUser }}
       </div>

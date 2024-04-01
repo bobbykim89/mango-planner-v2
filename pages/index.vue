@@ -1,10 +1,43 @@
 <script setup lang="ts">
 import { MclInputText } from '@bobbykim/mcl-forms'
-import { Modal, vToggle } from '@bobbykim/manguito-theme'
+import { Modal } from '@bobbykim/manguito-theme'
 import PlanInputForm from '@/components/plans/PlanInputForm.vue'
 import type { PlanFormInput } from '@/types'
+import { useUserStore, useProfileStore } from '@/stores'
+import UtilityBlock from '@/components/plans/UtilityBlock.vue'
+import { storeToRefs } from 'pinia'
 
+const userStore = useUserStore()
+const profileStore = useProfileStore()
+const { isAuthenticated } = storeToRefs(userStore)
+const { userProfile } = storeToRefs(profileStore)
 const searchTerm = ref<string>('')
+const modalRef = ref<InstanceType<typeof Modal>>()
+
+const userProfileStatus = computed<boolean>(() => {
+  if (isAuthenticated && userProfile !== null) {
+    return true
+  }
+  return false
+})
+const handleShowAllClick = (e: Event) => {
+  e.preventDefault()
+  console.log('show all')
+}
+const handleShowIncompleteClick = (e: Event) => {
+  e.preventDefault()
+  console.log('show incomplete')
+}
+const handleShowCustomClick = (e: Event) => {
+  e.preventDefault()
+  console.log('show-custom')
+}
+const openModal = () => {
+  modalRef.value!.open()
+}
+const updateSearchTerm = (text: string) => {
+  searchTerm.value = text
+}
 
 const handleNewFormSubmit = (e: Event, item: PlanFormInput) => {
   e.preventDefault()
@@ -15,110 +48,58 @@ const handleNewFormSubmit = (e: Event, item: PlanFormInput) => {
 <template>
   <section class="container py-md lg:py-lg">
     <div class="grid md:grid-cols-2 gap-sm grid-flow-row">
-      <div>
+      <div class="px-xs md:px-0">
         <!-- input form desktop -->
         <div class="bg-dark-3 rounded-md p-md drop-shadow-md hidden md:block">
-          <PlanInputForm @form-submit="handleNewFormSubmit"></PlanInputForm>
+          <h3 class="h3-md text-warning mb-xs">Create New Plan</h3>
+          <PlanInputForm
+            prefix="desktop-new"
+            @form-submit="handleNewFormSubmit"
+          ></PlanInputForm>
         </div>
         <!-- utility block -->
-        <div class="bg-dark-3 rounded-md p-md drop-shadow-md md:mt-md">
-          <!-- search bar -->
-          <div class="flex gap-2xs mb-2xs">
-            <label
-              for="search-bar"
-              class="mb-0 bg-warning p-2xs text-light-1 h-full rounded-l-md"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 512 512"
-                fill="currentColor"
-                class="h-sm"
-              >
-                <!-- !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
-                <path
-                  d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
-                />
-              </svg>
-            </label>
-            <MclInputText
-              id="search-bar"
-              highlight-color="warning"
-              placeholder="Search"
-              class="w-full"
-              v-model="searchTerm"
-            ></MclInputText>
-          </div>
-          <!-- sort buttons -->
-          <div class="btn-group">
-            <!-- sort list -->
-            <button class="btn btn-light-3 btn-full">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 512 512"
-                fill="currentColor"
-                class="h-sm mx-auto"
-              >
-                <!-- !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
-                <path
-                  d="M40 48C26.7 48 16 58.7 16 72v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V72c0-13.3-10.7-24-24-24H40zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zM16 232v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V232c0-13.3-10.7-24-24-24H40c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V392c0-13.3-10.7-24-24-24H40z"
-                />
-              </svg>
-            </button>
-            <!-- sort incomplete -->
-            <button class="btn btn-light-3 btn-full">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 640 512"
-                fill="currentColor"
-                class="h-sm mx-auto"
-              >
-                <!-- !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
-                <path
-                  d="M32 32C14.3 32 0 46.3 0 64S14.3 96 32 96H608c17.7 0 32-14.3 32-32s-14.3-32-32-32H32zm0 384c-17.7 0-32 14.3-32 32s14.3 32 32 32H608c17.7 0 32-14.3 32-32s-14.3-32-32-32H32zM7 167c-9.4 9.4-9.4 24.6 0 33.9l55 55L7 311c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l55-55 55 55c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-55-55 55-55c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-55 55L41 167c-9.4-9.4-24.6-9.4-33.9 0zM265 167c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l55 55-55 55c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l55-55 55 55c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-55-55 55-55c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-55 55-55-55zM455 167c-9.4 9.4-9.4 24.6 0 33.9l55 55-55 55c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l55-55 55 55c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-55-55 55-55c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-55 55-55-55c-9.4-9.4-24.6-9.4-33.9 0z"
-                />
-              </svg>
-            </button>
-            <!-- sort completed -->
-            <button class="btn btn-light-3 btn-full">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 576 512"
-                fill="currentColor"
-                class="h-sm mx-auto"
-              >
-                <!-- !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
-                <path
-                  d="M96 80c0-26.5 21.5-48 48-48H432c26.5 0 48 21.5 48 48V384H96V80zm313 47c-9.4-9.4-24.6-9.4-33.9 0l-111 111-47-47c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l64 64c9.4 9.4 24.6 9.4 33.9 0L409 161c9.4-9.4 9.4-24.6 0-33.9zM0 336c0-26.5 21.5-48 48-48H64V416H512V288h16c26.5 0 48 21.5 48 48v96c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V336z"
-                />
-              </svg>
-            </button>
-            <!-- new -- mobile -->
-            <button class="btn btn-warning btn-full" v-toggle:new-input-modal>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 448 512"
-                fill="currentColor"
-                class="h-sm mx-auto"
-              >
-                <!-- !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
-                <path
-                  d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
+        <UtilityBlock
+          :hasProfile="userProfileStatus"
+          @new-post="openModal"
+          @show-all="handleShowAllClick"
+          @show-incomplete="handleShowIncompleteClick"
+          @show-custom="handleShowCustomClick"
+          @search-update="updateSearchTerm"
+        ></UtilityBlock>
       </div>
+      <div>Search term: {{ searchTerm }}</div>
     </div>
     <Modal
-      id="new-input-modal"
+      ref="modalRef"
       placement="center"
       color="dark-3"
       title="New Plan"
+      class-name="px-xs rounded-md"
     >
+      <template #header="{ close }">
+        <div class="flex justify-between py-xs border-b-2">
+          <h3 class="h3-md text-warning">Create New Plan</h3>
+          <button @click="close">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="1em"
+              viewBox="0 0 384 512"
+              class="fill-light-2 hover:fill-light-1 focus:fill-light-1 transition-colors duration-300 ease-linear h-sm"
+            >
+              <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
+              <path
+                d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
+              />
+            </svg>
+          </button>
+        </div>
+      </template>
       <template #body>
-        <div class="p-md">
-          <PlanInputForm @form-submit="handleNewFormSubmit"></PlanInputForm>
+        <div class="py-md">
+          <PlanInputForm
+            prefix="mobile-new"
+            @form-submit="handleNewFormSubmit"
+          ></PlanInputForm>
         </div>
       </template>
     </Modal>

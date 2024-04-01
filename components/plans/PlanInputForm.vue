@@ -9,9 +9,11 @@ import type { TypeInputLiteralType, PlanFormInput } from '@/types'
 
 const props = withDefaults(
   defineProps<{
+    prefix?: string
     submitText?: string
   }>(),
   {
+    prefix: 'form',
     submitText: 'Save',
   }
 )
@@ -32,17 +34,17 @@ const formContent = reactive<PlanFormInput>({
 })
 const typeOptions: TypeOptions[] = [
   {
-    id: 'type-personal',
+    id: `${props.prefix}-type-personal`,
     text: 'Personal',
     value: 'personal',
   },
   {
-    id: 'type-work',
+    id: `${props.prefix}-type-work`,
     text: 'Work',
     value: 'work',
   },
   {
-    id: 'type-chore',
+    id: `${props.prefix}-type-chore`,
     text: 'Chore',
     value: 'chore',
   },
@@ -65,14 +67,14 @@ const onFormSubmit = (e: Event) => {
   <div>
     <form @submit.prevent="onFormSubmit">
       <MclFormGroup
-        label-for="title"
+        :label-for="`${prefix}-title`"
         label="Title:"
         text-color="light-1"
         :text-bold="true"
         class="mb-xs"
       >
         <MclInputText
-          id="title"
+          :id="`${prefix}-title`"
           highlight-color="warning"
           placeholder="Please write your plan here."
           rounded
@@ -81,14 +83,14 @@ const onFormSubmit = (e: Event) => {
         ></MclInputText>
       </MclFormGroup>
       <MclFormGroup
-        label-for="content"
+        :label-for="`${prefix}-content`"
         label="Content:"
         text-color="light-1"
         :text-bold="true"
         class="mb-xs"
       >
         <MclTextArea
-          id="content"
+          :id="`${prefix}-content`"
           highlight-color="warning"
           placeholder="Please write details here"
           rounded
@@ -121,5 +123,3 @@ const onFormSubmit = (e: Event) => {
     </form>
   </div>
 </template>
-
-<style scoped></style>
