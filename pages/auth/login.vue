@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { MclFormGroup, MclInputText } from '@bobbykim/mcl-forms'
-import { useUserStore } from '@/stores'
+import { useUserStore, useInitPiniaStore } from '@/stores'
 
 const userStore = useUserStore()
+const initPiniaStore = useInitPiniaStore()
 const loginCred = reactive<{
   email: string
   password: string
@@ -13,7 +14,7 @@ const loginCred = reactive<{
 const handleFormSubmit = async () => {
   const { email, password } = loginCred
   await userStore.loginWithCredential({ email, password })
-  console.log({ email, password })
+  await initPiniaStore.initStores()
 }
 </script>
 

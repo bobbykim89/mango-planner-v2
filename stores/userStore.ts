@@ -18,12 +18,14 @@ export const useUserStore = defineStore('user', () => {
   })
   // state
   const currentUser = ref<UserType | null>(null)
-  const isAuthenticated = ref<boolean>()
+  const isAuthenticated = ref<boolean>(false)
+  const accessToken = ref<string | null>(null)
   // getters
   const getCurrentAuthInfo = computed(() => {
     return {
       currentUser: currentUser.value,
       isAuthenticated: isAuthenticated.value,
+      accessToken: accessToken.value,
     }
   })
   // actions
@@ -51,6 +53,7 @@ export const useUserStore = defineStore('user', () => {
       }
       currentUser.value = data.value
       isAuthenticated.value = true
+      accessToken.value = cookie.value
     } catch (error) {
       alertStore.setAlert('Authentication error: Cannot bring user info')
       currentUser.value = null
@@ -77,6 +80,7 @@ export const useUserStore = defineStore('user', () => {
         alertStore.setAlert("Couldn't fetch user data from server.")
         currentUser.value = null
         isAuthenticated.value = false
+        accessToken.value = null
         return
       }
       cookie.value = data.value.access_token
@@ -187,11 +191,13 @@ export const useUserStore = defineStore('user', () => {
     cookie.value = null
     currentUser.value = null
     isAuthenticated.value = false
+    accessToken.value = null
     alertStore.setAlert('Logout Successful!')
   }
   return {
     currentUser,
     isAuthenticated,
+    accessToken,
     getCurrentAuthInfo,
     getCurrentUser,
     loginWithCredential,
