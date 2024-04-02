@@ -1,18 +1,30 @@
 <script setup lang="ts">
-import { MclInputText } from '@bobbykim/mcl-forms'
 import { Modal } from '@bobbykim/manguito-theme'
 import PlanInputForm from '@/components/plans/PlanInputForm.vue'
-import type { PlanFormInput } from '@/types'
-import { useUserStore, useProfileStore } from '@/stores'
+import type { PlanFormInput, TypeInputLiteralType } from '@/types'
+import { useUserStore, useProfileStore, usePlanStore } from '@/stores'
 import UtilityBlock from '@/components/plans/UtilityBlock.vue'
 import { storeToRefs } from 'pinia'
+import PlanCollapsable from '@/components/plans/PlanCollapsable.vue'
+import { Plan } from '@/server/models'
 
+type PlanDisplayStyle = 'all' | 'incomplete' | 'custom'
+type ModalFormType = 'new' | 'update'
 const userStore = useUserStore()
 const profileStore = useProfileStore()
+const planStore = usePlanStore()
 const { isAuthenticated } = storeToRefs(userStore)
 const { userProfile } = storeToRefs(profileStore)
 const searchTerm = ref<string>('')
 const modalRef = ref<InstanceType<typeof Modal>>()
+const modalForm = ref<ModalFormType>('new')
+const displayStyle = ref<PlanDisplayStyle>('all')
+const updateDataForm = reactive<PlanFormInput>({
+  title: '',
+  content: '',
+  type: 'personal',
+})
+const selectedPost = ref<string>('')
 
 const userProfileStatus = computed<boolean>(() => {
   if (isAuthenticated && userProfile !== null) {
@@ -22,27 +34,75 @@ const userProfileStatus = computed<boolean>(() => {
 })
 const handleShowAllClick = (e: Event) => {
   e.preventDefault()
+  displayStyle.value = 'all'
   console.log('show all')
 }
 const handleShowIncompleteClick = (e: Event) => {
   e.preventDefault()
+  displayStyle.value = 'incomplete'
   console.log('show incomplete')
 }
 const handleShowCustomClick = (e: Event) => {
   e.preventDefault()
+  displayStyle.value = 'custom'
   console.log('show-custom')
 }
 const openModal = () => {
+  modalForm.value = 'new'
   modalRef.value!.open()
+}
+const onModalClose = () => {
+  selectedPost.value = ''
+  updateDataForm.title = ''
+  updateDataForm.content = ''
+  updateDataForm.type = 'personal'
+  console.log(updateDataForm)
+  console.log(selectedPost.value)
 }
 const updateSearchTerm = (text: string) => {
   searchTerm.value = text
 }
 
-const handleNewFormSubmit = (e: Event, item: PlanFormInput) => {
+const handleNewFormSubmit = async (e: Event, item: PlanFormInput) => {
   e.preventDefault()
-  console.log(item)
+  // console.log(item)
+  await planStore.createNewPost(item)
+  modalRef.value?.close()
 }
+const handleCollapseToggle = (e: Event, complete: boolean) => {
+  console.log(e, complete)
+}
+const handleCollapseEdit = (e: Event, item: InstanceType<typeof Plan>) => {
+  modalForm.value = 'update'
+  selectedPost.value = item._id.toString()
+  updateDataForm.title = item.title
+  updateDataForm.type = item.type as TypeInputLiteralType
+  if (item.content) {
+    updateDataForm.content = item.content
+  }
+  modalRef.value?.open()
+}
+const onEditSubmit = (e: Event, data: PlanFormInput) => {
+  console.log(data)
+  selectedPost.value = ''
+  updateDataForm.title = ''
+  updateDataForm.content = ''
+  updateDataForm.type = 'personal'
+  modalRef.value?.close()
+}
+const handleCollapseDelete = async (e: Event, id: string) => {
+  console.log(e, id)
+  await planStore.deletePost(id)
+}
+const getPlans = computed(() => {
+  if (displayStyle.value === 'incomplete') {
+    return planStore.getIncompletePlans
+  }
+  if (displayStyle.value === 'custom') {
+    return planStore.getPlansByOrder
+  }
+  return planStore.getAllPlans
+})
 </script>
 
 <template>
@@ -67,7 +127,20 @@ const handleNewFormSubmit = (e: Event, item: PlanFormInput) => {
           @search-update="updateSearchTerm"
         ></UtilityBlock>
       </div>
-      <div>Search term: {{ searchTerm }}</div>
+      <!-- right column -->
+      <div class="px-xs md:px-0">
+        Search term: {{ searchTerm }} Sort logic: {{ displayStyle }}
+        <div>
+          <PlanCollapsable
+            v-for="(item, idx) in getPlans"
+            :item="item"
+            :key="idx"
+            @toggle-complete="handleCollapseToggle"
+            @edit="handleCollapseEdit"
+            @delete="handleCollapseDelete"
+          ></PlanCollapsable>
+        </div>
+      </div>
     </div>
     <Modal
       ref="modalRef"
@@ -75,11 +148,15 @@ const handleNewFormSubmit = (e: Event, item: PlanFormInput) => {
       color="dark-3"
       title="New Plan"
       class-name="px-xs rounded-md"
+      @close="onModalClose"
     >
       <template #header="{ close }">
         <div class="flex justify-between py-xs border-b-2">
-          <h3 class="h3-md text-warning">Create New Plan</h3>
-          <button @click="close">
+          <h3 class="h3-md text-warning">
+            <span v-if="modalForm === 'new'">Create New Plan</span>
+            <span v-else>Update Plan</span>
+          </h3>
+          <button @click="onModalClose(), close()">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               height="1em"
@@ -97,8 +174,16 @@ const handleNewFormSubmit = (e: Event, item: PlanFormInput) => {
       <template #body>
         <div class="py-md">
           <PlanInputForm
+            v-if="modalForm === 'new'"
             prefix="mobile-new"
             @form-submit="handleNewFormSubmit"
+          ></PlanInputForm>
+          <PlanInputForm
+            v-else
+            prefix="update"
+            :post-input="updateDataForm"
+            submit-text="Update"
+            @form-submit="onEditSubmit"
           ></PlanInputForm>
         </div>
       </template>

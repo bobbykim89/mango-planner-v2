@@ -11,6 +11,7 @@ const props = withDefaults(
   defineProps<{
     prefix?: string
     submitText?: string
+    postInput?: PlanFormInput
   }>(),
   {
     prefix: 'form',
@@ -28,9 +29,9 @@ const emit = defineEmits<{
   (e: 'form-submit', event: Event, data: PlanFormInput): void
 }>()
 const formContent = reactive<PlanFormInput>({
-  title: '',
-  content: '',
-  type: 'personal',
+  title: props.postInput?.title || '',
+  content: props.postInput?.content || '',
+  type: props.postInput?.type || 'personal',
 })
 const typeOptions: TypeOptions[] = [
   {

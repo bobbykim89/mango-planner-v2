@@ -9,7 +9,7 @@ type ProfileType = InstanceType<typeof Profile>
 export const useProfileStore = defineStore('profile', () => {
   const alertStore = useAlertStore()
   const userStore = useUserStore()
-  const cookie = useCookie('access_token')
+  const cookie = useAuthToken()
   // state
   const userProfile = ref<ProfileType | null>(null)
   // getters
@@ -22,8 +22,8 @@ export const useProfileStore = defineStore('profile', () => {
   // actions
   const getCurrentUserProfile = async () => {
     try {
-      const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated) {
+      const { isAuthenticated, accessToken } = userStore.getCurrentAuthInfo
+      if (!accessToken || !isAuthenticated) {
         alertStore.setAlert('No user authentication found, please login')
         return
       }
@@ -33,7 +33,7 @@ export const useProfileStore = defineStore('profile', () => {
       // })
       const { data: res, error } = await useFetch<ProfileType>('/api/profile', {
         method: 'GET',
-        headers: { Authorization: cookie.value },
+        headers: { Authorization: accessToken },
       })
       if (!res.value || error.value !== null) {
         userProfile.value = null
@@ -47,8 +47,8 @@ export const useProfileStore = defineStore('profile', () => {
   }
   const postNewUserProfile = async () => {
     try {
-      const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated) {
+      const { isAuthenticated, accessToken } = userStore.getCurrentAuthInfo
+      if (!accessToken || !isAuthenticated) {
         alertStore.setAlert('No user authentication found, please login')
         return
       }
@@ -58,7 +58,7 @@ export const useProfileStore = defineStore('profile', () => {
       // })
       const { data: res, error } = await useFetch<ProfileType>('/api/profile', {
         method: 'POST',
-        headers: { Authorization: cookie.value },
+        headers: { Authorization: accessToken },
       })
       if (!res.value || error.value !== null) {
         alertStore.setAlert(
@@ -77,8 +77,8 @@ export const useProfileStore = defineStore('profile', () => {
   }
   const updateUserProfilePicture = async (payload: FormData) => {
     try {
-      const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated) {
+      const { isAuthenticated, accessToken } = userStore.getCurrentAuthInfo
+      if (!accessToken || !isAuthenticated) {
         alertStore.setAlert('No user authentication found, please login')
         return
       }
@@ -95,7 +95,7 @@ export const useProfileStore = defineStore('profile', () => {
         {
           method: 'PUT',
           headers: {
-            Authorization: cookie.value,
+            Authorization: accessToken,
             'Content-Type': 'multipart/form-data',
           },
           body: payload,
@@ -118,8 +118,8 @@ export const useProfileStore = defineStore('profile', () => {
   const updateUserPlansOrder = async (payload: { plansOrder: string[] }) => {
     try {
       const { plansOrder } = payload
-      const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated) {
+      const { isAuthenticated, accessToken } = userStore.getCurrentAuthInfo
+      if (!accessToken || !isAuthenticated) {
         alertStore.setAlert('No user authentication found, please login')
         return
       }
@@ -131,6 +131,7 @@ export const useProfileStore = defineStore('profile', () => {
         '/api/profile/plans-order',
         {
           method: 'PUT',
+          headers: { Authorization: accessToken },
           body: { plansOrder },
         }
       )
@@ -150,8 +151,8 @@ export const useProfileStore = defineStore('profile', () => {
   const toggleUserDarkMode = async (payload: { dark: boolean }) => {
     try {
       const { dark } = payload
-      const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated) {
+      const { isAuthenticated, accessToken } = userStore.getCurrentAuthInfo
+      if (!accessToken || !isAuthenticated) {
         alertStore.setAlert('No user authentication found, please login')
         return
       }
@@ -163,6 +164,7 @@ export const useProfileStore = defineStore('profile', () => {
         '/api/profile/dark',
         {
           method: 'PUT',
+          headers: { Authorization: accessToken },
           body: { dark },
         }
       )
