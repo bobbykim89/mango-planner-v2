@@ -14,7 +14,7 @@ import { PlanInput } from './dto'
 export class PlanController {
   public async getAllPostByUser(e: H3Event<EventHandlerRequest>) {
     const plans = await Plan.find({ author: e.context.user.id }).sort({
-      date: -1,
+      updatedAt: -1,
     })
     if (!plans) {
       throw createError({
@@ -104,6 +104,55 @@ export class PlanController {
       return body as PlanInput
     })
 
+    const plan = await Plan.findById(planId)
+
+    if (!plan) {
+      throw createError({
+        status: 404,
+        message: 'Not found',
+        statusMessage: 'Plan not found',
+      })
+    }
+    if (plan.author?.toString() !== user.id) {
+      throw createError({
+        status: 401,
+        message: 'Access denied',
+        statusMessage:
+          'Access denied: Current user is not authorized to update this item',
+      })
+    }
+    const updatedPlan = await Plan.findByIdAndUpdate(
+      planId,
+      { ...body, updatedAt: new Date() },
+      {
+        new: true,
+        returnDocument: 'after',
+      }
+    )
+    return updatedPlan
+  }
+  public async togglePlanCompleteById(e: H3Event<EventHandlerRequest>) {
+    const user = e.context.user
+    const planId = getRouterParam(e, 'id')
+    // validator
+    const body = await readValidatedBody(e, (body) => {
+      if (!body) {
+        throw createError({
+          status: 403,
+          message: 'Validation error',
+          statusMessage: 'Invalid client request',
+        })
+      }
+      const { complete } = body as PlanInput
+      if (typeof complete === 'undefined' || complete === null) {
+        throw createError({
+          status: 403,
+          message: 'Validation error',
+          statusMessage: "Validation error: complete can't be null.",
+        })
+      }
+      return body as PlanInput
+    })
     const plan = await Plan.findById(planId)
 
     if (!plan) {
