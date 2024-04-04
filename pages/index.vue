@@ -15,6 +15,7 @@ const profileStore = useProfileStore()
 const planStore = usePlanStore()
 const { isAuthenticated } = storeToRefs(userStore)
 const { userProfile } = storeToRefs(profileStore)
+const { plans } = storeToRefs(planStore)
 const searchTerm = ref<string>('')
 const modalRef = ref<InstanceType<typeof Modal>>()
 const modalForm = ref<ModalFormType>('new')
@@ -51,13 +52,14 @@ const openModal = () => {
   modalForm.value = 'new'
   modalRef.value!.open()
 }
-const onModalClose = () => {
+const closeModal = () => {
+  modalRef.value?.close()
+}
+const onClear = () => {
   selectedPost.value = ''
   updateDataForm.title = ''
   updateDataForm.content = ''
   updateDataForm.type = 'personal'
-  console.log(updateDataForm)
-  console.log(selectedPost.value)
 }
 const updateSearchTerm = (text: string) => {
   searchTerm.value = text
@@ -66,11 +68,18 @@ const updateSearchTerm = (text: string) => {
 const handleNewFormSubmit = async (e: Event, item: PlanFormInput) => {
   e.preventDefault()
   // console.log(item)
+  console.log('from submit form', item)
   await planStore.createNewPost(item)
   modalRef.value?.close()
 }
-const handleCollapseToggle = (e: Event, complete: boolean) => {
-  console.log(e, complete)
+const handleCollapseToggle = async (
+  e: Event,
+  id: string,
+  complete: boolean
+) => {
+  console.log(e, id, complete)
+  await planStore.updatePost({ id, body: { complete: !complete } })
+  onClear()
 }
 const handleCollapseEdit = (e: Event, item: InstanceType<typeof Plan>) => {
   modalForm.value = 'update'
@@ -82,12 +91,10 @@ const handleCollapseEdit = (e: Event, item: InstanceType<typeof Plan>) => {
   }
   modalRef.value?.open()
 }
-const onEditSubmit = (e: Event, data: PlanFormInput) => {
-  console.log(data)
-  selectedPost.value = ''
-  updateDataForm.title = ''
-  updateDataForm.content = ''
-  updateDataForm.type = 'personal'
+const onEditSubmit = async (e: Event, data: PlanFormInput) => {
+  console.log(selectedPost.value, data)
+  await planStore.updatePost({ id: selectedPost.value, body: data })
+  onClear()
   modalRef.value?.close()
 }
 const handleCollapseDelete = async (e: Event, id: string) => {
@@ -102,12 +109,16 @@ const getPlans = computed(() => {
     return planStore.getPlansByOrder
   }
   return planStore.getAllPlans
+  // return plans.value
 })
 </script>
 
 <template>
   <section class="container py-md lg:py-lg">
-    <div class="grid md:grid-cols-2 gap-sm grid-flow-row">
+    <div
+      class="grid md:grid-cols-2 gap-sm grid-flow-row"
+      @keyup.esc="closeModal(), onClear()"
+    >
       <div class="px-xs md:px-0">
         <!-- input form desktop -->
         <div class="bg-dark-3 rounded-md p-md drop-shadow-md hidden md:block">
@@ -132,12 +143,13 @@ const getPlans = computed(() => {
         Search term: {{ searchTerm }} Sort logic: {{ displayStyle }}
         <div>
           <PlanCollapsable
-            v-for="(item, idx) in getPlans"
+            v-for="item in getPlans"
             :item="item"
-            :key="idx"
+            :key="item._id.toString()"
             @toggle-complete="handleCollapseToggle"
             @edit="handleCollapseEdit"
             @delete="handleCollapseDelete"
+            class="mb-xs last:mb-0"
           ></PlanCollapsable>
         </div>
       </div>
@@ -148,7 +160,7 @@ const getPlans = computed(() => {
       color="dark-3"
       title="New Plan"
       class-name="px-xs rounded-md"
-      @close="onModalClose"
+      @close="onClear"
     >
       <template #header="{ close }">
         <div class="flex justify-between py-xs border-b-2">
@@ -156,7 +168,7 @@ const getPlans = computed(() => {
             <span v-if="modalForm === 'new'">Create New Plan</span>
             <span v-else>Update Plan</span>
           </h3>
-          <button @click="onModalClose(), close()">
+          <button @click="onClear(), close()">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               height="1em"
