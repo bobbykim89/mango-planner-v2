@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
 import { ref, computed } from 'vue'
 import { useUserStore, useAlertStore, useInitPiniaStore } from './'
 import { Profile } from '@/server/models'
@@ -10,7 +10,8 @@ export const useProfileStore = defineStore('profile', () => {
   const userStore = useUserStore()
   const initPiniaStore = useInitPiniaStore()
   const cookie = useAuthToken()
-  const { isAuthenticated } = userStore.getCurrentAuthInfo
+  // const { isAuthenticated } = userStore.getCurrentAuthInfo
+  const { isAuthenticated } = storeToRefs(userStore)
   // state
   const userProfile = ref<ProfileType | null>(null)
   // getters
@@ -22,8 +23,7 @@ export const useProfileStore = defineStore('profile', () => {
   })
   // actions
   const getCurrentUserProfile = async () => {
-    const { isAuthenticated } = userStore.getCurrentAuthInfo
-    if (!cookie.value || !isAuthenticated) {
+    if (!cookie.value || !isAuthenticated.value) {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
@@ -41,7 +41,7 @@ export const useProfileStore = defineStore('profile', () => {
     initPiniaStore.setLoading(false)
   }
   const postNewUserProfile = async () => {
-    if (!cookie.value || !isAuthenticated) {
+    if (!cookie.value || !isAuthenticated.value) {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
@@ -62,7 +62,7 @@ export const useProfileStore = defineStore('profile', () => {
     alertStore.setAlert('Successfully created user profile!')
   }
   const updateUserProfilePicture = async (payload: FormData) => {
-    if (!cookie.value || !isAuthenticated) {
+    if (!cookie.value || !isAuthenticated.value) {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
@@ -87,7 +87,7 @@ export const useProfileStore = defineStore('profile', () => {
     alertStore.setAlert('Successfully updated profile picture!')
   }
   const updateUserPlansOrder = async (payload: { plansOrder: string[] }) => {
-    if (!cookie.value || !isAuthenticated) {
+    if (!cookie.value || !isAuthenticated.value) {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
@@ -108,7 +108,7 @@ export const useProfileStore = defineStore('profile', () => {
     initPiniaStore.setLoading(false)
   }
   const toggleUserDarkMode = async (payload: { dark: boolean }) => {
-    if (!cookie.value || !isAuthenticated) {
+    if (!cookie.value || !isAuthenticated.value) {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
