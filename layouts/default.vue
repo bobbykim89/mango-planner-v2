@@ -3,7 +3,12 @@ import MPLogo from '@/assets/images/logo.png'
 import { CtaTarget, HeaderHorizontal, Alert } from '@bobbykim/manguito-theme'
 import type { MenuItemType, SocialUrl } from '@bobbykim/mcl-footer'
 import { MclFooterA } from '@bobbykim/mcl-footer'
-import { useInitPiniaStore, useAlertStore, useUserStore } from '@/stores'
+import {
+  useInitPiniaStore,
+  useAlertStore,
+  useUserStore,
+  usePlanStore,
+} from '@/stores'
 import { storeToRefs } from 'pinia'
 
 const router = useRouter()
@@ -11,9 +16,11 @@ const initPiniaStore = useInitPiniaStore()
 await useAsyncData('initPinia', () => initPiniaStore.initStores())
 const alertStore = useAlertStore()
 const userStore = useUserStore()
+const planStore = usePlanStore()
 const { loading } = storeToRefs(initPiniaStore)
 const { alert } = storeToRefs(alertStore)
 const { currentUser } = storeToRefs(userStore)
+const { plans } = storeToRefs(planStore)
 
 const footerMenuItems: MenuItemType[] = [
   {
@@ -62,6 +69,9 @@ const handleFooterMenuClick = (e: Event, item: MenuItemType) => {
 const onAlertClose = () => {
   alertStore.clearAlert()
 }
+// onMounted(() => {
+//   initPiniaStore.initStores()
+// })
 </script>
 
 <template>
@@ -128,8 +138,10 @@ const onAlertClose = () => {
           </div>
         </Alert>
       </div>
+      <div>Loading: {{ loading }}</div>
       <div v-if="!loading">
-        {{ currentUser }}
+        <div>current user: {{ currentUser }}</div>
+        <div>plans: {{ plans }}</div>
       </div>
       <slot />
     </div>

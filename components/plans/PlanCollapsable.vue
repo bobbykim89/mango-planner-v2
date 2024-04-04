@@ -16,7 +16,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'toggle-complete', event: Event, complete: boolean): void
+  (e: 'toggle-complete', event: Event, id: string, complete: boolean): void
   (e: 'edit', event: Event, item: PlanItemType): void
   (e: 'delete', event: Event, id: string): void
 }>()
@@ -49,8 +49,8 @@ const getBgColor = computed<string>(() => {
 })
 
 const handleToggleCompleteClick = (e: Event) => {
-  const { complete } = props.item
-  emit('toggle-complete', e, complete)
+  const { _id, complete } = props.item
+  emit('toggle-complete', e, _id.toString(), complete)
 }
 const handleEditClick = (e: Event) => {
   const { item } = props
@@ -114,7 +114,10 @@ watch(
     >
       <div class="py-xs">
         <div class="flex gap-2xs">
-          <div class="w-full pl-xs pr-2xs" v-html="item.content"></div>
+          <div
+            class="w-full pl-xs pr-2xs whitespace-pre-line text-light-3"
+            v-html="item.content"
+          ></div>
           <div
             class="px-xs border-l border-light-3 flex flex-col items-center gap-2xs text-light-3"
           >

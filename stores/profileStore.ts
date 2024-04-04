@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useCookie, useFetch } from '#imports'
-import { useUserStore, useAlertStore } from './'
+import { useUserStore, useAlertStore, useInitPiniaStore } from './'
 import { Profile } from '@/server/models'
 
 type ProfileType = InstanceType<typeof Profile>
@@ -9,6 +9,7 @@ type ProfileType = InstanceType<typeof Profile>
 export const useProfileStore = defineStore('profile', () => {
   const alertStore = useAlertStore()
   const userStore = useUserStore()
+  const initPiniaStore = useInitPiniaStore()
   const cookie = useAuthToken()
   // state
   const userProfile = ref<ProfileType | null>(null)
@@ -21,29 +22,63 @@ export const useProfileStore = defineStore('profile', () => {
   })
   // actions
   const getCurrentUserProfile = async () => {
-    try {
-      const { isAuthenticated, accessToken } = userStore.getCurrentAuthInfo
-      if (!accessToken || !isAuthenticated) {
-        alertStore.setAlert('No user authentication found, please login')
-        return
-      }
-      // const res: ProfileType = await $fetch('/api/profile', {
-      //   method: 'GET',
-      //   headers: { Authorization: cookie.value },
-      // })
-      const { data: res, error } = await useFetch<ProfileType>('/api/profile', {
-        method: 'GET',
-        headers: { Authorization: accessToken },
-      })
-      if (!res.value || error.value !== null) {
-        userProfile.value = null
-        return
-      }
-      userProfile.value = res.value
-    } catch (error) {
-      alertStore.setAlert('Authentication error: Cannot bring user profile')
-      userProfile.value = null
+    // try {
+    const { isAuthenticated, accessToken } = userStore.getCurrentAuthInfo
+    if (!cookie.value || !isAuthenticated) {
+      alertStore.setAlert('No user authentication found, please login')
+      return
     }
+    // const res: ProfileType = await $fetch('/api/profile', {
+    //   method: 'GET',
+    //   headers: { Authorization: cookie.value },
+    // })
+    // const {
+    //   data: res,
+    //   pending,
+    //   error,
+    // } = await useFetch<ProfileType>('/api/profile', {
+    //   method: 'GET',
+    //   // headers: { Authorization: accessToken },
+    //   onRequest({ options }) {
+    //     options.headers = {
+    //       ...options.headers,
+    //       Authorization: accessToken,
+    //     }
+    //     console.log('sending request')
+    //   },
+    //   onResponseError() {
+    //     console.log('error happened during calling user profile', {
+    //       access_token: accessToken,
+    //     })
+    //   },
+    // })
+    // console.log({
+    //   pending: pending.value,
+    //   res: res.value,
+    // })
+    // initPiniaStore.setLoading(pending.value)
+    // if (!pending.value && !res.value) {
+    //   userProfile.value = null
+    //   initPiniaStore.setLoading(false)
+    //   return
+    // }
+    // userProfile.value = res.value
+    const res = await $fetch<ProfileType | null>('/api/profile', {
+      method: 'GET',
+      headers: { Authorization: cookie.value },
+    })
+    initPiniaStore.setLoading(true)
+    if (!res) {
+      userProfile.value = null
+      initPiniaStore.setLoading(false)
+      return
+    }
+    userProfile.value = res
+    initPiniaStore.setLoading(false)
+    // } catch (error) {
+    //   alertStore.setAlert('Authentication error: Cannot bring user profile')
+    //   userProfile.value = null
+    // }
   }
   const postNewUserProfile = async () => {
     try {
@@ -56,17 +91,30 @@ export const useProfileStore = defineStore('profile', () => {
       //   method: 'POST',
       //   headers: { Authorization: cookie.value },
       // })
-      const { data: res, error } = await useFetch<ProfileType>('/api/profile', {
+      const {
+        data: res,
+        pending,
+        error,
+      } = await useFetch<ProfileType>('/api/profile', {
         method: 'POST',
-        headers: { Authorization: accessToken },
+        // headers: { Authorization: accessToken },
+        onRequest({ options }) {
+          options.headers = {
+            ...options.headers,
+            Authorization: accessToken,
+          }
+        },
       })
-      if (!res.value || error.value !== null) {
+      initPiniaStore.setLoading(pending.value)
+      if (!pending.value && !res.value) {
         alertStore.setAlert(
           'Failed to get response from server, please try again'
         )
+        initPiniaStore.setLoading(false)
         return
       }
       await getCurrentUserProfile()
+      initPiniaStore.setLoading(false)
       alertStore.setAlert('Successfully created user profile!')
     } catch (error) {
       alertStore.setAlert(
@@ -90,24 +138,35 @@ export const useProfileStore = defineStore('profile', () => {
       //   },
       //   body: payload,
       // })
-      const { data: res, error } = await useFetch<ProfileType>(
-        '/api/profile/profile-picture',
-        {
-          method: 'PUT',
-          headers: {
+      const {
+        data: res,
+        pending,
+        error,
+      } = await useFetch<ProfileType>('/api/profile/profile-picture', {
+        method: 'PUT',
+        // headers: {
+        //   Authorization: accessToken,
+        //   'Content-Type': 'multipart/form-data',
+        // },
+        // body: payload,
+        onRequest({ options }) {
+          ;(options.headers = {
+            ...options.headers,
             Authorization: accessToken,
-            'Content-Type': 'multipart/form-data',
-          },
-          body: payload,
-        }
-      )
-      if (!res.value || error.value !== null) {
+          }),
+            (options.body = payload)
+        },
+      })
+      initPiniaStore.setLoading(pending.value)
+      if (!pending.value && !res.value) {
         alertStore.setAlert(
           'Failed to get response from server, please try again'
         )
+        initPiniaStore.setLoading(false)
         return
       }
       await getCurrentUserProfile()
+      initPiniaStore.setLoading(false)
       alertStore.setAlert('Successfully updated profile picture!')
     } catch (error) {
       alertStore.setAlert(
@@ -117,7 +176,7 @@ export const useProfileStore = defineStore('profile', () => {
   }
   const updateUserPlansOrder = async (payload: { plansOrder: string[] }) => {
     try {
-      const { plansOrder } = payload
+      // const { plansOrder } = payload
       const { isAuthenticated, accessToken } = userStore.getCurrentAuthInfo
       if (!accessToken || !isAuthenticated) {
         alertStore.setAlert('No user authentication found, please login')
@@ -127,21 +186,32 @@ export const useProfileStore = defineStore('profile', () => {
       //   method: 'PUT',
       //   body: { plansOrder },
       // })
-      const { data: res, error } = await useFetch<ProfileType>(
-        '/api/profile/plans-order',
-        {
-          method: 'PUT',
-          headers: { Authorization: accessToken },
-          body: { plansOrder },
-        }
-      )
-      if (!res.value || error.value !== null) {
+      const {
+        data: res,
+        pending,
+        error,
+      } = await useFetch<ProfileType>('/api/profile/plans-order', {
+        method: 'PUT',
+        // headers: { Authorization: accessToken },
+        // body: { plansOrder },
+        onRequest({ options }) {
+          options.headers = {
+            ...options.headers,
+            Authorization: accessToken,
+          }
+          options.body = payload
+        },
+      })
+      initPiniaStore.setLoading(pending.value)
+      if (!pending.value && !res.value) {
         alertStore.setAlert(
           'Failed to get response from server, please try again'
         )
+        initPiniaStore.setLoading(false)
         return
       }
       await getCurrentUserProfile()
+      initPiniaStore.setLoading(false)
     } catch (error) {
       alertStore.setAlert(
         'Failed to update plans order, please try again later.'
@@ -150,7 +220,7 @@ export const useProfileStore = defineStore('profile', () => {
   }
   const toggleUserDarkMode = async (payload: { dark: boolean }) => {
     try {
-      const { dark } = payload
+      // const { dark } = payload
       const { isAuthenticated, accessToken } = userStore.getCurrentAuthInfo
       if (!accessToken || !isAuthenticated) {
         alertStore.setAlert('No user authentication found, please login')
@@ -160,21 +230,32 @@ export const useProfileStore = defineStore('profile', () => {
       //   method: 'PUT',
       //   body: { dark },
       // })
-      const { data: res, error } = await useFetch<ProfileType>(
-        '/api/profile/dark',
-        {
-          method: 'PUT',
-          headers: { Authorization: accessToken },
-          body: { dark },
-        }
-      )
-      if (!res.value || error.value !== null) {
+      const {
+        data: res,
+        pending,
+        error,
+      } = await useFetch<ProfileType>('/api/profile/dark', {
+        method: 'PUT',
+        // headers: { Authorization: accessToken },
+        // body: { dark },
+        onRequest({ options }) {
+          options.headers = {
+            ...options.headers,
+            Authorization: accessToken,
+          }
+          options.body = payload
+        },
+      })
+      initPiniaStore.setLoading(pending.value)
+      if (!pending.value && !res.value) {
         alertStore.setAlert(
           'Failed to get response from server, please try again'
         )
+        initPiniaStore.setLoading(false)
         return
       }
       await getCurrentUserProfile()
+      initPiniaStore.setLoading(false)
       alertStore.setAlert(
         `Darkmode ${userProfile.value?.dark ? 'enabled' : 'disabled'}`
       )

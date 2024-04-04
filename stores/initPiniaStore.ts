@@ -11,9 +11,18 @@ export const useInitPiniaStore = defineStore('init', () => {
   // actions
   const initStores = async () => {
     await userStore.getCurrentUser()
-    await profileStore.getCurrentUserProfile()
-    await planStore.getAllPostByUser()
-    loading.value = false
+    const { isAuthenticated } = userStore.getCurrentAuthInfo
+    if (isAuthenticated && loading.value === false) {
+      console.log('calling profile')
+      await profileStore.getCurrentUserProfile()
+      console.log('calling posts')
+      await planStore.getAllPostByUser()
+      console.log('finish calling posts')
+      loading.value = false
+    }
   }
-  return { loading, initStores }
+  const setLoading = (value: boolean) => {
+    loading.value = value
+  }
+  return { loading, initStores, setLoading }
 })
