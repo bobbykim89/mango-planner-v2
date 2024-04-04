@@ -78,7 +78,7 @@ const handleCollapseToggle = async (
   complete: boolean
 ) => {
   console.log(e, id, complete)
-  await planStore.updatePost({ id, body: { complete: !complete } })
+  await planStore.toggleComplete({ id, body: { complete: !complete } })
   onClear()
 }
 const handleCollapseEdit = (e: Event, item: InstanceType<typeof Plan>) => {
