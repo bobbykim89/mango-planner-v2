@@ -179,7 +179,7 @@ export class ProfileController {
         })
       }
       const { dark } = body as Partial<ProfileInput>
-      if (!dark) {
+      if (typeof dark === 'undefined' || dark === null) {
         throw createError({
           status: 403,
           message: 'Validation error',

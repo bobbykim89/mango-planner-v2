@@ -1,4 +1,4 @@
-import { defineStore, storeToRefs } from 'pinia'
+import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useUserStore, useAlertStore, useInitPiniaStore } from './'
 import { Profile } from '@/server/models'

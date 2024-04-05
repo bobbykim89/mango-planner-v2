@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Collapse, vCollapse } from '@bobbykim/manguito-theme'
-import { MclCollapseA } from '@bobbykim/mcl-collapse'
 import { Plan } from '@/server/models'
 
 type PlanItemType = InstanceType<typeof Plan>
@@ -184,22 +183,4 @@ watch(
       </svg>
     </div>
   </div>
-  <!-- <MclCollapseA
-    :collapse-id="item._id.toString()"
-    :title="item.title"
-    :bg-color="getBgColor"
-    slot-bg-color="light-4"
-    border-color="light-4"
-    icon-color="light-2"
-    title-color="light-3"
-    :highlight-color="item.complete ? 'success' : 'danger'"
-    rounded
-  >
-    <template #tab>
-      <div>{{ item.complete }}</div>
-    </template>
-    <template #content>
-      <div v-html="item.content"></div>
-    </template>
-  </MclCollapseA> -->
 </template>

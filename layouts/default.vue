@@ -16,7 +16,11 @@ import {
   useProfileStore,
 } from '@/stores'
 import { storeToRefs } from 'pinia'
+import WeatherWidget from '@/components/widget/WeatherWidget.vue'
+import DarkmodeWidget from '@/components/widget/DarkmodeWidget.vue'
+import { useGeolocation } from '@vueuse/core'
 
+const config = useRuntimeConfig()
 const router = useRouter()
 const initPiniaStore = useInitPiniaStore()
 await useAsyncData('initPinia', () => initPiniaStore.initStores())
@@ -30,6 +34,7 @@ const { currentUser, isAuthenticated } = storeToRefs(userStore)
 const { userProfile } = storeToRefs(profileStore)
 const { plans } = storeToRefs(planStore)
 const sidebarRef = ref<InstanceType<typeof Sidebar>>()
+const { coords } = useGeolocation()
 
 const footerMenuItems: MenuItemType[] = [
   {
@@ -73,7 +78,6 @@ const handleAuthClick = (e: Event, url: string) => {
 }
 const sidebarOpen = (e: Event) => {
   e.preventDefault()
-  console.log('username click')
   sidebarRef.value?.open()
 }
 const sidebarClose = () => {
@@ -89,6 +93,10 @@ const onAlertClose = () => {
 const onLogout = () => {
   userStore.logoutUser()
   sidebarClose()
+}
+const onDarkModeClick = async (e: Event, dark: boolean) => {
+  e.preventDefault()
+  await profileStore.toggleUserDarkMode({ dark: !dark })
 }
 </script>
 
@@ -186,7 +194,20 @@ const onLogout = () => {
           </div>
         </template>
         <template #body>
-          <div class="text-light-3">body text</div>
+          <div class="text-light-3 py-xs px-xs">
+            <WeatherWidget
+              v-if="coords.latitude !== null && coords.latitude !== Infinity"
+              :latitude="coords.latitude"
+              :longitude="coords.longitude"
+              :api-key="config.public.openWeatherApiKey"
+            ></WeatherWidget>
+            <div v-if="userProfile !== null" class="mt-xs">
+              <DarkmodeWidget
+                :dark="userProfile.dark"
+                @dark-click="onDarkModeClick"
+              ></DarkmodeWidget>
+            </div>
+          </div>
         </template>
         <template #footer>
           <div class="text-light-3 flex justify-center items-center">
