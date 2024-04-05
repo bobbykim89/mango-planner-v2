@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { useCookie, useFetch } from '#imports'
 import {
   useAlertStore,
   useInitPiniaStore,
