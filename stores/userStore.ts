@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import { useCookie, useFetch } from '#imports'
-import { useAlertStore, useInitPiniaStore } from './'
+import {
+  useAlertStore,
+  useInitPiniaStore,
+  usePlanStore,
+  useProfileStore,
+} from './'
 import { User } from '@/server/models'
 import { ref, computed } from 'vue'
 
@@ -13,6 +18,8 @@ interface AuthToken {
 export const useUserStore = defineStore('user', () => {
   const alertStore = useAlertStore()
   const initPiniaStore = useInitPiniaStore()
+  const planStore = usePlanStore()
+  const profileStore = useProfileStore()
   const cookie = useAuthToken()
   // state
   const currentUser = ref<UserType | null>(null)
@@ -136,6 +143,8 @@ export const useUserStore = defineStore('user', () => {
     cookie.value = null
     currentUser.value = null
     isAuthenticated.value = false
+    planStore.clearPlanData()
+    profileStore.clearProfileData()
     initPiniaStore.setLoading(false)
     alertStore.setAlert('Logout Successful!')
   }

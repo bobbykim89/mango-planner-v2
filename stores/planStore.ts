@@ -17,7 +17,6 @@ export const usePlanStore = defineStore('plan', () => {
   const profileStore = useProfileStore()
   const userStore = useUserStore()
   const initPinaStore = useInitPiniaStore()
-  const { isAuthenticated } = storeToRefs(userStore)
   // state
   const plans = ref<PlanType[]>([])
   // getters
@@ -57,7 +56,8 @@ export const usePlanStore = defineStore('plan', () => {
   })
   // actions
   const getAllPostByUser = async () => {
-    if (!cookie.value || !isAuthenticated.value) {
+    const { isAuthenticated } = userStore.getCurrentAuthInfo
+    if (!cookie.value || !isAuthenticated) {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
@@ -75,7 +75,8 @@ export const usePlanStore = defineStore('plan', () => {
     initPinaStore.setLoading(false)
   }
   const createNewPost = async (payload: PlanInput) => {
-    if (!cookie.value || !isAuthenticated.value) {
+    const { isAuthenticated } = userStore.getCurrentAuthInfo
+    if (!cookie.value || !isAuthenticated) {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
@@ -97,7 +98,8 @@ export const usePlanStore = defineStore('plan', () => {
     alertStore.setAlert('Successfully created new plan!')
   }
   const updatePost = async (payload: { id: string; body: PlanInput }) => {
-    if (!cookie.value || !isAuthenticated.value) {
+    const { isAuthenticated } = userStore.getCurrentAuthInfo
+    if (!cookie.value || !isAuthenticated) {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
@@ -119,7 +121,8 @@ export const usePlanStore = defineStore('plan', () => {
     alertStore.setAlert('Successfully updated plan!')
   }
   const toggleComplete = async (payload: { id: string; body: PlanInput }) => {
-    if (!cookie.value || !isAuthenticated.value) {
+    const { isAuthenticated } = userStore.getCurrentAuthInfo
+    if (!cookie.value || !isAuthenticated) {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
@@ -145,7 +148,8 @@ export const usePlanStore = defineStore('plan', () => {
     )
   }
   const deletePost = async (payload: string) => {
-    if (!cookie.value || !isAuthenticated.value) {
+    const { isAuthenticated } = userStore.getCurrentAuthInfo
+    if (!cookie.value || !isAuthenticated) {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
@@ -165,6 +169,9 @@ export const usePlanStore = defineStore('plan', () => {
     initPinaStore.setLoading(false)
     alertStore.setAlert('Successfully deleted plan!')
   }
+  const clearPlanData = () => {
+    plans.value = []
+  }
   return {
     plans,
     getAllPlans,
@@ -175,5 +182,6 @@ export const usePlanStore = defineStore('plan', () => {
     updatePost,
     toggleComplete,
     deletePost,
+    clearPlanData,
   }
 })
