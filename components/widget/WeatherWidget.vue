@@ -60,7 +60,7 @@ const iconSrc = computed<string | null>(() => {
 
 <template>
   <div class="px-xs py-2xs bg-dark-4 rounded-md drop-shadow-md">
-    <div class="flex items-center gap-xs">
+    <div class="flex items-center gap-xs justify-center">
       <img
         v-if="iconSrc"
         :src="iconSrc"
