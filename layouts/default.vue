@@ -18,6 +18,7 @@ import {
 import { storeToRefs } from 'pinia'
 import WeatherWidget from '@/components/widget/WeatherWidget.vue'
 import DarkmodeWidget from '@/components/widget/DarkmodeWidget.vue'
+import UserInfoWidget from '@/components/widget/UserInfoWidget.vue'
 import { useGeolocation } from '@vueuse/core'
 
 const config = useRuntimeConfig()
@@ -35,6 +36,7 @@ const { userProfile } = storeToRefs(profileStore)
 const { plans } = storeToRefs(planStore)
 const sidebarRef = ref<InstanceType<typeof Sidebar>>()
 const { coords } = useGeolocation()
+const fileDataRef = ref<File | undefined>(undefined)
 
 const footerMenuItems: MenuItemType[] = [
   {
@@ -97,7 +99,33 @@ const onLogout = () => {
 const onDarkModeClick = async (e: Event, dark: boolean) => {
   e.preventDefault()
   await profileStore.toggleUserDarkMode({ dark: !dark })
+  // useColorMode().preference = dark ? 'dark' : 'light'
 }
+const onUsernameChange = async (e: Event, name: string) => {
+  e.preventDefault()
+  console.log(name)
+  await userStore.updateUsername({ username: name })
+}
+const onFileUpload = async (e: Event, file: File) => {
+  e.preventDefault()
+  const fileFormData = new FormData()
+  // fileDataRef.value = file
+  fileFormData.append('image', file)
+  // for (let item of fileFormData.entries()) {
+  //   console.log(item[0] + ',' + item[1])
+  // }
+  await profileStore.updateUserProfilePicture(fileFormData)
+  // console.log(file)
+}
+watch(
+  () => userProfile.value,
+  (newValue) => {
+    if (userProfile.value === null) {
+      useColorMode().preference = 'light'
+    }
+    useColorMode().preference = newValue?.dark ? 'dark' : 'light'
+  }
+)
 </script>
 
 <template>
@@ -175,6 +203,7 @@ const onDarkModeClick = async (e: Event, dark: boolean) => {
         color="dark-3"
         placement="right"
         class-name="border-l-4 border-warning"
+        width="400"
       >
         <template #header="{ close }">
           <div class="flex items-center py-2xs px-3xs bg-dark-3 drop-shadow-md">
@@ -205,7 +234,12 @@ const onDarkModeClick = async (e: Event, dark: boolean) => {
               <DarkmodeWidget
                 :dark="userProfile.dark"
                 @dark-click="onDarkModeClick"
+                class="mb-xs"
               ></DarkmodeWidget>
+              <UserInfoWidget
+                @on-username-update="onUsernameChange"
+                @on-file-upload="onFileUpload"
+              ></UserInfoWidget>
             </div>
           </div>
         </template>

@@ -67,6 +67,10 @@ export const useProfileStore = defineStore('profile', () => {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
+    for (let item of payload.entries()) {
+      console.log(item[0] + ',' + item[1])
+    }
+    // console.log(payload)
     const res = await $fetch<ProfileType>('/api/profile/profile-picture', {
       method: 'PUT',
       headers: {

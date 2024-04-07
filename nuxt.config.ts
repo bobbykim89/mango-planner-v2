@@ -14,7 +14,7 @@ export default defineNuxtConfig({
       openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
     },
   },
-  modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss'],
+  modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode'],
   typescript: {
     typeCheck: true,
     strict: true,
@@ -25,6 +25,15 @@ export default defineNuxtConfig({
         types: ['vite/client'],
       },
     },
+  },
+  colorMode: {
+    classSuffix: '',
+  },
+  tailwindcss: {
+    cssPath: '~/assets/css/tailwind.css',
+    configPath: 'tailwind.config.js',
+    exposeConfig: false,
+    viewer: true,
   },
   build: {
     transpile: ['@bobbykim'],

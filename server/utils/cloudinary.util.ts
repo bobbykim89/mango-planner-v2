@@ -12,7 +12,7 @@ cloudinary.config({
 
 export const uploadCloudinary = async (e: H3Event, key: string = 'image') => {
   const body = await readMultipartFormData(e)
-
+  console.log(body)
   if (!body) {
     throw createError({
       status: 404,
@@ -20,6 +20,7 @@ export const uploadCloudinary = async (e: H3Event, key: string = 'image') => {
       statusMessage: 'Request body not found, please try again',
     })
   }
+  // console.log(body)
   const file = body.find((item) => {
     return item.name === key
   })
