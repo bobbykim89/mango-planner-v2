@@ -103,19 +103,20 @@ const onDarkModeClick = async (e: Event, dark: boolean) => {
 }
 const onUsernameChange = async (e: Event, name: string) => {
   e.preventDefault()
-  console.log(name)
   await userStore.updateUsername({ username: name })
 }
 const onFileUpload = async (e: Event, file: File) => {
   e.preventDefault()
   const fileFormData = new FormData()
-  // fileDataRef.value = file
   fileFormData.append('image', file)
-  // for (let item of fileFormData.entries()) {
-  //   console.log(item[0] + ',' + item[1])
-  // }
   await profileStore.updateUserProfilePicture(fileFormData)
-  // console.log(file)
+}
+const onPwUpdate = async (e: Event, currPw: string, newPw: string) => {
+  e.preventDefault()
+  await userStore.updatePassword({
+    currentPassword: currPw,
+    newPassword: newPw,
+  })
 }
 watch(
   () => userProfile.value,
@@ -237,8 +238,11 @@ watch(
                 class="mb-xs"
               ></DarkmodeWidget>
               <UserInfoWidget
+                :username="currentUser?.name"
+                :profile-picture="userProfile?.profilePicture"
                 @on-username-update="onUsernameChange"
                 @on-file-upload="onFileUpload"
+                @on-pw-update="onPwUpdate"
               ></UserInfoWidget>
             </div>
           </div>

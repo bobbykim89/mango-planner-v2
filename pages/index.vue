@@ -15,7 +15,6 @@ const profileStore = useProfileStore()
 const planStore = usePlanStore()
 const { isAuthenticated } = storeToRefs(userStore)
 const { userProfile } = storeToRefs(profileStore)
-const { plans } = storeToRefs(planStore)
 const searchTerm = ref<string>('')
 const modalRef = ref<InstanceType<typeof Modal>>()
 const modalForm = ref<ModalFormType>('new')
@@ -36,17 +35,14 @@ const userProfileStatus = computed<boolean>(() => {
 const handleShowAllClick = (e: Event) => {
   e.preventDefault()
   displayStyle.value = 'all'
-  console.log('show all')
 }
 const handleShowIncompleteClick = (e: Event) => {
   e.preventDefault()
   displayStyle.value = 'incomplete'
-  console.log('show incomplete')
 }
 const handleShowCustomClick = (e: Event) => {
   e.preventDefault()
   displayStyle.value = 'custom'
-  console.log('show-custom')
 }
 const openModal = () => {
   modalForm.value = 'new'
@@ -67,8 +63,6 @@ const updateSearchTerm = (text: string) => {
 
 const handleNewFormSubmit = async (e: Event, item: PlanFormInput) => {
   e.preventDefault()
-  // console.log(item)
-  console.log('from submit form', item)
   await planStore.createNewPost(item)
   modalRef.value?.close()
 }
@@ -77,7 +71,6 @@ const handleCollapseToggle = async (
   id: string,
   complete: boolean
 ) => {
-  console.log(e, id, complete)
   await planStore.toggleComplete({ id, body: { complete: !complete } })
   onClear()
 }
@@ -92,13 +85,11 @@ const handleCollapseEdit = (e: Event, item: InstanceType<typeof Plan>) => {
   modalRef.value?.open()
 }
 const onEditSubmit = async (e: Event, data: PlanFormInput) => {
-  console.log(selectedPost.value, data)
   await planStore.updatePost({ id: selectedPost.value, body: data })
   onClear()
   modalRef.value?.close()
 }
 const handleCollapseDelete = async (e: Event, id: string) => {
-  console.log(e, id)
   await planStore.deletePost(id)
 }
 const getPlans = computed(() => {
