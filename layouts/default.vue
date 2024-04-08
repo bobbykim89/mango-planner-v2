@@ -121,20 +121,26 @@ const onDarkModeClick = async (e: Event, dark: boolean) => {
 }
 const onUsernameChange = async (e: Event, name: string) => {
   e.preventDefault()
-  await userStore.updateUsername({ username: name })
+  if (process.client && window.confirm('Please confirm username update')) {
+    await userStore.updateUsername({ username: name })
+  }
 }
 const onFileUpload = async (e: Event, file: File) => {
   e.preventDefault()
   const fileFormData = new FormData()
   fileFormData.append('image', file)
-  await profileStore.updateUserProfilePicture(fileFormData)
+  if (process.client && window.confirm('Please confirm file upload.')) {
+    await profileStore.updateUserProfilePicture(fileFormData)
+  }
 }
 const onPwUpdate = async (e: Event, currPw: string, newPw: string) => {
   e.preventDefault()
-  await userStore.updatePassword({
-    currentPassword: currPw,
-    newPassword: newPw,
-  })
+  if (process.client && window.confirm('Please confirm password update.')) {
+    await userStore.updatePassword({
+      currentPassword: currPw,
+      newPassword: newPw,
+    })
+  }
 }
 const onProfileCreate = async (e: Event) => {
   e.preventDefault()
