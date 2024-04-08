@@ -50,7 +50,7 @@ export const usePlanStore = defineStore('plan', () => {
       order[id] = idx
     })
     const sortedPlans = plans.value.sort((a, b) => {
-      return order[a.id] - order[b.id]
+      return order[a._id.toString()] - order[b._id.toString()]
     })
     return sortedPlans
   })
