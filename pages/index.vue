@@ -22,14 +22,6 @@ useHead({
   ],
 })
 
-useHead({
-  title: 'Mango Planner | Login',
-  meta: [
-    { name: 'description', content: 'login page' },
-    { property: 'og:title', content: 'Mango Planner | Login' },
-  ],
-})
-
 type PlanDisplayStyle = 'all' | 'incomplete' | 'custom' | 'search'
 type ModalFormType = 'new' | 'update'
 const userStore = useUserStore()

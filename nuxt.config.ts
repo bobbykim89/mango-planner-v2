@@ -5,9 +5,9 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       title: 'Mango Planner',
-      // htmlAttrs: {
-      //   lang: 'en',
-      // },
+      htmlAttrs: {
+        lang: 'en',
+      },
       meta: [
         {
           name: 'description',
@@ -36,7 +36,12 @@ export default defineNuxtConfig({
       openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
     },
   },
-  modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode'],
+  modules: [
+    '@pinia/nuxt',
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/color-mode',
+    '@vite-pwa/nuxt',
+  ],
   typescript: {
     typeCheck: true,
     strict: true,
@@ -63,5 +68,54 @@ export default defineNuxtConfig({
   },
   nitro: {
     plugins: ['~/server/plugin/connectDb.ts'],
+  },
+  pwa: {
+    strategies: 'generateSW',
+    manifest: {
+      short_name: 'MangoPlanner',
+      name: 'Mango Planner',
+      description: 'Simple planner app for daily use',
+      icons: [
+        {
+          src: 'favicon.ico',
+          sizes: '48x48',
+          type: 'image/x-icon',
+        },
+        {
+          src: 'mango_planner_logo-192x192.png',
+          sizes: '192x192',
+          type: 'image/png',
+        },
+        {
+          src: 'mango_planner_logo-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+        },
+        {
+          src: 'mango_planner_logo-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any maskable',
+        },
+      ],
+      display: 'standalone',
+      theme_color: '#000000',
+      background_color: '#f1ac18',
+      lang: 'en-US',
+      start_url: '/',
+    },
+    includeAssets: [
+      'favicon.ico',
+      'favicon.svg',
+      'mango_planner_logo-192x192.png',
+      'mango_planner_logo-512x512.png',
+    ],
+    registerType: 'autoUpdate',
+    devOptions: {
+      enabled: true,
+      suppressWarnings: true,
+      navigateFallback: '/',
+      type: 'module',
+    },
   },
 })
