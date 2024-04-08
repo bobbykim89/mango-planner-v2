@@ -8,6 +8,7 @@ import UtilityBlock from '@/components/plans/UtilityBlock.vue'
 import { storeToRefs } from 'pinia'
 import PlanCollapsable from '@/components/plans/PlanCollapsable.vue'
 import { Plan } from '@/server/models'
+import draggable from 'vuedraggable'
 
 definePageMeta({
   middleware: ['auth-route'],
@@ -29,7 +30,7 @@ useHead({
   ],
 })
 
-type PlanDisplayStyle = 'all' | 'incomplete' | 'custom'
+type PlanDisplayStyle = 'all' | 'incomplete' | 'custom' | 'search'
 type ModalFormType = 'new' | 'update'
 const userStore = useUserStore()
 const profileStore = useProfileStore()
@@ -45,6 +46,7 @@ const updateDataForm = reactive<PlanFormInput>({
   content: '',
   type: 'personal',
 })
+const customOrderData = ref<InstanceType<typeof Plan>[]>([])
 const selectedPost = ref<string>('')
 
 const userProfileStatus = computed<boolean>(() => {
@@ -71,6 +73,7 @@ const handleShowIncompleteClick = (e: Event) => {
 }
 const handleShowCustomClick = (e: Event) => {
   e.preventDefault()
+  customOrderData.value = planStore.getPlansByOrder
   displayStyle.value = 'custom'
 }
 const openModal = () => {
@@ -87,12 +90,14 @@ const onClear = () => {
   updateDataForm.type = 'personal'
 }
 const updateSearchTerm = (text: string) => {
+  displayStyle.value = 'search'
   searchTerm.value = text
 }
 
 const handleNewFormSubmit = async (e: Event, item: PlanFormInput) => {
   e.preventDefault()
   await planStore.createNewPost(item)
+  customOrderData.value = planStore.getPlansByOrder
   modalRef.value?.close()
 }
 const handleCollapseToggle = async (
@@ -104,6 +109,7 @@ const handleCollapseToggle = async (
   onClear()
 }
 const handleCollapseEdit = (e: Event, item: InstanceType<typeof Plan>) => {
+  e.preventDefault()
   modalForm.value = 'update'
   selectedPost.value = item._id.toString()
   updateDataForm.title = item.title
@@ -114,38 +120,50 @@ const handleCollapseEdit = (e: Event, item: InstanceType<typeof Plan>) => {
   modalRef.value?.open()
 }
 const onEditSubmit = async (e: Event, data: PlanFormInput) => {
+  e.preventDefault()
   await planStore.updatePost({ id: selectedPost.value, body: data })
   onClear()
   modalRef.value?.close()
 }
 const handleCollapseDelete = async (e: Event, id: string) => {
+  e.preventDefault()
   await planStore.deletePost(id)
+  customOrderData.value = planStore.getPlansByOrder
 }
 const getPlans = computed(() => {
-  if (searchTerm.value !== '') {
+  if (displayStyle.value === 'search') {
     return planStore.getAllPlans.filter((item) => {
       const search = new RegExp(`${searchTerm.value}`, 'gi')
       return item.title.match(search) || item.content?.match(search)
     })
   }
-  if (searchTerm.value === '' && displayStyle.value === 'incomplete') {
+  if (displayStyle.value === 'incomplete') {
     return planStore.getIncompletePlans
   }
-  if (searchTerm.value === '' && displayStyle.value === 'custom') {
-    return planStore.getPlansByOrder
-  }
   return planStore.getAllPlans
-  // return plans.value
 })
+const onOrderUpdate = async () => {
+  const itemsOrder: string[] = customOrderData.value.map((item) => {
+    return item._id.toString()
+  })
+  const titlesOrder: string[] = customOrderData.value.map((item) => {
+    return item.title
+  })
+  // console.log(titlesOrder)
+  console.log(itemsOrder)
+  await profileStore.updateUserPlansOrder({ plansOrder: itemsOrder })
+  await profileStore.getCurrentUserProfile()
+  customOrderData.value = planStore.getPlansByOrder
+}
 </script>
 
 <template>
   <section class="container py-md lg:py-lg min-h-[75vh]">
     <div
-      class="grid md:grid-cols-2 gap-sm grid-flow-row"
+      class="grid md:grid-cols-2 gap-md grid-flow-row px-xs"
       @keyup.esc="closeModal(), onClear()"
     >
-      <div class="px-xs">
+      <div>
         <!-- input form desktop -->
         <div
           class="bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md hidden md:block"
@@ -167,18 +185,49 @@ const getPlans = computed(() => {
         ></UtilityBlock>
       </div>
       <!-- right column -->
-      <div class="px-xs">
-        <div>
-          <PlanCollapsable
-            v-for="item in getPlans"
-            :item="item"
-            :key="item._id.toString()"
-            @toggle-complete="handleCollapseToggle"
-            @edit="handleCollapseEdit"
-            @delete="handleCollapseDelete"
-            class="mb-xs last:mb-0"
-          ></PlanCollapsable>
-        </div>
+      <div>
+        <Transition name="fade" mode="out-in">
+          <div v-if="displayStyle === 'custom'">
+            <draggable
+              v-model="customOrderData"
+              item-key="_id"
+              @change="onOrderUpdate"
+            >
+              <template #item="{ element }">
+                <PlanCollapsable
+                  :item="element"
+                  :key="element._id.toString()"
+                  @toggle-complete="handleCollapseToggle"
+                  @edit="handleCollapseEdit"
+                  @delete="handleCollapseDelete"
+                  class="mb-xs last:mb-0"
+                ></PlanCollapsable>
+              </template>
+            </draggable>
+          </div>
+          <div v-else-if="displayStyle === 'incomplete'">
+            <PlanCollapsable
+              v-for="item in getPlans"
+              :item="item"
+              :key="item._id.toString()"
+              @toggle-complete="handleCollapseToggle"
+              @edit="handleCollapseEdit"
+              @delete="handleCollapseDelete"
+              class="mb-xs last:mb-0"
+            ></PlanCollapsable>
+          </div>
+          <div v-else>
+            <PlanCollapsable
+              v-for="item in getPlans"
+              :item="item"
+              :key="item._id.toString()"
+              @toggle-complete="handleCollapseToggle"
+              @edit="handleCollapseEdit"
+              @delete="handleCollapseDelete"
+              class="mb-xs last:mb-0"
+            ></PlanCollapsable>
+          </div>
+        </Transition>
       </div>
     </div>
     <Modal
@@ -230,4 +279,18 @@ const getPlans = computed(() => {
   </section>
 </template>
 
-<style scoped></style>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: translateX(-10%);
+}
+.fade-leave-to {
+  opacity: 0;
+  transform: translateX(10%);
+}
+</style>

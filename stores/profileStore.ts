@@ -105,7 +105,7 @@ export const useProfileStore = defineStore('profile', () => {
       initPiniaStore.setLoading(false)
       return
     }
-    await getCurrentUserProfile()
+    userProfile.value = res
     initPiniaStore.setLoading(false)
   }
   const toggleUserDarkMode = async (payload: { dark: boolean }) => {
