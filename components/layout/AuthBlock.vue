@@ -13,8 +13,8 @@ const props = defineProps<{
 }>()
 type AuthTarget = 'login' | 'signup'
 const emit = defineEmits<{
-  (e: 'login-click', event: Event, url: string): void
-  (e: 'signup-click', event: Event, url: string): void
+  (e: 'login-click', event: Event, link: string): void
+  (e: 'signup-click', event: Event, link: string): void
   (e: 'username-click', event: Event): void
 }>()
 
@@ -38,28 +38,32 @@ const handleUsernameClick = (e: Event) => {
 <template>
   <div>
     <!-- auth btns -->
-    <button
+    <div
       v-if="auth"
-      class="flex items-center gap-xs md:gap-2xs border-l-2 border-warning px-sm hover:opacity-60 transition-opacity duration-300 ease-linear"
-      @click="handleUsernameClick"
+      class="flex justify-center md:justify-normal items-center md:border-l-2 border-warning px-sm hover:opacity-60 transition-opacity duration-300 ease-linear"
     >
-      <div v-if="profilePicture">
-        <img
-          :src="cloudinaryBaseUrl + profilePicture"
-          alt="profile picture"
-          class="h-md rounded-full aspect-square"
-        />
-      </div>
-      <div class="text-lg font-bold text-warning">
-        <span>
-          {{ username }}
-        </span>
-      </div>
-    </button>
+      <button
+        @click="handleUsernameClick"
+        class="flex items-center gap-xs md:gap-2xs"
+      >
+        <div v-if="profilePicture">
+          <img
+            :src="cloudinaryBaseUrl + profilePicture"
+            alt="profile picture"
+            class="h-md rounded-full aspect-square"
+          />
+        </div>
+        <div class="text-lg font-bold text-warning">
+          <span>
+            {{ username }}
+          </span>
+        </div>
+      </button>
+    </div>
     <!-- guest btns -->
     <div
       v-else
-      class="flex items-center gap-xs md:gap-sm border-l-2 border-warning px-sm"
+      class="flex flex-col md:flex-row justify-center md:justify-normal items-center gap-2xs md:gap-sm md:border-l-2 border-warning px-sm"
     >
       <!-- login btn -->
       <a

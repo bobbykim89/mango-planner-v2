@@ -39,12 +39,22 @@ const getCheckColor = computed(() => {
 const getBgColor = computed<string>(() => {
   const { type } = props.item
   if (type === 'work') {
-    return 'bg-info'
+    return 'bg-info/60 dark:bg-info'
   }
   if (type === 'chore') {
-    return 'bg-primary'
+    return 'bg-primary/60 dark:bg-primary'
   }
-  return 'bg-dark-3'
+  return 'bg-light-3 dark:bg-dark-3'
+})
+const getContentBgColor = computed<string>(() => {
+  const { type } = props.item
+  if (type === 'work') {
+    return 'bg-info/25 dark:bg-info/50'
+  }
+  if (type === 'chore') {
+    return 'bg-primary/25 dark:bg-primary/50'
+  }
+  return 'bg-light-3/25 dark:bg-dark-3/50'
 })
 
 const handleToggleCompleteClick = (e: Event) => {
@@ -70,16 +80,16 @@ watch(
 
 <template>
   <div
-    class="rounded-md overflow-hidden w-full border-l-4"
+    class="rounded-md overflow-hidden w-full border-l-4 drop-shadow-md"
     :class="getBorderColor"
   >
     <div
-      class="py-xs pl-sm pr-xs cursor-pointer"
+      class="py-xs pl-sm pr-xs cursor-pointer select-none"
       :class="getBgColor"
       v-collapse:[item._id.toString()]
     >
       <div class="flex justify-between items-center">
-        <h3 class="h3-md text-light-3">
+        <h3 class="h3-md text-dark-3 dark:text-light-3">
           {{ item.title }}
         </h3>
         <div @click.stop class="cursor-default">
@@ -108,17 +118,17 @@ watch(
       :id="item._id.toString()"
       @open="toggleCollapse"
       @close="toggleCollapse"
-      :class-name="getBgColor + ' bg-opacity-60'"
+      :class-name="getContentBgColor"
       accordion="plans-accordion"
     >
       <div class="py-xs">
         <div class="flex gap-2xs">
           <div
-            class="w-full pl-xs pr-2xs whitespace-pre-line text-light-3"
+            class="w-full pl-xs pr-2xs whitespace-pre-line text-dark-3 dark:text-light-3"
             v-html="item.content"
           ></div>
           <div
-            class="px-xs border-l border-light-3 flex flex-col items-center gap-2xs text-light-3"
+            class="px-xs border-l-2 border-dark-1 dark:border-light-3 flex flex-col items-center gap-2xs text-dark-1 dark:text-light-3"
           >
             <!-- edit button -->
             <button
@@ -162,7 +172,7 @@ watch(
       </div>
     </Collapse>
     <div
-      class="py-1.5 px-sm cursor-pointer transition-all duration-500 flex justify-center items-center text-light-3"
+      class="py-1.5 px-sm cursor-pointer transition-all duration-500 flex justify-center items-center text-dark-3 dark:text-light-3"
       :class="[getBgColor]"
       v-collapse:[item._id.toString()]
     >

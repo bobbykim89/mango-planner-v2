@@ -37,7 +37,9 @@ watch(
 
 <template>
   <!-- utility block -->
-  <div class="bg-dark-3 rounded-md p-xs md:p-md drop-shadow-md md:mt-md">
+  <div
+    class="bg-light-2 dark:bg-dark-3 rounded-md p-xs md:p-md drop-shadow-md md:mt-md"
+  >
     <!-- search bar -->
     <div class="flex gap-2xs mb-2xs">
       <label
@@ -70,10 +72,9 @@ watch(
     <div class="btn-group">
       <!-- sort list -->
       <button
-        class="btn btn-light-3 btn-full"
-        v-tooltip
-        title="All"
-        color="warning"
+        class="btn btn-light-4 dark:btn-light-3 btn-full text-dark-3"
+        aria-label="all"
+        title="all"
         @click="onShowAllClick"
       >
         <svg
@@ -90,11 +91,9 @@ watch(
       </button>
       <!-- sort incomplete -->
       <button
-        class="btn btn-light-3 btn-full"
-        v-tooltip
-        title="Incomplete"
-        color="warning"
-        tooltip-width="100"
+        class="btn btn-light-4 dark:btn-light-3 btn-full text-dark-3"
+        aria-label="incomplete"
+        title="incomplete"
         @click="onShowIncompleteClick"
       >
         <svg
@@ -111,10 +110,9 @@ watch(
       </button>
       <!-- sort custom: display only when user has profile -->
       <button
-        class="btn btn-light-3 btn-full"
-        v-tooltip
-        title="Custom"
-        color="warning"
+        class="btn btn-light-4 dark:btn-light-3 btn-full text-dark-3"
+        aria-label="custom"
+        title="custom"
         v-if="hasProfile"
         @click="onShowCustomClick"
       >
@@ -132,10 +130,9 @@ watch(
       </button>
       <!-- new -- mobile -->
       <button
-        class="btn btn-warning btn-full"
-        v-tooltip:left
-        title="New"
-        color="warning"
+        class="btn btn-warning btn-full text-dark-3 md:!hidden"
+        aria-label="new"
+        title="new"
         @click="onNewPostClick"
       >
         <svg

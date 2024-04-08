@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Modal } from '@bobbykim/manguito-theme'
+import type { ColorPalette } from '@bobbykim/manguito-theme'
 import PlanInputForm from '@/components/plans/PlanInputForm.vue'
 import type { PlanFormInput, TypeInputLiteralType } from '@/types'
 import { useUserStore, useProfileStore, usePlanStore } from '@/stores'
@@ -7,6 +8,26 @@ import UtilityBlock from '@/components/plans/UtilityBlock.vue'
 import { storeToRefs } from 'pinia'
 import PlanCollapsable from '@/components/plans/PlanCollapsable.vue'
 import { Plan } from '@/server/models'
+
+definePageMeta({
+  middleware: ['auth-route'],
+})
+
+useHead({
+  title: 'Mango Planner | Home',
+  meta: [
+    { name: 'description', content: 'Main page' },
+    { property: 'og:title', content: 'Mango Planner | Home' },
+  ],
+})
+
+useHead({
+  title: 'Mango Planner | Login',
+  meta: [
+    { name: 'description', content: 'login page' },
+    { property: 'og:title', content: 'Mango Planner | Login' },
+  ],
+})
 
 type PlanDisplayStyle = 'all' | 'incomplete' | 'custom'
 type ModalFormType = 'new' | 'update'
@@ -27,11 +48,19 @@ const updateDataForm = reactive<PlanFormInput>({
 const selectedPost = ref<string>('')
 
 const userProfileStatus = computed<boolean>(() => {
-  if (isAuthenticated && userProfile !== null) {
+  if (isAuthenticated && userProfile.value !== null) {
     return true
   }
   return false
 })
+
+const handleBgColors = computed<ColorPalette>(() => {
+  if (userProfile.value !== null && userProfile.value.dark) {
+    return 'dark-3'
+  }
+  return 'light-3'
+})
+
 const handleShowAllClick = (e: Event) => {
   e.preventDefault()
   displayStyle.value = 'all'
@@ -93,10 +122,16 @@ const handleCollapseDelete = async (e: Event, id: string) => {
   await planStore.deletePost(id)
 }
 const getPlans = computed(() => {
-  if (displayStyle.value === 'incomplete') {
+  if (searchTerm.value !== '') {
+    return planStore.getAllPlans.filter((item) => {
+      const search = new RegExp(`${searchTerm.value}`, 'gi')
+      return item.title.match(search) || item.content?.match(search)
+    })
+  }
+  if (searchTerm.value === '' && displayStyle.value === 'incomplete') {
     return planStore.getIncompletePlans
   }
-  if (displayStyle.value === 'custom') {
+  if (searchTerm.value === '' && displayStyle.value === 'custom') {
     return planStore.getPlansByOrder
   }
   return planStore.getAllPlans
@@ -105,14 +140,16 @@ const getPlans = computed(() => {
 </script>
 
 <template>
-  <section class="container py-md lg:py-lg">
+  <section class="container py-md lg:py-lg min-h-[75vh]">
     <div
       class="grid md:grid-cols-2 gap-sm grid-flow-row"
       @keyup.esc="closeModal(), onClear()"
     >
-      <div class="px-xs md:px-0">
+      <div class="px-xs">
         <!-- input form desktop -->
-        <div class="bg-dark-3 rounded-md p-md drop-shadow-md hidden md:block">
+        <div
+          class="bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md hidden md:block"
+        >
           <h3 class="h3-md text-warning mb-xs">Create New Plan</h3>
           <PlanInputForm
             prefix="desktop-new"
@@ -130,8 +167,7 @@ const getPlans = computed(() => {
         ></UtilityBlock>
       </div>
       <!-- right column -->
-      <div class="px-xs md:px-0">
-        Search term: {{ searchTerm }} Sort logic: {{ displayStyle }}
+      <div class="px-xs">
         <div>
           <PlanCollapsable
             v-for="item in getPlans"
@@ -148,7 +184,7 @@ const getPlans = computed(() => {
     <Modal
       ref="modalRef"
       placement="center"
-      color="dark-3"
+      :color="handleBgColors"
       title="New Plan"
       class-name="px-xs rounded-md"
       @close="onClear"
@@ -164,7 +200,7 @@ const getPlans = computed(() => {
               xmlns="http://www.w3.org/2000/svg"
               height="1em"
               viewBox="0 0 384 512"
-              class="fill-light-2 hover:fill-light-1 focus:fill-light-1 transition-colors duration-300 ease-linear h-sm"
+              class="fill-dark-3 hover:fill-dark-1 focus:fill-dark-1 dark:fill-light-2 dark:hover:fill-light-1 dark:focus:fill-light-1 transition-colors duration-300 ease-linear h-sm"
             >
               <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
               <path

@@ -5,6 +5,7 @@ import {
   MclTextArea,
   MclInputRadio,
 } from '@bobbykim/mcl-forms'
+import type { ColorPalette } from '@bobbykim/manguito-theme'
 import type { TypeInputLiteralType, PlanFormInput } from '@/types'
 
 const props = withDefaults(
@@ -62,6 +63,13 @@ const onFormSubmit = (e: Event) => {
   emit('form-submit', e, formContent)
   clearInput()
 }
+
+const formTextColor = computed<ColorPalette>(() => {
+  if (useColorMode().preference === 'dark') {
+    return 'light-3'
+  }
+  return 'dark-3'
+})
 </script>
 
 <template>
@@ -70,7 +78,7 @@ const onFormSubmit = (e: Event) => {
       <MclFormGroup
         :label-for="`${prefix}-title`"
         label="Title:"
-        text-color="light-1"
+        :text-color="formTextColor"
         :text-bold="true"
         class="mb-xs"
       >
@@ -86,7 +94,7 @@ const onFormSubmit = (e: Event) => {
       <MclFormGroup
         :label-for="`${prefix}-content`"
         label="Content:"
-        text-color="light-1"
+        :text-color="formTextColor"
         :text-bold="true"
         class="mb-xs"
       >
@@ -109,11 +117,20 @@ const onFormSubmit = (e: Event) => {
             :value="item.value"
             :checked="formContent.type === item.value"
             bg-color="warning"
+            :checked-color="
+              item.value === 'personal'
+                ? 'dark-3'
+                : item.value === 'work'
+                ? 'info'
+                : 'primary'
+            "
             @change="setTypeValue"
           ></MclInputRadio>
           <MclFormGroup :label-for="item.id">
             <template #label>
-              <p class="text-light-1 font-bold">{{ item.text }}</p>
+              <p class="text-dark-3 dark:text-light-3 font-bold">
+                {{ item.text }}
+              </p>
             </template>
           </MclFormGroup>
         </div>
