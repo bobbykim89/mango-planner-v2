@@ -1,0 +1,15 @@
+// page transition animations
+.page-enter-active,
+.page-leave-active {
+  transition: all 0.3s;
+}
+.page-enter-from {
+  transform: translateX(-20%);
+  opacity: 0;
+  filter: blur(1rem);
+}
+.page-leave-to {
+  transform: translateX(20%);
+  opacity: 0;
+  filter: blur(1rem);
+}

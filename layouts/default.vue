@@ -6,20 +6,21 @@ import {
   Alert,
   Sidebar,
 } from '@bobbykim/manguito-theme'
+import type { ColorPalette } from '@bobbykim/manguito-theme'
 import type { MenuItemType, SocialUrl } from '@bobbykim/mcl-footer'
 import { MclFooterA } from '@bobbykim/mcl-footer'
 import {
   useInitPiniaStore,
   useAlertStore,
   useUserStore,
-  usePlanStore,
   useProfileStore,
 } from '@/stores'
 import { storeToRefs } from 'pinia'
 import WeatherWidget from '@/components/widget/WeatherWidget.vue'
 import DarkmodeWidget from '@/components/widget/DarkmodeWidget.vue'
 import UserInfoWidget from '@/components/widget/UserInfoWidget.vue'
-import { useGeolocation } from '@vueuse/core'
+import CreateProfileWidget from '@/components/widget/CreateProfileWidget.vue'
+import { useGeolocation, useScroll, useWindowScroll } from '@vueuse/core'
 
 const config = useRuntimeConfig()
 const router = useRouter()
@@ -27,16 +28,15 @@ const initPiniaStore = useInitPiniaStore()
 await useAsyncData('initPinia', () => initPiniaStore.initStores())
 const alertStore = useAlertStore()
 const userStore = useUserStore()
-const planStore = usePlanStore()
 const profileStore = useProfileStore()
-const { loading } = storeToRefs(initPiniaStore)
 const { alert } = storeToRefs(alertStore)
 const { currentUser, isAuthenticated } = storeToRefs(userStore)
 const { userProfile } = storeToRefs(profileStore)
-const { plans } = storeToRefs(planStore)
+const layoutRef = ref<HTMLElement | null>(null)
 const sidebarRef = ref<InstanceType<typeof Sidebar>>()
+const headerRef = ref<InstanceType<typeof HeaderHorizontal>>()
 const { coords } = useGeolocation()
-const fileDataRef = ref<File | undefined>(undefined)
+const { y } = useWindowScroll({ behavior: 'smooth' })
 
 const footerMenuItems: MenuItemType[] = [
   {
@@ -70,17 +70,32 @@ const menuItemData = reactive<{
   },
 })
 
+const handleBgColors = computed<ColorPalette>(() => {
+  if (userProfile.value !== null && userProfile.value.dark) {
+    return 'dark-3'
+  }
+  return 'light-3'
+})
+const handleFooterMenuColor = computed<ColorPalette>(() => {
+  if (userProfile.value !== null && userProfile.value.dark) {
+    return 'light-2'
+  }
+  return 'dark-2'
+})
+
 const handleTitleClick = (e: Event, url: string, target: CtaTarget) => {
   e.preventDefault()
   router.push({ path: url })
 }
 const handleAuthClick = (e: Event, url: string) => {
   e.preventDefault()
+  headerRef.value?.headerClose()
   router.push({ path: url })
 }
 const sidebarOpen = (e: Event) => {
   e.preventDefault()
   sidebarRef.value?.open()
+  headerRef.value?.headerClose()
 }
 const sidebarClose = () => {
   sidebarRef.value?.close()
@@ -92,14 +107,17 @@ const handleFooterMenuClick = (e: Event, item: MenuItemType) => {
 const onAlertClose = () => {
   alertStore.clearAlert()
 }
+const onScrollToTop = () => {
+  y.value = 0
+}
 const onLogout = () => {
   userStore.logoutUser()
   sidebarClose()
+  router.push({ path: '/auth/login' })
 }
 const onDarkModeClick = async (e: Event, dark: boolean) => {
   e.preventDefault()
   await profileStore.toggleUserDarkMode({ dark: !dark })
-  // useColorMode().preference = dark ? 'dark' : 'light'
 }
 const onUsernameChange = async (e: Event, name: string) => {
   e.preventDefault()
@@ -118,10 +136,14 @@ const onPwUpdate = async (e: Event, currPw: string, newPw: string) => {
     newPassword: newPw,
   })
 }
+const onProfileCreate = async (e: Event) => {
+  e.preventDefault()
+  await profileStore.postNewUserProfile()
+}
 watch(
   () => userProfile.value,
   (newValue) => {
-    if (userProfile.value === null) {
+    if (newValue === null) {
       useColorMode().preference = 'light'
     }
     useColorMode().preference = newValue?.dark ? 'dark' : 'light'
@@ -130,8 +152,12 @@ watch(
 </script>
 
 <template>
-  <div>
-    <HeaderHorizontal bg-color="dark-3" :scroll-distance="100">
+  <div class="relative">
+    <HeaderHorizontal
+      ref="headerRef"
+      :bg-color="handleBgColors"
+      :scroll-distance="100"
+    >
       <template #content
         ><div class="flex flex-shrink-0 items-center self-center md:py-3xs">
           <div class="h-md md:h-lg mr-2xs md:mr-sm align-middle">
@@ -176,10 +202,23 @@ watch(
             @username-click="sidebarOpen"
           ></LayoutAuthBlock></div
       ></template>
-      <template #mobile-content><div>mewmew</div></template>
+      <template #mobile-content="{ headerClose }"
+        ><div class="py-xs">
+          <LayoutAuthBlock
+            :auth="isAuthenticated"
+            login-url="/auth/login"
+            signup-url="/auth/signup"
+            url-target="_self"
+            :username="currentUser?.name"
+            :profile-picture="userProfile?.profilePicture"
+            @login-click="handleAuthClick"
+            @signup-click="handleAuthClick"
+            @username-click="sidebarOpen"
+          ></LayoutAuthBlock></div
+      ></template>
     </HeaderHorizontal>
-    <div class="bg-dark-2">
-      <div class="container pt-xs px-xs md:px-0">
+    <div class="bg-light-4 dark:bg-dark-2">
+      <div class="container pt-xs px-xs">
         <Alert :show="alert !== null" dismissible @close="onAlertClose">
           <div class="flex justify-center text-light-1">
             <svg
@@ -197,23 +236,26 @@ watch(
           </div>
         </Alert>
       </div>
-      <div>Loading: {{ loading }}</div>
       <slot />
+      <LayoutScrollToTop @scroll-click="onScrollToTop"></LayoutScrollToTop>
       <Sidebar
         ref="sidebarRef"
-        color="dark-3"
+        :color="handleBgColors"
         placement="right"
         class-name="border-l-4 border-warning"
         width="400"
       >
         <template #header="{ close }">
-          <div class="flex items-center py-2xs px-3xs bg-dark-3 drop-shadow-md">
-            <button @click="close" class="p-2xs">
+          <div
+            class="flex items-center py-2xs px-3xs bg-light-3 dark:bg-dark-3 drop-shadow-md"
+          >
+            <button @click="close" class="p-2xs text-dark-3 dark:text-light-3">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 height="1em"
                 viewBox="0 0 384 512"
-                class="fill-light-3 hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear h-sm"
+                fill="currentColor"
+                class="hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear h-sm"
               >
                 <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
                 <path
@@ -245,10 +287,15 @@ watch(
                 @on-pw-update="onPwUpdate"
               ></UserInfoWidget>
             </div>
+            <div v-else class="mt-xs">
+              <CreateProfileWidget
+                @btn-click="onProfileCreate"
+              ></CreateProfileWidget>
+            </div>
           </div>
         </template>
         <template #footer>
-          <div class="text-light-3 flex justify-center items-center">
+          <div class="flex justify-center items-center">
             <button
               class="px-sm py-xs flex items-center gap-3 text-lg font-bold text-warning hover:opacity-60 transition-opacity duration-300 ease-linear"
               @click="onLogout"
@@ -274,18 +321,27 @@ watch(
       :logo="menuItemData.logo"
       :logo-alt="menuItemData.logoAlt"
       :logo-link="menuItemData.logoLink"
+      :bg-color="handleBgColors"
       :title="menuItemData.title"
       title-color="warning"
       :logo-as-link="false"
       :menu-item-as-link="false"
       :menu-items="menuItemData.menu"
+      :menu-text-color="handleFooterMenuColor"
       :social-links="menuItemData.social"
+      :headline-color="handleFooterMenuColor"
       social-icon-color="warning"
       highlight-color="warning"
       border-top-color="warning"
       @logo-click="handleTitleClick"
       @menu-click="handleFooterMenuClick"
-    ></MclFooterA>
+    >
+      <div>
+        <span class="text-dark-3 dark:text-light-3"
+          >&copy; Mango Planner {{ new Date().getFullYear() }}</span
+        >
+      </div>
+    </MclFooterA>
   </div>
 </template>
 

@@ -1,6 +1,28 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
+    head: {
+      title: 'Mango Planner',
+      // htmlAttrs: {
+      //   lang: 'en',
+      // },
+      meta: [
+        {
+          name: 'description',
+          content: 'Simple planner app for daily use',
+        },
+        { property: 'og:title', content: 'Mango Planner' },
+        {
+          property: 'og:image',
+          content:
+            'https://res.cloudinary.com/dwgni1x3t/image/upload/v1712540581/mango-planner/assets/pwa-512x512_y540s7.png',
+        },
+      ],
+      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    },
+  },
   runtimeConfig: {
     mongoId: process.env.MONGO_ADMIN_ID,
     mongoPw: process.env.MONGO_ADMIN_PW,
@@ -29,6 +51,7 @@ export default defineNuxtConfig({
   colorMode: {
     classSuffix: '',
   },
+  css: ['~/assets/css/page_transition.scss'],
   tailwindcss: {
     cssPath: '~/assets/css/tailwind.css',
     configPath: 'tailwind.config.js',

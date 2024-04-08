@@ -16,11 +16,7 @@ export class ProfileController {
     }
     const profile = await Profile.findOne({ user: user.id })
     if (!profile) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'Profile for Current User not found',
-      })
+      return null
     }
     return profile
   }
