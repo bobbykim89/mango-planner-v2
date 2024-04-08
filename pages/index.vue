@@ -39,6 +39,7 @@ const { isAuthenticated } = storeToRefs(userStore)
 const { userProfile } = storeToRefs(profileStore)
 const searchTerm = ref<string>('')
 const modalRef = ref<InstanceType<typeof Modal>>()
+const confirmModal = ref<InstanceType<typeof Modal>>()
 const modalForm = ref<ModalFormType>('new')
 const displayStyle = ref<PlanDisplayStyle>('all')
 const updateDataForm = reactive<PlanFormInput>({
@@ -106,6 +107,7 @@ const handleCollapseToggle = async (
   complete: boolean
 ) => {
   await planStore.toggleComplete({ id, body: { complete: !complete } })
+  customOrderData.value = planStore.getPlansByOrder
   onClear()
 }
 const handleCollapseEdit = (e: Event, item: InstanceType<typeof Plan>) => {
@@ -121,13 +123,28 @@ const handleCollapseEdit = (e: Event, item: InstanceType<typeof Plan>) => {
 }
 const onEditSubmit = async (e: Event, data: PlanFormInput) => {
   e.preventDefault()
-  await planStore.updatePost({ id: selectedPost.value, body: data })
+  if (process.client && window.confirm('Please confirm to update this item.')) {
+    await planStore.updatePost({ id: selectedPost.value, body: data })
+  }
   onClear()
   modalRef.value?.close()
 }
 const handleCollapseDelete = async (e: Event, id: string) => {
   e.preventDefault()
-  await planStore.deletePost(id)
+  if (
+    process.client &&
+    window.confirm('Permanently deleting this item. Please confirm to proceed.')
+  ) {
+    await planStore.deletePost(id)
+  }
+  customOrderData.value = planStore.getPlansByOrder
+}
+const onOrderUpdate = async () => {
+  const itemsOrder: string[] = customOrderData.value.map((item) => {
+    return item._id.toString()
+  })
+  await profileStore.updateUserPlansOrder({ plansOrder: itemsOrder })
+  await profileStore.getCurrentUserProfile()
   customOrderData.value = planStore.getPlansByOrder
 }
 const getPlans = computed(() => {
@@ -142,19 +159,6 @@ const getPlans = computed(() => {
   }
   return planStore.getAllPlans
 })
-const onOrderUpdate = async () => {
-  const itemsOrder: string[] = customOrderData.value.map((item) => {
-    return item._id.toString()
-  })
-  const titlesOrder: string[] = customOrderData.value.map((item) => {
-    return item.title
-  })
-  // console.log(titlesOrder)
-  console.log(itemsOrder)
-  await profileStore.updateUserPlansOrder({ plansOrder: itemsOrder })
-  await profileStore.getCurrentUserProfile()
-  customOrderData.value = planStore.getPlansByOrder
-}
 </script>
 
 <template>
