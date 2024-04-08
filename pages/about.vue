@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import AboutImage from '@/assets/images/about.jpg'
 
+useHead({
+  title: 'Mango Planner | About',
+  meta: [
+    { name: 'description', content: 'About page' },
+    { property: 'og:title', content: 'Mango Planner | About' },
+  ],
+})
+
 const socialUrls = {
   linkedin: {
     url: 'https://www.linkedin.com/in/sihun-kim-9baa17165/',
