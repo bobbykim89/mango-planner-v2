@@ -5,9 +5,9 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       title: 'Mango Planner',
-      htmlAttrs: {
-        lang: 'en',
-      },
+      // htmlAttrs: {
+      //   lang: 'en',
+      // },
       meta: [
         {
           name: 'description',
@@ -90,19 +90,33 @@ export default defineNuxtConfig({
           src: 'mango_planner_logo-512x512.png',
           sizes: '512x512',
           type: 'image/png',
+          purpose: 'any',
         },
         {
           src: 'mango_planner_logo-512x512.png',
           sizes: '512x512',
           type: 'image/png',
-          purpose: 'any maskable',
+          purpose: 'maskable',
         },
       ],
       display: 'standalone',
-      theme_color: '#000000',
       background_color: '#f1ac18',
       lang: 'en-US',
       start_url: '/',
+      screenshots: [
+        {
+          src: 'screenshot_desktop.png',
+          sizes: '2097x1236',
+          type: 'image/png',
+          form_factor: 'wide',
+        },
+        {
+          src: 'screenshot_mobile.png',
+          sizes: '422x784',
+          type: 'image/png',
+          form_factor: 'narrow',
+        },
+      ],
     },
     includeAssets: [
       'favicon.ico',
