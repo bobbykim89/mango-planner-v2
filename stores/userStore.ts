@@ -7,6 +7,7 @@ import {
 } from './'
 import { User } from '@/server/models'
 import { ref, computed } from 'vue'
+import type { H3Error } from 'h3'
 
 type UserType = InstanceType<typeof User>
 
@@ -54,88 +55,109 @@ export const useUserStore = defineStore('user', () => {
     email: string
     password: string
   }) => {
-    const res = await $fetch<AuthToken>('/api/auth', {
-      method: 'POST',
-      body: payload,
-    })
-    initPiniaStore.setLoading(true)
-    if (!res) {
-      alertStore.setAlert("Couldn't fetch user data from server.")
+    try {
+      const res = await $fetch<AuthToken>('/api/auth', {
+        method: 'POST',
+        body: payload,
+      })
+      initPiniaStore.setLoading(true)
+      if (!res) {
+        alertStore.setAlert("Couldn't fetch user data from server.")
+        currentUser.value = null
+        isAuthenticated.value = false
+        return
+      }
+      cookie.value = res.access_token
+      await getCurrentUser()
+      initPiniaStore.setLoading(false)
+      alertStore.setAlert('Login Successful!')
+    } catch (error) {
+      alertStore.setAlert((error as H3Error).statusMessage!)
       currentUser.value = null
       isAuthenticated.value = false
-      return
     }
-    cookie.value = res.access_token
-    await getCurrentUser()
-    initPiniaStore.setLoading(false)
-    alertStore.setAlert('Login Successful!')
   }
   const signupNewUser = async (payload: {
     email: string
     password: string
     name: string
   }) => {
-    const res = await $fetch<AuthToken>('/api/user', {
-      method: 'POST',
-      body: payload,
-    })
-    initPiniaStore.setLoading(true)
-    if (!res) {
-      alertStore.setAlert(
-        'Failed to get response from server, please try again'
-      )
+    try {
+      const res = await $fetch<AuthToken>('/api/user', {
+        method: 'POST',
+        body: payload,
+      })
+      initPiniaStore.setLoading(true)
+      if (!res) {
+        alertStore.setAlert(
+          'Failed to get response from server, please try again'
+        )
+        initPiniaStore.setLoading(false)
+        return
+      }
+      cookie.value = res.access_token
+      await getCurrentUser()
       initPiniaStore.setLoading(false)
-      return
+      alertStore.setAlert('Signup Successful!')
+    } catch (error) {
+      alertStore.setAlert((error as H3Error).statusMessage!)
+      initPiniaStore.setLoading(false)
     }
-    cookie.value = res.access_token
-    await getCurrentUser()
-    initPiniaStore.setLoading(false)
-    alertStore.setAlert('Signup Successful!')
   }
   const updateUsername = async (payload: { username: string }) => {
-    if (!cookie.value) {
-      return
-    }
-    const res = await $fetch('/api/user/username', {
-      method: 'PUT',
-      headers: { Authorization: cookie.value },
-      body: payload,
-    })
-    initPiniaStore.setLoading(true)
-    if (!res) {
-      alertStore.setAlert(
-        'Failed to get response from server, please try again'
-      )
+    try {
+      if (!cookie.value) {
+        return
+      }
+      const res = await $fetch('/api/user/username', {
+        method: 'PUT',
+        headers: { Authorization: cookie.value },
+        body: payload,
+      })
+      initPiniaStore.setLoading(true)
+      if (!res) {
+        alertStore.setAlert(
+          'Failed to get response from server, please try again'
+        )
+        initPiniaStore.setLoading(false)
+        return
+      }
+      await getCurrentUser()
       initPiniaStore.setLoading(false)
-      return
+      alertStore.setAlert('Successfully updated username!')
+    } catch (error) {
+      alertStore.setAlert((error as H3Error).statusMessage!)
+      initPiniaStore.setLoading(false)
     }
-    await getCurrentUser()
-    initPiniaStore.setLoading(false)
-    alertStore.setAlert('Successfully updated username!')
   }
   const updatePassword = async (payload: {
     currentPassword: string
     newPassword: string
   }) => {
-    if (!cookie.value) {
-      return
-    }
-    const res = await $fetch('/api/user/password', {
-      method: 'PUT',
-      headers: { Authorization: cookie.value },
-      body: payload,
-    })
-    initPiniaStore.setLoading(true)
-    if (!res) {
-      alertStore.setAlert(
-        'Failed to get response from server, please try again'
-      )
+    try {
+      if (!cookie.value) {
+        return
+      }
+      const res = await $fetch('/api/user/password', {
+        method: 'PUT',
+        headers: { Authorization: cookie.value },
+        body: payload,
+      })
+      initPiniaStore.setLoading(true)
+      if (!res) {
+        alertStore.setAlert(
+          'Failed to get response from server, please try again'
+        )
+        initPiniaStore.setLoading(false)
+        return
+      }
+      await getCurrentUser()
       initPiniaStore.setLoading(false)
-      return
+      alertStore.setAlert('Successfully updated user password!')
+    } catch (error) {
+      alertStore.setAlert((error as H3Error).statusMessage!)
+      initPiniaStore.setLoading(false)
     }
-    await getCurrentUser()
-    initPiniaStore.setLoading(false)
-    alertStore.setAlert('Successfully updated user password!')
   }
   const logoutUser = () => {
     initPiniaStore.setLoading(true)
@@ -150,7 +172,6 @@ export const useUserStore = defineStore('user', () => {
   return {
     currentUser,
     isAuthenticated,
-    // accessToken,
     getCurrentAuthInfo,
     getCurrentUser,
     loginWithCredential,

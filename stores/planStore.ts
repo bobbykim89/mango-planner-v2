@@ -8,6 +8,7 @@ import {
 import { Plan } from '@/server/models'
 import { ref, computed } from 'vue'
 import type { PlanInput } from '@/types'
+import type { H3Error } from 'h3'
 
 type PlanType = InstanceType<typeof Plan>
 
@@ -56,23 +57,28 @@ export const usePlanStore = defineStore('plan', () => {
   })
   // actions
   const getAllPostByUser = async () => {
-    const { isAuthenticated } = userStore.getCurrentAuthInfo
-    if (!cookie.value || !isAuthenticated) {
-      alertStore.setAlert('No user authentication found, please login')
-      return
-    }
-    const res = await $fetch<PlanType[]>('/api/plan', {
-      method: 'GET',
-      headers: { Authorization: cookie.value },
-    })
-    initPinaStore.setLoading(true)
-    if (res === null) {
-      alertStore.setAlert('Authentication error: Cannot bring user posts')
+    try {
+      const { isAuthenticated } = userStore.getCurrentAuthInfo
+      if (!cookie.value || !isAuthenticated) {
+        alertStore.setAlert('No user authentication found, please login')
+        return
+      }
+      const res = await $fetch<PlanType[]>('/api/plan', {
+        method: 'GET',
+        headers: { Authorization: cookie.value },
+      })
+      initPinaStore.setLoading(true)
+      if (res === null) {
+        alertStore.setAlert('Authentication error: Cannot bring user posts')
+        initPinaStore.setLoading(false)
+        return
+      }
+      plans.value = res
       initPinaStore.setLoading(false)
-      return
+    } catch (error) {
+      alertStore.setAlert((error as H3Error).statusMessage!)
+      initPinaStore.setLoading(false)
     }
-    plans.value = res
-    initPinaStore.setLoading(false)
   }
   const createNewPost = async (payload: PlanInput) => {
     const { isAuthenticated } = userStore.getCurrentAuthInfo

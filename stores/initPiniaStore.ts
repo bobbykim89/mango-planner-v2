@@ -8,6 +8,7 @@ export const useInitPiniaStore = defineStore('init', () => {
   const profileStore = useProfileStore()
   // state
   const loading = ref<boolean>(true)
+  const mounted = ref<boolean>(false)
   // actions
   const initStores = async () => {
     await userStore.getCurrentUser()
@@ -17,9 +18,10 @@ export const useInitPiniaStore = defineStore('init', () => {
       await planStore.getAllPostByUser()
     }
     loading.value = false
+    mounted.value = true
   }
   const setLoading = (value: boolean) => {
     loading.value = value
   }
-  return { loading, initStores, setLoading }
+  return { loading, mounted, initStores, setLoading }
 })
