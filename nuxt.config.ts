@@ -77,6 +77,11 @@ export default defineNuxtConfig({
       description: 'Simple planner app for daily use',
       icons: [
         {
+          src: 'favicon.svg',
+          type: 'image/svg+xml',
+          sizes: '128x128',
+        },
+        {
           src: 'favicon.ico',
           sizes: '48x48',
           type: 'image/x-icon',
@@ -93,7 +98,7 @@ export default defineNuxtConfig({
           purpose: 'any',
         },
         {
-          src: 'mango_planner_logo-512x512.png',
+          src: 'mango_plannable_maskable_512.png',
           sizes: '512x512',
           type: 'image/png',
           purpose: 'maskable',
@@ -101,6 +106,7 @@ export default defineNuxtConfig({
       ],
       display: 'standalone',
       background_color: '#f1ac18',
+      theme_color: '#e8e8e8',
       lang: 'en-US',
       start_url: '/',
       screenshots: [
@@ -118,18 +124,15 @@ export default defineNuxtConfig({
         },
       ],
     },
-    includeAssets: [
-      'favicon.ico',
-      'favicon.svg',
-      'mango_planner_logo-192x192.png',
-      'mango_planner_logo-512x512.png',
-    ],
+    workbox: {
+      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+    },
     registerType: 'autoUpdate',
     devOptions: {
-      enabled: true,
-      suppressWarnings: true,
-      navigateFallback: '/',
-      type: 'module',
+      enabled: false,
+      // suppressWarnings: true,
+      // navigateFallback: '/',
+      // type: 'module',
     },
   },
 })

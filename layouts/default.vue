@@ -149,6 +149,14 @@ const onProfileCreate = async (e: Event) => {
   await profileStore.postNewUserProfile()
 }
 watch(
+  () => isAuthenticated.value,
+  (newValue) => {
+    if (newValue === false) {
+      useColorMode().preference = 'light'
+    }
+  }
+)
+watch(
   () => userProfile.value,
   (newValue) => {
     if (newValue === null) {

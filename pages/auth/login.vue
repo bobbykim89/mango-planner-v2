@@ -21,6 +21,7 @@ const userStore = useUserStore()
 const profileStore = useProfileStore()
 const initPiniaStore = useInitPiniaStore()
 const { userProfile } = storeToRefs(profileStore)
+const { currentUser } = storeToRefs(userStore)
 const loginCred = reactive<{
   email: string
   password: string
@@ -32,7 +33,9 @@ const handleFormSubmit = async () => {
   const { email, password } = loginCred
   await userStore.loginWithCredential({ email, password })
   await initPiniaStore.initStores()
-  router.push({ path: '/' })
+  if (currentUser.value !== null) {
+    router.push({ path: '/' })
+  }
 }
 const formTextColor = computed<ColorPalette>(() => {
   if (userProfile.value !== null && userProfile.value.dark) {

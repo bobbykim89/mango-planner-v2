@@ -5,10 +5,10 @@ export default defineNuxtRouteMiddleware(() => {
   const userStore = useUserStore()
   const initPiniaStore = useInitPiniaStore()
   const alertStore = useAlertStore()
-  const { loading } = storeToRefs(initPiniaStore)
+  const { mounted } = storeToRefs(initPiniaStore)
   const { isAuthenticated } = userStore.getCurrentAuthInfo
   // await userStore.getCurrentUser()
-  if (!loading.value && isAuthenticated) {
+  if (mounted.value && isAuthenticated) {
     alertStore.setAlert("Guest only route: redirecting to '/'")
     return navigateTo({ path: '/' })
   }

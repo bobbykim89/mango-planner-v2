@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useUserStore, useAlertStore, useInitPiniaStore } from './'
 import { Profile } from '@/server/models'
+import type { H3Error } from 'h3'
 
 type ProfileType = InstanceType<typeof Profile>
 
@@ -21,23 +22,29 @@ export const useProfileStore = defineStore('profile', () => {
   })
   // actions
   const getCurrentUserProfile = async () => {
-    const { isAuthenticated } = userStore.getCurrentAuthInfo
-    if (!cookie.value || !isAuthenticated) {
-      alertStore.setAlert('No user authentication found, please login')
-      return
-    }
-    const res = await $fetch<ProfileType | null>('/api/profile', {
-      method: 'GET',
-      headers: { Authorization: cookie.value },
-    })
-    initPiniaStore.setLoading(true)
-    if (!res) {
+    try {
+      const { isAuthenticated } = userStore.getCurrentAuthInfo
+      if (!cookie.value || !isAuthenticated) {
+        alertStore.setAlert('No user authentication found, please login')
+        return
+      }
+      const res = await $fetch<ProfileType | null>('/api/profile', {
+        method: 'GET',
+        headers: { Authorization: cookie.value },
+      })
+      initPiniaStore.setLoading(true)
+      if (!res) {
+        userProfile.value = null
+        initPiniaStore.setLoading(false)
+        return
+      }
+      userProfile.value = res
+      initPiniaStore.setLoading(false)
+    } catch (error) {
+      alertStore.setAlert((error as H3Error).statusMessage!)
       userProfile.value = null
       initPiniaStore.setLoading(false)
-      return
     }
-    userProfile.value = res
-    initPiniaStore.setLoading(false)
   }
   const postNewUserProfile = async () => {
     const { isAuthenticated } = userStore.getCurrentAuthInfo
