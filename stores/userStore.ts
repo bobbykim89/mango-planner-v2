@@ -48,7 +48,7 @@ export const useUserStore = defineStore('user', () => {
     currentUser.value = res
     isAuthenticated.value = true
     initPiniaStore.setLoading(false)
-    alertStore.setAlert('Auccessfully authenticated user')
+    alertStore.setAlert('Successfully authenticated user')
   }
   const loginWithCredential = async (payload: {
     email: string

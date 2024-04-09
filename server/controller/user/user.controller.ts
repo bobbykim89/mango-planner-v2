@@ -37,7 +37,8 @@ export class UserController {
       }
       const validator = {
         email: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-        password: /^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[a-zA-Z0-9]*)$/,
+        password:
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/,
       }
       const checkEmail = validator.email.test(email)
       const checkPassword = validator.password.test(password)
@@ -48,7 +49,7 @@ export class UserController {
           statusMessage: 'Validation error: please add valid email address',
         })
       }
-      if (checkPassword) {
+      if (!checkPassword) {
         throw createError({
           status: 403,
           message: 'Validation error',
@@ -120,10 +121,12 @@ export class UserController {
         })
       }
       const validator = {
-        password: /^(.{0,7}|[^0-9]*|[^A-Z]*|[^a-z]*|[a-zA-Z0-9]*)$/,
+        password:
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/,
       }
       const checkNewPassword = validator.password.test(newPassword)
-      if (checkNewPassword) {
+      console.log(checkNewPassword)
+      if (!checkNewPassword) {
         throw createError({
           status: 403,
           message: 'Validation error',
@@ -156,13 +159,6 @@ export class UserController {
         statusMessage: 'Unexpected error occurred, please try again.',
       })
     }
-    // const payload = {
-    //   id: user.id,
-    // }
-    // // set access token
-    // const accessToken = jwt.sign(payload, config.jwtSecret, {
-    //   expiresIn: '7d',
-    // })
     setResponseStatus(e, 200, 'Successfully updated user password')
     const status = getResponseStatus(e)
     const text = getResponseStatusText(e)
@@ -170,7 +166,6 @@ export class UserController {
     return {
       status,
       message: text,
-      // access_token: `Bearer ${accessToken}`,
     }
   }
   public async updateUserName(e: H3Event<EventHandlerRequest>) {

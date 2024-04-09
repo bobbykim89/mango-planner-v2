@@ -156,7 +156,7 @@ const getPlans = computed(() => {
 <template>
   <section class="container py-md lg:py-lg min-h-[75vh]">
     <div
-      class="grid md:grid-cols-2 gap-md grid-flow-row px-xs"
+      class="grid md:grid-cols-2 gap-md grid-flow-row px-sm md:px-xs"
       @keyup.esc="closeModal(), onClear()"
     >
       <div>

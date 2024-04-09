@@ -99,6 +99,8 @@ const formTextColor = computed<ColorPalette>(() => {
               highlight-color="warning"
               rounded
               required
+              pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$"
+              invalid-feedback="Password must include one number, one uppercase and lowercase letter, one special character with at least 8 characters length."
               v-model="signUpCred.password"
             ></MclInputText>
           </MclFormGroup>
