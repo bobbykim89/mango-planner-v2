@@ -3,12 +3,19 @@ import { Modal } from '@bobbykim/manguito-theme'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import PlanInputForm from '@/components/plans/PlanInputForm.vue'
 import type { PlanFormInput, TypeInputLiteralType } from '@/types'
-import { useUserStore, useProfileStore, usePlanStore } from '@/stores'
+import {
+  useUserStore,
+  useProfileStore,
+  usePlanStore,
+  useInitPiniaStore,
+} from '@/stores'
 import UtilityBlock from '@/components/plans/UtilityBlock.vue'
 import { storeToRefs } from 'pinia'
 import PlanCollapsable from '@/components/plans/PlanCollapsable.vue'
 import { Plan } from '@/server/models'
 import draggable from 'vuedraggable'
+import MobileUtilityToggleButton from '@/components/plans/MobileUtilityToggleButton.vue'
+import MobileUtilityBlock from '@/components/plans/MobileUtilityBlock.vue'
 
 definePageMeta({
   middleware: ['auth-route'],
@@ -27,12 +34,14 @@ type ModalFormType = 'new' | 'update'
 const userStore = useUserStore()
 const profileStore = useProfileStore()
 const planStore = usePlanStore()
+const initPiniaStore = useInitPiniaStore()
 const { isAuthenticated } = storeToRefs(userStore)
 const { userProfile } = storeToRefs(profileStore)
+const { mounted } = storeToRefs(initPiniaStore)
 const searchTerm = ref<string>('')
 const modalRef = ref<InstanceType<typeof Modal>>()
-const confirmModal = ref<InstanceType<typeof Modal>>()
 const modalForm = ref<ModalFormType>('new')
+const mobileUtilityToggle = ref<boolean>(false)
 const displayStyle = ref<PlanDisplayStyle>('all')
 const updateDataForm = reactive<PlanFormInput>({
   title: '',
@@ -71,6 +80,7 @@ const handleShowCustomClick = (e: Event) => {
 }
 const openModal = () => {
   modalForm.value = 'new'
+  mobileUtilityToggle.value = false
   modalRef.value!.open()
 }
 const closeModal = () => {
@@ -139,6 +149,9 @@ const onOrderUpdate = async () => {
   await profileStore.getCurrentUserProfile()
   customOrderData.value = planStore.getPlansByOrder
 }
+const onMobileUtilityToggle = (open: boolean) => {
+  mobileUtilityToggle.value = !open
+}
 const getPlans = computed(() => {
   if (displayStyle.value === 'search') {
     return planStore.getAllPlans.filter((item) => {
@@ -156,14 +169,30 @@ const getPlans = computed(() => {
 <template>
   <section class="container py-md lg:py-lg min-h-[75vh]">
     <div
-      class="grid md:grid-cols-2 gap-md grid-flow-row px-sm md:px-xs"
+      v-if="mounted"
+      class="grid md:grid-cols-2 gap-md grid-flow-row px-sm md:px-xs relative"
       @keyup.esc="closeModal(), onClear()"
     >
-      <div>
+      <!-- mobile utility block -->
+      <MobileUtilityToggleButton
+        :open="mobileUtilityToggle"
+        @toggle="onMobileUtilityToggle"
+      ></MobileUtilityToggleButton>
+      <Transition name="mobile-utility">
+        <MobileUtilityBlock
+          v-show="mobileUtilityToggle"
+          :hasProfile="userProfileStatus"
+          @new-post="openModal"
+          @show-all="handleShowAllClick"
+          @show-incomplete="handleShowIncompleteClick"
+          @show-custom="handleShowCustomClick"
+          @search-update="updateSearchTerm"
+        ></MobileUtilityBlock>
+      </Transition>
+      <!-- left column -->
+      <div class="hidden md:block">
         <!-- input form desktop -->
-        <div
-          class="bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md hidden md:block"
-        >
+        <div class="bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md">
           <h3 class="h3-md text-warning mb-xs">Create New Plan</h3>
           <PlanInputForm
             prefix="desktop-new"
@@ -173,7 +202,6 @@ const getPlans = computed(() => {
         <!-- utility block -->
         <UtilityBlock
           :hasProfile="userProfileStatus"
-          @new-post="openModal"
           @show-all="handleShowAllClick"
           @show-incomplete="handleShowIncompleteClick"
           @show-custom="handleShowCustomClick"
@@ -226,6 +254,11 @@ const getPlans = computed(() => {
         </Transition>
       </div>
     </div>
+    <div v-else class="min-h-[60vh] flex items-center">
+      <div
+        class="loader border-light-3 dark:border-light-4 border-t-warning dark:border-t-warning border-[20px] rounded-full w-[200px] h-[200px] mx-auto"
+      ></div>
+    </div>
     <Modal
       ref="modalRef"
       placement="center"
@@ -276,6 +309,7 @@ const getPlans = computed(() => {
 </template>
 
 <style scoped>
+/* plan items transition animation */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease, transform 0.2s ease;
@@ -288,5 +322,27 @@ const getPlans = computed(() => {
 .fade-leave-to {
   opacity: 0;
   transform: translateX(10%);
+}
+/* mobileUtility block transition animation */
+.mobile-utility-enter-active,
+.mobile-utility-leave-active {
+  transition: transform 0.3s ease;
+}
+.mobile-utility-enter-from,
+.mobile-utility-leave-to {
+  transform: translateX(-100%);
+}
+
+/* spinner animation */
+.loader {
+  animation: spinner 2s linear infinite;
+}
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
