@@ -23,10 +23,7 @@ definePageMeta({
 
 useHead({
   title: 'Mango Planner | Home',
-  meta: [
-    { name: 'description', content: 'Main page' },
-    { property: 'og:title', content: 'Mango Planner | Home' },
-  ],
+  meta: [{ property: 'og:title', content: 'Mango Planner | Home' }],
 })
 
 type PlanDisplayStyle = 'all' | 'incomplete' | 'custom' | 'search'

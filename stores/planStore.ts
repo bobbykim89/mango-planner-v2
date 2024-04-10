@@ -150,7 +150,8 @@ export const usePlanStore = defineStore('plan', () => {
     alertStore.setAlert(
       `Successfully marked the plan ${
         res.complete ? 'completed' : 'incomplete'
-      }`
+      }`,
+      'success'
     )
   }
   const deletePost = async (payload: string) => {
