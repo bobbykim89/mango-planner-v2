@@ -148,7 +148,7 @@ export const usePlanStore = defineStore('plan', () => {
     await getAllPostByUser()
     initPinaStore.setLoading(false)
     alertStore.setAlert(
-      `Successfulled marked the plan ${
+      `Successfully marked the plan ${
         res.complete ? 'completed' : 'incomplete'
       }`
     )
