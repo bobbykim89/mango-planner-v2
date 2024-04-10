@@ -49,7 +49,7 @@ export const useUserStore = defineStore('user', () => {
     currentUser.value = res
     isAuthenticated.value = true
     initPiniaStore.setLoading(false)
-    alertStore.setAlert('Successfully authenticated user')
+    alertStore.setAlert('Successfully authenticated user', 'success')
   }
   const loginWithCredential = async (payload: {
     email: string
@@ -70,7 +70,7 @@ export const useUserStore = defineStore('user', () => {
       cookie.value = res.access_token
       await getCurrentUser()
       initPiniaStore.setLoading(false)
-      alertStore.setAlert('Login Successful!')
+      alertStore.setAlert('Login Successful!', 'success')
     } catch (error) {
       alertStore.setAlert((error as H3Error).statusMessage!)
       currentUser.value = null
@@ -98,7 +98,7 @@ export const useUserStore = defineStore('user', () => {
       cookie.value = res.access_token
       await getCurrentUser()
       initPiniaStore.setLoading(false)
-      alertStore.setAlert('Signup Successful!')
+      alertStore.setAlert('Signup Successful!', 'success')
     } catch (error) {
       alertStore.setAlert((error as H3Error).statusMessage!)
       initPiniaStore.setLoading(false)
@@ -124,7 +124,7 @@ export const useUserStore = defineStore('user', () => {
       }
       await getCurrentUser()
       initPiniaStore.setLoading(false)
-      alertStore.setAlert('Successfully updated username!')
+      alertStore.setAlert('Successfully updated username!', 'success')
     } catch (error) {
       alertStore.setAlert((error as H3Error).statusMessage!)
       initPiniaStore.setLoading(false)
@@ -153,7 +153,7 @@ export const useUserStore = defineStore('user', () => {
       }
       await getCurrentUser()
       initPiniaStore.setLoading(false)
-      alertStore.setAlert('Successfully updated user password!')
+      alertStore.setAlert('Successfully updated user password!', 'success')
     } catch (error) {
       alertStore.setAlert((error as H3Error).statusMessage!)
       initPiniaStore.setLoading(false)
@@ -167,7 +167,7 @@ export const useUserStore = defineStore('user', () => {
     planStore.clearPlanData()
     profileStore.clearProfileData()
     initPiniaStore.setLoading(false)
-    alertStore.setAlert('Logout Successful!')
+    alertStore.setAlert('Logout Successful!', 'success')
   }
   return {
     currentUser,

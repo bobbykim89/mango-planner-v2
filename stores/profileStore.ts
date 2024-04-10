@@ -66,7 +66,7 @@ export const useProfileStore = defineStore('profile', () => {
     }
     await getCurrentUserProfile()
     initPiniaStore.setLoading(false)
-    alertStore.setAlert('Successfully created user profile!')
+    alertStore.setAlert('Successfully created user profile!', 'success')
   }
   const updateUserProfilePicture = async (payload: FormData) => {
     const { isAuthenticated } = userStore.getCurrentAuthInfo
@@ -91,7 +91,7 @@ export const useProfileStore = defineStore('profile', () => {
     }
     await getCurrentUserProfile()
     initPiniaStore.setLoading(false)
-    alertStore.setAlert('Successfully updated profile picture!')
+    alertStore.setAlert('Successfully updated profile picture!', 'success')
   }
   const updateUserPlansOrder = async (payload: { plansOrder: string[] }) => {
     const { isAuthenticated } = userStore.getCurrentAuthInfo
@@ -137,7 +137,8 @@ export const useProfileStore = defineStore('profile', () => {
     await getCurrentUserProfile()
     initPiniaStore.setLoading(false)
     alertStore.setAlert(
-      `Darkmode ${userProfile.value?.dark ? 'enabled' : 'disabled'}`
+      `Darkmode ${userProfile.value?.dark ? 'enabled' : 'disabled'}`,
+      'success'
     )
   }
   const clearProfileData = () => {

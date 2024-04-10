@@ -9,7 +9,7 @@ const emit = defineEmits<{
   (e: 'show-all', event: Event): void
   (e: 'show-incomplete', event: Event): void
   (e: 'show-custom', event: Event): void
-  // (e: 'new-post', event: Event): void
+  (e: 'new-post', event: Event): void
   (e: 'search-update', searchTerm: string): void
 }>()
 const searchTerm = ref<string>('')
@@ -23,9 +23,9 @@ const onShowIncompleteClick = (e: Event) => {
 const onShowCustomClick = (e: Event) => {
   emit('show-custom', e)
 }
-// const onNewPostClick = (e: Event) => {
-//   emit('new-post', e)
-// }
+const onNewPostClick = (e: Event) => {
+  emit('new-post', e)
+}
 watch(
   () => searchTerm.value,
   (newValue) => {
@@ -37,12 +37,12 @@ watch(
 <template>
   <!-- utility block -->
   <div
-    class="bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md md:mt-md"
+    class="fixed bottom-0 left-0 md:hidden z-10 w-11/12 bg-light-2 dark:bg-dark-3 rounded-tr-md p-xs drop-shadow-md mt-md"
   >
     <!-- search bar -->
     <div class="flex gap-2xs mb-2xs">
       <label
-        for="search-bar"
+        for="search-bar-mobile"
         class="mb-0 bg-warning p-2xs text-light-1 h-full rounded-l-md"
         title="Search"
       >
@@ -59,7 +59,7 @@ watch(
         </svg>
       </label>
       <MclInputText
-        id="search-bar"
+        id="search-bar-mobile"
         highlight-color="warning"
         placeholder="Search"
         class="w-full"
@@ -127,8 +127,8 @@ watch(
         </svg>
       </button>
       <!-- new -- mobile -->
-      <!-- <button
-        class="btn btn-warning btn-full text-dark-3 md:!hidden"
+      <button
+        class="btn btn-warning btn-full text-dark-3"
         aria-label="new"
         title="new"
         @click="onNewPostClick"
@@ -139,12 +139,12 @@ watch(
           fill="currentColor"
           class="h-sm mx-auto"
         >
-          !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.
+          <!-- !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
           <path
             d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"
           />
         </svg>
-      </button> -->
+      </button>
     </div>
   </div>
 </template>

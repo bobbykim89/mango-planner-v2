@@ -101,7 +101,7 @@ export const usePlanStore = defineStore('plan', () => {
     }
     plans.value = [res, ...plans.value]
     initPinaStore.setLoading(false)
-    alertStore.setAlert('Successfully created new plan!')
+    alertStore.setAlert('Successfully created new plan!', 'success')
   }
   const updatePost = async (payload: { id: string; body: PlanInput }) => {
     const { isAuthenticated } = userStore.getCurrentAuthInfo
@@ -124,7 +124,7 @@ export const usePlanStore = defineStore('plan', () => {
     }
     await getAllPostByUser()
     initPinaStore.setLoading(false)
-    alertStore.setAlert('Successfully updated plan!')
+    alertStore.setAlert('Successfully updated plan!', 'success')
   }
   const toggleComplete = async (payload: { id: string; body: PlanInput }) => {
     const { isAuthenticated } = userStore.getCurrentAuthInfo
@@ -173,7 +173,7 @@ export const usePlanStore = defineStore('plan', () => {
     }
     await getAllPostByUser()
     initPinaStore.setLoading(false)
-    alertStore.setAlert('Successfully deleted plan!')
+    alertStore.setAlert('Successfully deleted plan!', 'success')
   }
   const clearPlanData = () => {
     plans.value = []

@@ -29,7 +29,7 @@ await useAsyncData('initPinia', () => initPiniaStore.initStores())
 const alertStore = useAlertStore()
 const userStore = useUserStore()
 const profileStore = useProfileStore()
-const { alert } = storeToRefs(alertStore)
+const { alert, alertColor } = storeToRefs(alertStore)
 const { loading } = storeToRefs(initPiniaStore)
 const { currentUser, isAuthenticated } = storeToRefs(userStore)
 const { userProfile } = storeToRefs(profileStore)
@@ -82,6 +82,12 @@ const handleFooterMenuColor = computed<ColorPalette>(() => {
     return 'light-2'
   }
   return 'dark-2'
+})
+const handleMobileMenuBgColor = computed<ColorPalette>(() => {
+  if (userProfile.value !== null && userProfile.value.dark) {
+    return 'dark-2'
+  }
+  return 'light-4'
 })
 
 const handleTitleClick = (e: Event, url: string, target: CtaTarget) => {
@@ -173,6 +179,7 @@ watch(
     <HeaderHorizontal
       ref="headerRef"
       :bg-color="handleBgColors"
+      :mobile-menu-bg-color="handleMobileMenuBgColor"
       :scroll-distance="100"
     >
       <template #content
@@ -219,7 +226,7 @@ watch(
             @username-click="sidebarOpen"
           ></LayoutAuthBlock></div
       ></template>
-      <template #mobile-content="{ headerClose }"
+      <template #mobile-content
         ><div class="py-xs">
           <LayoutAuthBlock
             :auth="isAuthenticated"
@@ -236,7 +243,12 @@ watch(
     </HeaderHorizontal>
     <div class="bg-light-4 dark:bg-dark-2">
       <div class="container pt-xs px-sm md:px-xs">
-        <Alert :show="alert !== null" dismissible @close="onAlertClose">
+        <Alert
+          :show="alert !== null"
+          :color="alertColor"
+          dismissible
+          @close="onAlertClose"
+        >
           <div class="flex justify-center text-light-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
