@@ -196,7 +196,7 @@ const getPlans = computed(() => {
                   @toggle-complete="handleCollapseToggle"
                   @edit="handleCollapseEdit"
                   @delete="handleCollapseDelete"
-                  class="mb-xs last:mb-0"
+                  class="mb-sm last:mb-0"
                 ></PlanCollapsable>
               </template>
             </draggable>
@@ -209,7 +209,7 @@ const getPlans = computed(() => {
               @toggle-complete="handleCollapseToggle"
               @edit="handleCollapseEdit"
               @delete="handleCollapseDelete"
-              class="mb-xs last:mb-0"
+              class="mb-sm last:mb-0"
             ></PlanCollapsable>
           </div>
           <div v-else>
@@ -220,7 +220,7 @@ const getPlans = computed(() => {
               @toggle-complete="handleCollapseToggle"
               @edit="handleCollapseEdit"
               @delete="handleCollapseDelete"
-              class="mb-xs last:mb-0"
+              class="mb-sm last:mb-0"
             ></PlanCollapsable>
           </div>
         </Transition>

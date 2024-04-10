@@ -1,11 +1,12 @@
 import { storeToRefs } from 'pinia'
 import { useInitPiniaStore, useUserStore, useAlertStore } from '@/stores'
 
-export default defineNuxtRouteMiddleware(() => {
+export default defineNuxtRouteMiddleware(async () => {
   const userStore = useUserStore()
   const initPiniaStore = useInitPiniaStore()
   const alertStore = useAlertStore()
   const { mounted } = storeToRefs(initPiniaStore)
+  await userStore.getCurrentUser()
   const { isAuthenticated } = userStore.getCurrentAuthInfo
   if (mounted.value && !isAuthenticated) {
     alertStore.setAlert(
