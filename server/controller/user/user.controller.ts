@@ -1,5 +1,5 @@
 import { useRuntimeConfig } from '#imports'
-import { User, Profile } from '@/server/models'
+import { Profile, User } from '@/server/models'
 import bcrypt from 'bcryptjs'
 import {
   EventHandlerRequest,
@@ -11,7 +11,7 @@ import {
   setResponseStatus,
 } from 'h3'
 import jwt from 'jsonwebtoken'
-import type { UserInput, PwUpdateInput, NewUsernameInput } from './dto'
+import type { NewUsernameInput, PwUpdateInput, UserInput } from './dto'
 
 const config = useRuntimeConfig()
 

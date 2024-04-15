@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { useUserStore, usePlanStore, useProfileStore } from './'
+import { usePlanStore, useProfileStore, useUserStore } from './'
 
 export const useInitPiniaStore = defineStore('init', () => {
   const userStore = useUserStore()

@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { useInitPiniaStore, useProfileStore, useUserStore } from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { MclFormGroup, MclInputText } from '@bobbykim/mcl-forms'
-import { useUserStore, useInitPiniaStore, useProfileStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 
 definePageMeta({

@@ -1,8 +1,8 @@
-import { User, Profile, Plan } from '@/server/models'
+import { Plan, Profile, User } from '@/server/models'
+import { deleteCloudinaryImage } from '@/server/utils/cloudinary.util'
 import type { EventHandlerRequest, H3Event } from 'h3'
 import { createError, readValidatedBody } from 'h3'
 import type { ProfileInput } from './dto'
-import { deleteCloudinaryImage } from '@/server/utils/cloudinary.util'
 
 export class ProfileController {
   public async getCurrentProfile(e: H3Event<EventHandlerRequest>) {

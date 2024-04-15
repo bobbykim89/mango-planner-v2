@@ -59,13 +59,13 @@ export default defineNuxtConfig({
   css: ['~/assets/css/page_transition.scss'],
   tailwindcss: {
     cssPath: '~/assets/css/tailwind.css',
-    configPath: 'tailwind.config.js',
+    configPath: 'tailwind.config.ts',
     exposeConfig: false,
     viewer: true,
   },
-  build: {
-    transpile: ['@bobbykim'],
-  },
+  // build: {
+  //   transpile: ['@bobbykim'],
+  // },
   nitro: {
     plugins: ['~/server/plugin/connectDb.ts'],
   },

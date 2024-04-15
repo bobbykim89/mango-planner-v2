@@ -1,7 +1,8 @@
-import { mclTheme } from '@bobbykim/manguito-theme/themeVariables.cjs'
+import { mclTheme } from '@bobbykim/manguito-theme/mcl-theme'
+import type { Config } from 'tailwindcss'
 
 /** @type {import('tailwindcss').Config} */
-export default {
+export default <Partial<Config>>{
   darkMode: 'class',
   content: [
     './src/**/*.{vue,ts,js,cjs}',

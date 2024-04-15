@@ -37,7 +37,7 @@ watch(
 <template>
   <!-- utility block -->
   <div
-    class="bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md md:mt-md"
+    class="hidden md:block bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md md:mt-md"
   >
     <!-- search bar -->
     <div class="flex gap-2xs mb-2xs">
