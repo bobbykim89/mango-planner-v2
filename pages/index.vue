@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { Modal } from '@bobbykim/manguito-theme'
-import type { ColorPalette } from '@bobbykim/manguito-theme'
-import PlanInputForm from '@/components/plans/PlanInputForm.vue'
-import type { PlanFormInput, TypeInputLiteralType } from '@/types'
-import {
-  useUserStore,
-  useProfileStore,
-  usePlanStore,
-  useInitPiniaStore,
-} from '@/stores'
-import UtilityBlock from '@/components/plans/UtilityBlock.vue'
-import { storeToRefs } from 'pinia'
-import PlanCollapsable from '@/components/plans/PlanCollapsable.vue'
-import { Plan } from '@/server/models'
-import draggable from 'vuedraggable'
-import MobileUtilityToggleButton from '@/components/plans/MobileUtilityToggleButton.vue'
 import MobileUtilityBlock from '@/components/plans/MobileUtilityBlock.vue'
+import MobileUtilityToggleButton from '@/components/plans/MobileUtilityToggleButton.vue'
+import PlanCollapsable from '@/components/plans/PlanCollapsable.vue'
+import PlanInputForm from '@/components/plans/PlanInputForm.vue'
+import UtilityBlock from '@/components/plans/UtilityBlock.vue'
+import { Plan } from '@/server/models'
+import {
+  useInitPiniaStore,
+  usePlanStore,
+  useProfileStore,
+  useUserStore,
+} from '@/stores'
+import type { PlanFormInput, TypeInputLiteralType } from '@/types'
+import type { ColorPalette } from '@bobbykim/manguito-theme'
+import { Modal } from '@bobbykim/manguito-theme'
+import { storeToRefs } from 'pinia'
+import draggable from 'vuedraggable'
 
 definePageMeta({
   middleware: ['auth-route'],
@@ -167,7 +167,7 @@ const getPlans = computed(() => {
   <section class="container py-md lg:py-lg min-h-[75vh]">
     <div
       v-if="mounted"
-      class="grid md:grid-cols-2 gap-md grid-flow-row px-sm md:px-xs relative"
+      class="grid md:grid-cols-2 gap-xs md:gap-md grid-flow-row px-sm md:px-xs relative"
       @keyup.esc="closeModal(), onClear()"
     >
       <!-- mobile utility block -->
@@ -187,9 +187,11 @@ const getPlans = computed(() => {
         ></MobileUtilityBlock>
       </Transition>
       <!-- left column -->
-      <div class="hidden md:block">
+      <div>
         <!-- input form desktop -->
-        <div class="bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md">
+        <div
+          class="hidden md:block bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md"
+        >
           <h3 class="h3-md text-warning mb-xs">Create New Plan</h3>
           <PlanInputForm
             prefix="desktop-new"
@@ -204,6 +206,28 @@ const getPlans = computed(() => {
           @show-custom="handleShowCustomClick"
           @search-update="updateSearchTerm"
         ></UtilityBlock>
+        <div class="flex justify-end">
+          <button
+            class="btn btn-warning text-dark-3 md:!hidden px-md"
+            aria-label="new"
+            title="new"
+            @click="openModal"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 448 512"
+              fill="currentColor"
+              class="h-sm mx-auto"
+            >
+              !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com
+              License - https://fontawesome.com/license/free Copyright 2024
+              Fonticons, Inc.
+              <path
+                d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
       <!-- right column -->
       <div>

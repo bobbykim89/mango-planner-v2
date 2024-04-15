@@ -1,13 +1,13 @@
+import { User } from '@/server/models'
+import type { H3Error } from 'h3'
 import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
 import {
   useAlertStore,
   useInitPiniaStore,
   usePlanStore,
   useProfileStore,
 } from './'
-import { User } from '@/server/models'
-import { ref, computed } from 'vue'
-import type { H3Error } from 'h3'
 
 type UserType = InstanceType<typeof User>
 
