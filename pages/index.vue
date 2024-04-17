@@ -28,6 +28,7 @@ useHead({
 
 type PlanDisplayStyle = 'all' | 'incomplete' | 'custom' | 'search'
 type ModalFormType = 'new' | 'update'
+const router = useRouter()
 const userStore = useUserStore()
 const profileStore = useProfileStore()
 const planStore = usePlanStore()
@@ -207,6 +208,7 @@ const getPlans = computed(() => {
           @search-update="updateSearchTerm"
         ></UtilityBlock>
         <div class="flex justify-end">
+          <!-- mobile new button -->
           <button
             class="btn btn-warning text-dark-3 md:!hidden px-md"
             aria-label="new"
@@ -219,9 +221,9 @@ const getPlans = computed(() => {
               fill="currentColor"
               class="h-sm mx-auto"
             >
-              !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com
+              <!-- Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com
               License - https://fontawesome.com/license/free Copyright 2024
-              Fonticons, Inc.
+              Fonticons, Inc. -->
               <path
                 d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"
               />
@@ -231,6 +233,20 @@ const getPlans = computed(() => {
       </div>
       <!-- right column -->
       <div>
+        <div
+          v-if="planStore.getAllPlans.length === 0"
+          class="text-center bg-light-3 dark:bg-dark-3 rounded-md drop-shadow-md px-sm md:px-md py-md"
+        >
+          <div class="mb-sm text-lg text-dark-3 dark:text-light-3">
+            <p>
+              There is no plans made so far, please click on below button for
+              more info.
+            </p>
+          </div>
+          <NuxtLink to="/info" class="btn btn-warning"
+            >Go to Info page</NuxtLink
+          >
+        </div>
         <Transition name="fade" mode="out-in">
           <div v-if="displayStyle === 'custom'">
             <draggable
