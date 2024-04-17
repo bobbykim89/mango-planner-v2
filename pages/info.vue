@@ -134,7 +134,7 @@ const { isAuthenticated } = storeToRefs(userStore)
         <NuxtLink
           :to="isAuthenticated ? '/' : '/auth/login'"
           class="btn btn-warning"
-          >Go to {{ isAuthenticated ? 'Main' : 'Login' }}</NuxtLink
+          >Go to {{ isAuthenticated ? 'Main' : 'Login' }} page</NuxtLink
         >
       </div>
     </div>

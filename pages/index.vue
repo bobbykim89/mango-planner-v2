@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import MobileUtilityBlock from '@/components/plans/MobileUtilityBlock.vue'
 import MobileUtilityToggleButton from '@/components/plans/MobileUtilityToggleButton.vue'
+import NavigateToInfo from '@/components/plans/NavigateToInfo.vue'
 import PlanCollapsable from '@/components/plans/PlanCollapsable.vue'
 import PlanInputForm from '@/components/plans/PlanInputForm.vue'
 import UtilityBlock from '@/components/plans/UtilityBlock.vue'
@@ -28,7 +29,7 @@ useHead({
 
 type PlanDisplayStyle = 'all' | 'incomplete' | 'custom' | 'search'
 type ModalFormType = 'new' | 'update'
-const router = useRouter()
+
 const userStore = useUserStore()
 const profileStore = useProfileStore()
 const planStore = usePlanStore()
@@ -233,20 +234,9 @@ const getPlans = computed(() => {
       </div>
       <!-- right column -->
       <div>
-        <div
+        <NavigateToInfo
           v-if="planStore.getAllPlans.length === 0"
-          class="text-center bg-light-3 dark:bg-dark-3 rounded-md drop-shadow-md px-sm md:px-md py-md"
-        >
-          <div class="mb-sm text-lg text-dark-3 dark:text-light-3">
-            <p>
-              There is no plans made so far, please click on below button for
-              more info.
-            </p>
-          </div>
-          <NuxtLink to="/info" class="btn btn-warning"
-            >Go to Info page</NuxtLink
-          >
-        </div>
+        ></NavigateToInfo>
         <Transition name="fade" mode="out-in">
           <div v-if="displayStyle === 'custom'">
             <draggable
