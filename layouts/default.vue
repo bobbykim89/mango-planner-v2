@@ -46,6 +46,11 @@ const footerMenuItems: MenuItemType[] = [
     target: '_self',
   },
   {
+    title: 'Info',
+    url: '/info',
+    target: '_self',
+  },
+  {
     title: 'About',
     url: '/about',
     target: '_self',
