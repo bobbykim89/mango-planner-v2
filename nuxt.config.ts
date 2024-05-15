@@ -63,11 +63,11 @@ export default defineNuxtConfig({
     exposeConfig: false,
     viewer: true,
   },
-  // build: {
-  //   transpile: ['@bobbykim'],
-  // },
   nitro: {
     plugins: ['~/server/plugin/connectDb.ts'],
+    experimental: {
+      openAPI: true,
+    },
   },
   pwa: {
     strategies: 'generateSW',
