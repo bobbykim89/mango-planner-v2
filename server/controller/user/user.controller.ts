@@ -1,5 +1,5 @@
 import { useRuntimeConfig } from '#imports'
-import { User } from '@/server/models'
+import { Profile, User } from '@/server/models'
 import bcrypt from 'bcryptjs'
 import {
   EventHandlerRequest,
@@ -11,7 +11,7 @@ import {
   setResponseStatus,
 } from 'h3'
 import jwt from 'jsonwebtoken'
-import type { UserInput, PwUpdateInput, NewUsernameInput } from './dto'
+import type { NewUsernameInput, PwUpdateInput, UserInput } from './dto'
 
 const config = useRuntimeConfig()
 
@@ -75,7 +75,26 @@ export class UserController {
     })
     const salt = await bcrypt.genSalt(10)
     user.password = await bcrypt.hash(password, salt)
-    await user.save()
+    const saveUserData = await user.save()
+    if (!saveUserData) {
+      throw createError({
+        status: 500,
+        message: 'Server error',
+        statusMessage: 'Unexpected error occurred, please try again.',
+      })
+    }
+    // create user profile for new users
+    const userProfile = new Profile({
+      user: user.id,
+    })
+    const saveUserProfile = await userProfile.save()
+    if (!saveUserProfile) {
+      throw createError({
+        status: 500,
+        message: 'Server error',
+        statusMessage: 'Unexpected error occurred, please try again.',
+      })
+    }
     const payload = {
       id: user.id,
     }
@@ -83,6 +102,7 @@ export class UserController {
     const accessToken = jwt.sign(payload, config.jwtSecret, {
       expiresIn: '7d',
     })
+
     setResponseStatus(e, 200, 'Successfully created new user')
     const status = getResponseStatus(e)
     const text = getResponseStatusText(e)

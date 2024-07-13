@@ -37,7 +37,7 @@ watch(
 <template>
   <!-- utility block -->
   <div
-    class="bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md md:mt-md"
+    class="hidden md:block bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md md:mt-md"
   >
     <!-- search bar -->
     <div class="flex gap-2xs mb-2xs">
@@ -67,7 +67,7 @@ watch(
       ></MclInputText>
     </div>
     <!-- sort buttons -->
-    <div class="btn-group">
+    <div class="btn-group w-full">
       <!-- sort list -->
       <button
         class="btn btn-light-4 dark:btn-light-3 btn-full text-dark-3"

@@ -1,8 +1,8 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { useUserStore, useAlertStore, useInitPiniaStore } from './'
 import { Profile } from '@/server/models'
 import type { H3Error } from 'h3'
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import { useAlertStore, useInitPiniaStore, useUserStore } from './'
 
 type ProfileType = InstanceType<typeof Profile>
 
