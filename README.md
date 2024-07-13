@@ -1,75 +1,45 @@
-# Nuxt 3 Minimal Starter
+# Mango Planner v2
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+A repository for source code of [Mango Planner v2](https://mango-planner.vercel.app/) project. Reworked original [Mango Planner](https://github.com/bobbykim89/mango-planner) using Nuxt 3.
 
 ## Setup
 
-Make sure to install the dependencies:
+Install dependencies:
 
 ```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
+## yarn
 yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
+## Dev server
 
-Start the development server on `http://localhost:3000`:
+Start dev server on port 3000
 
 ```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
+## yarn
 yarn dev
-
-# bun
-bun run dev
 ```
 
 ## Production
 
-Build the application for production:
+Build application for production
 
 ```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
+## yarn
 yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
+yarn preview ## locally preview production build
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+## Tech stack
+
+> Vue
+> Nuxt 3
+> Nitro (H3)
+> MongoDB
+> Mongoose
+> TailwindCSS (tailwindcss, postCSS, autoprefixer)
+> vueuse
+> Bcrypt
+> Manguito Component Library (MCL)
