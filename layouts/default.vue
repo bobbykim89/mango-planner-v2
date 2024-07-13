@@ -46,6 +46,11 @@ const footerMenuItems: MenuItemType[] = [
     target: '_self',
   },
   {
+    title: 'Info',
+    url: '/info',
+    target: '_self',
+  },
+  {
     title: 'About',
     url: '/about',
     target: '_self',
@@ -120,6 +125,7 @@ const onScrollToTop = () => {
 const onLogout = () => {
   userStore.logoutUser()
   sidebarClose()
+  headerRef.value?.headerClose()
   useColorMode().preference = 'light'
   router.push({ path: '/auth/login' })
 }
@@ -129,30 +135,34 @@ const onDarkModeClick = async (e: Event, dark: boolean) => {
 }
 const onUsernameChange = async (e: Event, name: string) => {
   e.preventDefault()
-  if (process.client && window.confirm('Please confirm username update')) {
+  if (import.meta.client && window.confirm('Please confirm username update')) {
     await userStore.updateUsername({ username: name })
   }
+  headerRef.value?.headerClose()
 }
 const onFileUpload = async (e: Event, file: File) => {
   e.preventDefault()
   const fileFormData = new FormData()
   fileFormData.append('image', file)
-  if (process.client && window.confirm('Please confirm file upload.')) {
+  if (import.meta.client && window.confirm('Please confirm file upload.')) {
     await profileStore.updateUserProfilePicture(fileFormData)
   }
+  headerRef.value?.headerClose()
 }
 const onPwUpdate = async (e: Event, currPw: string, newPw: string) => {
   e.preventDefault()
-  if (process.client && window.confirm('Please confirm password update.')) {
+  if (import.meta.client && window.confirm('Please confirm password update.')) {
     await userStore.updatePassword({
       currentPassword: currPw,
       newPassword: newPw,
     })
   }
+  headerRef.value?.headerClose()
 }
 const onProfileCreate = async (e: Event) => {
   e.preventDefault()
   await profileStore.postNewUserProfile()
+  headerRef.value?.headerClose()
 }
 watch(
   () => isAuthenticated.value,
@@ -227,9 +237,10 @@ watch(
           ></LayoutAuthBlock></div
       ></template>
       <template #mobile-content
-        ><div class="py-xs">
+        ><div>
           <LayoutAuthBlock
-            :auth="isAuthenticated"
+            v-if="!isAuthenticated"
+            :auth="false"
             login-url="/auth/login"
             signup-url="/auth/signup"
             url-target="_self"
@@ -238,8 +249,68 @@ watch(
             @login-click="handleAuthClick"
             @signup-click="handleAuthClick"
             @username-click="sidebarOpen"
-          ></LayoutAuthBlock></div
-      ></template>
+            class="py-xs"
+          ></LayoutAuthBlock>
+        </div>
+        <!-- user profile block: visible only when authenticated -->
+        <div v-if="isAuthenticated" class="text-light-3 pt-xs px-xs">
+          <div
+            class="grid gap-4"
+            :class="{ 'grid-cols-2': userProfile !== null }"
+          >
+            <WeatherWidget
+              v-if="coords.latitude !== null && coords.latitude !== Infinity"
+              :latitude="coords.latitude"
+              :longitude="coords.longitude"
+              :api-key="config.public.openWeatherApiKey"
+            ></WeatherWidget>
+            <DarkmodeWidget
+              v-if="userProfile !== null"
+              :dark="userProfile.dark"
+              @dark-click="onDarkModeClick"
+              class="self-center"
+            ></DarkmodeWidget>
+          </div>
+
+          <div v-if="userProfile !== null" class="mt-xs">
+            <UserInfoWidget
+              :username="currentUser?.name"
+              :profile-picture="userProfile?.profilePicture"
+              @on-username-update="onUsernameChange"
+              @on-file-upload="onFileUpload"
+              @on-pw-update="onPwUpdate"
+            ></UserInfoWidget>
+          </div>
+          <div v-else class="mt-xs">
+            <CreateProfileWidget
+              @btn-click="onProfileCreate"
+            ></CreateProfileWidget>
+          </div>
+        </div>
+        <!-- logout button -->
+        <div
+          v-if="isAuthenticated"
+          class="flex justify-center items-center text-dark-3 dark:text-light-3"
+        >
+          <button
+            class="px-xs py-xs flex items-center gap-3 text-lg font-bold hover:opacity-60 transition-opacity duration-300 ease-linear"
+            @click="onLogout"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 512 512"
+              class="h-xs"
+              fill="currentColor"
+            >
+              <!-- !Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
+              <path
+                d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z"
+              />
+            </svg>
+            <span>Logout</span>
+          </button>
+        </div>
+      </template>
     </HeaderHorizontal>
     <div class="bg-light-4 dark:bg-dark-2">
       <div class="container pt-xs px-sm md:px-xs">
@@ -359,7 +430,9 @@ watch(
           </div>
         </template>
         <template #footer>
-          <div class="flex justify-center items-center">
+          <div
+            class="flex justify-center items-center bg-light-3 dark:bg-dark-3"
+          >
             <button
               class="px-sm py-xs flex items-center gap-3 text-lg font-bold text-warning hover:opacity-60 transition-opacity duration-300 ease-linear"
               @click="onLogout"

@@ -1,6 +1,7 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
+  compatibilityDate: '2024-07-13',
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
@@ -59,15 +60,15 @@ export default defineNuxtConfig({
   css: ['~/assets/css/page_transition.scss'],
   tailwindcss: {
     cssPath: '~/assets/css/tailwind.css',
-    configPath: 'tailwind.config.js',
+    configPath: 'tailwind.config.ts',
     exposeConfig: false,
     viewer: true,
   },
-  build: {
-    transpile: ['@bobbykim'],
-  },
   nitro: {
     plugins: ['~/server/plugin/connectDb.ts'],
+    experimental: {
+      openAPI: true,
+    },
   },
   pwa: {
     strategies: 'generateSW',

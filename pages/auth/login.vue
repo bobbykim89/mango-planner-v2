@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { useInitPiniaStore, useProfileStore, useUserStore } from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { MclFormGroup, MclInputText } from '@bobbykim/mcl-forms'
-import { useUserStore, useInitPiniaStore, useProfileStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 
 definePageMeta({
@@ -88,6 +88,14 @@ const formTextColor = computed<ColorPalette>(() => {
           </MclFormGroup>
           <button role="submit" class="btn btn-warning btn-full">Submit</button>
         </form>
+        <p class="mt-sm text-dark-3 dark:text-light-3 text-center">
+          <span> Don't have account? Click</span>
+          <NuxtLink
+            to="/auth/signup"
+            class="mx-3xs font-bold mcl-link text-warning"
+            >Sign up</NuxtLink
+          >
+        </p>
       </div>
     </div>
   </div>

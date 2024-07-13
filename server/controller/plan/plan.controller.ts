@@ -1,6 +1,6 @@
 import type { EventHandlerRequest, H3Event } from 'h3'
 
-import { Plan, User, Profile } from '@/server/models'
+import { Plan, Profile, User } from '@/server/models'
 import {
   createError,
   getResponseStatus,
