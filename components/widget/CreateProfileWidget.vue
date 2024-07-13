@@ -11,7 +11,7 @@ const handleButtonClick = (e: Event) => {
 
 <template>
   <div
-    class="px-sm py-xs bg-light-4 dark:bg-dark-4 text-dark-3 dark:text-light-3 rounded-md drop-shadow-md"
+    class="px-xs py-2xs md:px-sm md:py-xs md:bg-light-4 md:dark:bg-dark-4 text-dark-3 dark:text-light-3 md:rounded-md md:drop-shadow-md"
   >
     <div class="mb-2xs font-bold flex gap-xs justify-center items-center">
       <svg

@@ -14,7 +14,9 @@ const handleColorModeButtonClick = (e: Event) => {
 </script>
 
 <template>
-  <div class="px-xs py-2xs bg-light-4 dark:bg-dark-4 rounded-md drop-shadow-md">
+  <div
+    class="py-3xs px-xs md:py-2xs md:bg-light-4 md:dark:bg-dark-4 rounded-md drop-shadow-md"
+  >
     <div
       class="relative h-lg before:absolute before:h-xs before:w-full before:bg-warning/75 dark:before:bg-warning/50 before:rounded-lg before:top-1/2 before:-translate-y-1/2 cursor-pointer hover:opacity-80 transition-opacity duration-300 ease-linear"
       role="button"

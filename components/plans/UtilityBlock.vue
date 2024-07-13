@@ -67,7 +67,7 @@ watch(
       ></MclInputText>
     </div>
     <!-- sort buttons -->
-    <div class="btn-group">
+    <div class="btn-group w-full">
       <!-- sort list -->
       <button
         class="btn btn-light-4 dark:btn-light-3 btn-full text-dark-3"

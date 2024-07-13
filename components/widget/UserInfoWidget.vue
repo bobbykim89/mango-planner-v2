@@ -53,31 +53,31 @@ const formTextColor = computed<ColorPalette>(() => {
 
 <template>
   <div
-    class="px-2xs py-xs bg-light-4 dark:bg-dark-4 text-dark-3 dark:text-light-3 rounded-md drop-shadow-md"
+    class="md:px-2xs md:py-xs md:bg-light-4 md:dark:bg-dark-4 text-dark-3 dark:text-light-3 md:rounded-md md:drop-shadow-md"
   >
-    <div>
+    <div class="hidden md:block">
       <h4 class="h4-md mb-xs">My Info</h4>
     </div>
     <!-- current user profile -->
     <div
-      class="rounded-md drop-shadow-md overflow-hidden mb-xs px-xs py-sm bg-light-3 dark:bg-dark-3 flex flex-col justic-center items-center"
+      class="rounded-t-md md:rounded-md drop-shadow-md overflow-hidden md:mb-xs px-2xs py-2xs md:px-xs md:py-sm bg-light-3 dark:bg-dark-3 flex md:flex-col justify-center items-center gap-xs md:gap-sm"
     >
       <img
         v-if="profilePicture !== ''"
         :src="cloudinaryBaseUrl + profilePicture"
         alt="profile picture"
-        class="object-center object-cover aspect-square rounded-full h-2xl mb-sm"
+        class="object-center object-cover aspect-square rounded-full h-md md:h-2xl"
       />
       <img
         v-else
         :src="DefaultProfile"
         alt="placeholder profile picture"
-        class="object-center object-cover aspect-square rounded-full h-2xl mb-sm"
+        class="object-center object-cover aspect-square rounded-full h-md md:h-2xl"
       />
-      <p>{{ username }}</p>
+      <p class="font-bold">{{ username }}</p>
     </div>
     <!-- username update -->
-    <div class="rounded-md drop-shadow-md overflow-hidden mb-xs">
+    <div class="md:rounded-md drop-shadow-md overflow-hidden md:mb-xs">
       <button
         v-collapse:update-username
         class="block w-full py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-opacity-60 transition-all duration-300 ease-linear text-left"
@@ -113,7 +113,7 @@ const formTextColor = computed<ColorPalette>(() => {
       </Collapse>
     </div>
     <!-- profile picture update -->
-    <div class="rounded-md drop-shadow-md overflow-hidden mb-xs">
+    <div class="md:rounded-md drop-shadow-md overflow-hidden md:mb-xs">
       <button
         v-collapse:update-profile-picture
         class="block w-full py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-opacity-60 transition-all duration-300 ease-linear text-left"
@@ -150,10 +150,12 @@ const formTextColor = computed<ColorPalette>(() => {
       </Collapse>
     </div>
     <!-- password update -->
-    <div class="rounded-md drop-shadow-md overflow-hidden mb-xs">
+    <div
+      class="rounded-b-md md:rounded-md drop-shadow-md overflow-hidden md:mb-xs"
+    >
       <button
         v-collapse:update-password
-        class="block w-full py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-opacity-60 transition-all duration-300 ease-linear text-left"
+        class="block w-full pt-3xs pb-2xs md:py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-opacity-60 transition-all duration-300 ease-linear text-left"
       >
         Update Password
       </button>

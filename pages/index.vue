@@ -124,7 +124,10 @@ const handleCollapseEdit = (e: Event, item: InstanceType<typeof Plan>) => {
 }
 const onEditSubmit = async (e: Event, data: PlanFormInput) => {
   e.preventDefault()
-  if (process.client && window.confirm('Please confirm to update this item.')) {
+  if (
+    import.meta.client &&
+    window.confirm('Please confirm to update this item.')
+  ) {
     await planStore.updatePost({ id: selectedPost.value, body: data })
   }
   onClear()
@@ -133,7 +136,7 @@ const onEditSubmit = async (e: Event, data: PlanFormInput) => {
 const handleCollapseDelete = async (e: Event, id: string) => {
   e.preventDefault()
   if (
-    process.client &&
+    import.meta.client &&
     window.confirm('Permanently deleting this item. Please confirm to proceed.')
   ) {
     await planStore.deletePost(id)
