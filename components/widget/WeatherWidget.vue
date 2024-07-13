@@ -59,13 +59,15 @@ const iconSrc = computed<string | null>(() => {
 </script>
 
 <template>
-  <div class="px-xs py-2xs bg-light-4 dark:bg-dark-4 rounded-md drop-shadow-md">
+  <div
+    class="px-2xs py-3xs md:px-xs md:py-2xs md:bg-light-4 md:dark:bg-dark-4 rounded-md drop-shadow-md"
+  >
     <div class="flex items-center gap-xs justify-center">
       <img
         v-if="iconSrc"
         :src="iconSrc"
         :alt="weatherData.weather"
-        class="object-center object-cover"
+        class="object-center object-cover aspect-square h-xl md:h-auto"
       />
       <div
         class="flex flex-col justify-center items-start text-dark-3 dark:text-light-3"

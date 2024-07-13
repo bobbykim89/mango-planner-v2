@@ -63,14 +63,14 @@ const handleUsernameClick = (e: Event) => {
     <!-- guest btns -->
     <div
       v-else
-      class="flex flex-col md:flex-row justify-center md:justify-normal items-center gap-2xs md:gap-sm md:border-l-2 border-warning px-sm"
+      class="flex flex-col md:flex-row justify-center md:justify-normal items-center gap-2xs md:gap-sm md:border-l-2 border-warning px-sm text-dark-3 dark:text-light-3 md:text-warning md:dark:text-warning"
     >
       <!-- login btn -->
       <a
         :href="loginUrl"
         :target="urlTarget"
         @click="handleAuthClick($event, 'login')"
-        class="flex items-center gap-3 text-lg font-bold text-warning hover:opacity-60 transition-opacity duration-300 ease-linear"
+        class="flex items-center gap-3 text-lg font-bold hover:opacity-60 transition-opacity duration-300 ease-linear"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -90,7 +90,7 @@ const handleUsernameClick = (e: Event) => {
         :href="signupUrl"
         :target="urlTarget"
         @click="handleAuthClick($event, 'signup')"
-        class="flex items-center gap-3 text-lg font-bold text-warning hover:opacity-60 transition-opacity duration-300 ease-linear"
+        class="flex items-center gap-3 text-lg font-bold hover:opacity-60 transition-opacity duration-300 ease-linear"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
