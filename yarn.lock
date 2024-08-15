@@ -1029,28 +1029,28 @@
     "@babel/helper-validator-identifier" "^7.24.7"
     to-fast-properties "^2.0.0"
 
-"@bobbykim/manguito-theme@0.22.0", "@bobbykim/manguito-theme@^0.22.0":
-  version "0.22.0"
-  resolved "https://registry.yarnpkg.com/@bobbykim/manguito-theme/-/manguito-theme-0.22.0.tgz#42a1d496f4ab10015512500c2d32c1082a4d2d15"
-  integrity sha512-Qp2zZsJPHHATPave0hQD1id/1BUpjgXJ1AAHmllVzwOSfEcPDU54hgNUUHU4bJwAFlwzfJlaZmYvtaYr/z+zCQ==
+"@bobbykim/manguito-theme@0.22.1", "@bobbykim/manguito-theme@^0.22.1":
+  version "0.22.1"
+  resolved "https://registry.yarnpkg.com/@bobbykim/manguito-theme/-/manguito-theme-0.22.1.tgz#f16e081c25ae58e92b104aece4bbf60aff3a0750"
+  integrity sha512-DgjM8U/bBhMqBIwq8B6q6ROc2qJgCvLdxVhO/ZwDLQp0wiA+htEJ/DEGlklTgSq8AIBZNdoadUnDRqOv2b8Zxw==
   dependencies:
     "@vueuse/core" "^10.8.0"
     vue "^3.3.10"
 
-"@bobbykim/mcl-footer@^0.6.3":
-  version "0.6.3"
-  resolved "https://registry.yarnpkg.com/@bobbykim/mcl-footer/-/mcl-footer-0.6.3.tgz#e60278fc1a41330fa5072e501784b541426b4623"
-  integrity sha512-OpyPWOt3E3m9ftG8fuB5K5Gp/o+prYWbFB0vBI+DNbV7uFZqJ9SxYH7YhHbmQIyyHo72M0EeuBySUEwHU9W3mw==
+"@bobbykim/mcl-footer@^0.6.4":
+  version "0.6.4"
+  resolved "https://registry.yarnpkg.com/@bobbykim/mcl-footer/-/mcl-footer-0.6.4.tgz#b6cc7039a3a18e83532e1e4c0bd39b4350cdab8f"
+  integrity sha512-bKp90r5hX46EaSb8HkeWfn0yXOS0hBHDAYx3a3c0uOCSVkRkp1FdHZwve2ySSnPdSLlQmQpRNVpk8t0tictLhQ==
   dependencies:
-    "@bobbykim/manguito-theme" "0.22.0"
+    "@bobbykim/manguito-theme" "0.22.1"
     vue "^3.3.10"
 
-"@bobbykim/mcl-forms@^0.8.1":
-  version "0.8.1"
-  resolved "https://registry.yarnpkg.com/@bobbykim/mcl-forms/-/mcl-forms-0.8.1.tgz#3ff47ef291135a28669d3ac9a21287c35fc9528e"
-  integrity sha512-w9I+PnAY8dN3KBnaFwBFMF6Bes/MIo1j7klfzPQEnTbMTZX236fCMe6w46JxcSBGYJI/t5fEt7skvkBy35v+2Q==
+"@bobbykim/mcl-forms@^0.8.2":
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/@bobbykim/mcl-forms/-/mcl-forms-0.8.2.tgz#e88c18d6f20bc9eeb25f140013424ff3f1ef12ef"
+  integrity sha512-5Be8CT3yABPObEfKlr1+qIy4gXidVfKMkQkGMDhWni5Jj/x2xi5Y9I3p+Jig196KC1HyoiApwcXVa9avRWkylg==
   dependencies:
-    "@bobbykim/manguito-theme" "0.22.0"
+    "@bobbykim/manguito-theme" "0.22.1"
     "@vueuse/core" "^10.8.0"
     vue "^3.3.10"
 
