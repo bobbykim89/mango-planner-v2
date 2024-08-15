@@ -9,12 +9,7 @@ import {
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import type { MenuItemType, SocialUrl } from '@bobbykim/mcl-footer'
 import { MclFooterA } from '@bobbykim/mcl-footer'
-import {
-  useInitPiniaStore,
-  useAlertStore,
-  useUserStore,
-  useProfileStore,
-} from '@/stores'
+import { useAlertStore, useUserStore, useProfileStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import WeatherWidget from '@/components/widget/WeatherWidget.vue'
 import DarkmodeWidget from '@/components/widget/DarkmodeWidget.vue'
@@ -24,13 +19,10 @@ import { useGeolocation, useWindowScroll } from '@vueuse/core'
 
 const config = useRuntimeConfig()
 const router = useRouter()
-const initPiniaStore = useInitPiniaStore()
-await useAsyncData('initPinia', () => initPiniaStore.initStores())
 const alertStore = useAlertStore()
 const userStore = useUserStore()
 const profileStore = useProfileStore()
 const { alert, alertColor } = storeToRefs(alertStore)
-const { loading } = storeToRefs(initPiniaStore)
 const { currentUser, isAuthenticated } = storeToRefs(userStore)
 const { userProfile } = storeToRefs(profileStore)
 const sidebarRef = ref<InstanceType<typeof Sidebar>>()
