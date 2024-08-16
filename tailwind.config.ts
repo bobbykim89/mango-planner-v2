@@ -5,7 +5,9 @@ import type { Config } from 'tailwindcss'
 export default <Partial<Config>>{
   darkMode: 'class',
   content: [
-    './src/**/*.{vue,ts,js,cjs}',
+    './components/**/*.{vue,ts,js,cjs}',
+    './pages/**/*.{vue,ts,js,cjs}',
+    './layouts/**/*.{vue,ts,js,cjs}',
     './node_modules/@bobbykim/**/*.{vue,ts,js,cjs}',
   ],
   theme: {
