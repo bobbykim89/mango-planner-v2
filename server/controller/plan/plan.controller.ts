@@ -9,7 +9,7 @@ import {
   readValidatedBody,
   setResponseStatus,
 } from 'h3'
-import { PlanInput } from './dto'
+import { planInputSchema, planInputCompleteSchema } from './dto'
 
 export class PlanController {
   public async getAllPostByUser(e: H3Event<EventHandlerRequest>) {
@@ -27,24 +27,7 @@ export class PlanController {
   }
   public async createNewPlan(e: H3Event<EventHandlerRequest>) {
     const user = e.context.user
-    const body = await readValidatedBody(e, (body) => {
-      if (!body) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: 'Invalid client request',
-        })
-      }
-      const { title, type } = body as PlanInput
-      if (!title || !type) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: "Validation error: title and type can't be null.",
-        })
-      }
-      return body as PlanInput
-    })
+    const body = await readValidatedBody(e, planInputSchema.parse)
     const currentUser = await User.findById(user.id).select('-password')
     if (!currentUser) {
       throw createError({
@@ -85,24 +68,7 @@ export class PlanController {
     const planId = getRouterParam(e, 'id')
 
     // validator
-    const body = await readValidatedBody(e, (body) => {
-      if (!body) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: 'Invalid client request',
-        })
-      }
-      const { title, type } = body as PlanInput
-      if (!title || !type) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: "Validation error: title and type can't be null.",
-        })
-      }
-      return body as PlanInput
-    })
+    const body = await readValidatedBody(e, planInputSchema.parse)
 
     const plan = await Plan.findById(planId)
 
@@ -135,24 +101,7 @@ export class PlanController {
     const user = e.context.user
     const planId = getRouterParam(e, 'id')
     // validator
-    const body = await readValidatedBody(e, (body) => {
-      if (!body) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: 'Invalid client request',
-        })
-      }
-      const { complete } = body as PlanInput
-      if (typeof complete === 'undefined' || complete === null) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: "Validation error: complete can't be null.",
-        })
-      }
-      return body as PlanInput
-    })
+    const body = await readValidatedBody(e, planInputCompleteSchema.parse)
     const plan = await Plan.findById(planId)
 
     if (!plan) {

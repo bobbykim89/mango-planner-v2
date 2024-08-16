@@ -8,10 +8,11 @@
     "url": "https://www.devbobbykim.com/"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
     "build": "nuxt build",
+    "build:local": "nuxt build --dotenv .env.local",
     "dev": "nuxt dev --dotenv .env.local",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -31,7 +32,8 @@
     "pinia": "^2.1.7",
     "vue": "^3.4.31",
     "vue-router": "^4.4.0",
-    "vuedraggable": "^4.1.0"
+    "vuedraggable": "^4.1.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@nuxtjs/color-mode": "^3.4.2",
