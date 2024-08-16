@@ -11,53 +11,14 @@ import {
   setResponseStatus,
 } from 'h3'
 import jwt from 'jsonwebtoken'
-import type { NewUsernameInput, PwUpdateInput, UserInput } from './dto'
+import { userInputSchema, usernameSchema, pwUpdateInputSchema } from './dto'
 
 const config = useRuntimeConfig()
 
 export class UserController {
   public async signupUser(e: H3Event<EventHandlerRequest>) {
     // validate body
-    const body = await readValidatedBody(e, (body) => {
-      if (!body) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: 'Invalid client request',
-        })
-      }
-      const { name, email, password } = body as UserInput
-      if (!name || !email || !password) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage:
-            'Validation error: please fill in all of name, email and password.',
-        })
-      }
-      const validator = {
-        email: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-        password:
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/,
-      }
-      const checkEmail = validator.email.test(email)
-      const checkPassword = validator.password.test(password)
-      if (!checkEmail) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: 'Validation error: please add valid email address',
-        })
-      }
-      if (!checkPassword) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: 'Validation error: please add valid password',
-        })
-      }
-      return body as UserInput
-    })
+    const body = await readValidatedBody(e, userInputSchema.parse)
     const { name, email, password } = body
     let user = await User.findOne({ email })
     if (user) {
@@ -123,38 +84,7 @@ export class UserController {
       })
     }
     // validate body
-    const body = await readValidatedBody(e, (body) => {
-      if (!body) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: 'Invalid client request',
-        })
-      }
-      const { newPassword, currentPassword } = body as Partial<PwUpdateInput>
-      if (!newPassword || !currentPassword) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage:
-            'Validation error: please fill in all of current password and new password.',
-        })
-      }
-      const validator = {
-        password:
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/,
-      }
-      const checkNewPassword = validator.password.test(newPassword)
-      console.log(checkNewPassword)
-      if (!checkNewPassword) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: 'Validation error: please add valid password',
-        })
-      }
-      return body as Partial<PwUpdateInput>
-    })
+    const body = await readValidatedBody(e, pwUpdateInputSchema.parse)
     const { currentPassword, newPassword } = body
     // check if current password matches
     const isMatch = await bcrypt.compare(currentPassword!, user.password)
@@ -198,24 +128,7 @@ export class UserController {
       })
     }
     // validate body
-    const body = await readValidatedBody(e, (body) => {
-      if (!body) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: 'Invalid client request',
-        })
-      }
-      const { username } = body as Partial<NewUsernameInput>
-      if (!username) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: 'Validation error: please fill in your username.',
-        })
-      }
-      return body as Partial<NewUsernameInput>
-    })
+    const body = await readValidatedBody(e, usernameSchema.parse)
     const updatedUser = await User.findByIdAndUpdate(
       user.id,
       { name: body.username },

@@ -12,8 +12,8 @@ export const useInitPiniaStore = defineStore('init', () => {
   // actions
   const initStores = async () => {
     await userStore.getCurrentUser()
-    const { isAuthenticated } = userStore.getCurrentAuthInfo
-    if (isAuthenticated && loading.value === false) {
+    const { isAuthenticated } = storeToRefs(userStore)
+    if (isAuthenticated.value === true && loading.value === false) {
       await profileStore.getCurrentUserProfile()
       await planStore.getAllPostByUser()
     }
