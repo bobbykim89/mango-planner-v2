@@ -2,7 +2,7 @@ import { Plan, Profile, User } from '@/server/models'
 import { deleteCloudinaryImage } from '@/server/utils/cloudinary.util'
 import type { EventHandlerRequest, H3Event } from 'h3'
 import { createError, readValidatedBody } from 'h3'
-import type { ProfileInput } from './dto'
+import { profileInputSchema, profileInputDarkSchema } from './dto'
 
 export class ProfileController {
   public async getCurrentProfile(e: H3Event<EventHandlerRequest>) {
@@ -113,25 +113,7 @@ export class ProfileController {
         statusMessage: 'Profile for Current User not found',
       })
     }
-    const body = await readValidatedBody(e, (body) => {
-      if (!body) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: 'Invalid client request',
-        })
-      }
-      const { plansOrder } = body as Partial<ProfileInput>
-      if (!plansOrder) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage:
-            'Validation error: request body does not have plansOrder.',
-        })
-      }
-      return body as Partial<ProfileInput>
-    })
+    const body = await readValidatedBody(e, profileInputSchema.parse)
     const updatedProfile = await Profile.findByIdAndUpdate(
       profile.id,
       { ...body, updatedAt: new Date() },
@@ -166,25 +148,7 @@ export class ProfileController {
         statusMessage: 'Profile for Current User not found',
       })
     }
-    const body = await readValidatedBody(e, (body) => {
-      if (!body) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage: 'Invalid client request',
-        })
-      }
-      const { dark } = body as Partial<ProfileInput>
-      if (typeof dark === 'undefined' || dark === null) {
-        throw createError({
-          status: 403,
-          message: 'Validation error',
-          statusMessage:
-            'Validation error: request body does not have plansOrder.',
-        })
-      }
-      return body as Partial<ProfileInput>
-    })
+    const body = await readValidatedBody(e, profileInputDarkSchema.parse)
     const updatedProfile = await Profile.findByIdAndUpdate(
       profile.id,
       { ...body, updatedAt: new Date() },

@@ -6,9 +6,9 @@ export default defineNuxtConfig({
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       title: 'Mango Planner',
-      // htmlAttrs: {
-      //   lang: 'en',
-      // },
+      htmlAttrs: {
+        lang: 'en',
+      },
       meta: [
         {
           name: 'description',
@@ -51,6 +51,7 @@ export default defineNuxtConfig({
       compilerOptions: {
         moduleResolution: 'bundler',
         verbatimModuleSyntax: false,
+        strict: true,
         types: ['vite/client'],
       },
     },
