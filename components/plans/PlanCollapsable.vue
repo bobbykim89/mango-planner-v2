@@ -8,9 +8,11 @@ const props = withDefaults(
   defineProps<{
     item: PlanItemType
     visible?: boolean
+    showHandle?: boolean
   }>(),
   {
     visible: false,
+    showHandle: false,
   }
 )
 
@@ -89,9 +91,23 @@ watch(
       v-collapse:[item._id.toString()]
     >
       <div class="flex justify-between items-center">
-        <h3 class="h3-md text-dark-3 dark:text-light-3">
-          {{ item.title }}
-        </h3>
+        <div class="flex gap-4 items-center">
+          <svg
+            v-if="showHandle"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 448 512"
+            fill="currentColor"
+            class="w-xs text-dark-3/80 dark:text-light-3/80 handle"
+          >
+            <!-- !Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
+            <path
+              d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"
+            />
+          </svg>
+          <h3 class="h3-md text-dark-3 dark:text-light-3">
+            {{ item.title }}
+          </h3>
+        </div>
         <div @click.stop class="cursor-default">
           <!-- toggle button -->
           <button

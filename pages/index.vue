@@ -245,11 +245,13 @@ const getPlans = computed(() => {
             <draggable
               v-model="customOrderData"
               item-key="_id"
+              handle=".handle"
               @change="onOrderUpdate"
             >
               <template #item="{ element }">
                 <PlanCollapsable
                   :item="element"
+                  :show-handle="true"
                   :key="element._id.toString()"
                   @toggle-complete="handleCollapseToggle"
                   @edit="handleCollapseEdit"
