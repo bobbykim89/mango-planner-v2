@@ -1,12 +1,5 @@
 import { z } from 'zod'
 
-// export interface PlanInput {
-//   title: string
-//   content?: string
-//   complete?: boolean
-//   type: string
-// }
-
 export const planInputSchema = z.object({
   title: z.string(),
   content: z.optional(z.string()),

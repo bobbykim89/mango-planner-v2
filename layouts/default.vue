@@ -466,9 +466,11 @@ watch(
       @menu-click="handleFooterMenuClick"
     >
       <div>
-        <span class="text-dark-3 dark:text-light-3"
-          >&copy; Mango Planner {{ new Date().getFullYear() }}</span
-        >
+        <ClientOnly>
+          <span class="text-dark-3 dark:text-light-3"
+            >&copy; Mango Planner {{ new Date().getFullYear() }}</span
+          >
+        </ClientOnly>
       </div>
     </MclFooterA>
   </div>

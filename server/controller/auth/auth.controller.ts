@@ -1,5 +1,4 @@
-import { useRuntimeConfig } from '#imports'
-import { User } from '@/server/models'
+import { User, type UserModel } from '@/server/models'
 import bcrypt from 'bcryptjs'
 import type { EventHandlerRequest, H3Event } from 'h3'
 import {
@@ -9,15 +8,22 @@ import {
   readValidatedBody,
   setResponseStatus,
 } from 'h3'
-import jwt from 'jsonwebtoken'
 import { authInputSchema } from './dto'
-
-const config = useRuntimeConfig()
+import { type Model } from 'mongoose'
+import { UserController } from '../user/user.controller'
 
 export class AuthController {
-  public async getCurrentUser(e: H3Event<EventHandlerRequest>) {
+  private userModel: Model<UserModel>
+  private userController: UserController
+  constructor() {
+    this.userModel = User
+    this.userController = new UserController()
+  }
+  public getCurrentUser = async (e: H3Event<EventHandlerRequest>) => {
     try {
-      const user = await User.findById(e.context.user.id).select('-password')
+      const user = await this.userModel
+        .findById(e.context.user.id)
+        .select('-password')
       return user
     } catch (error) {
       throw createError({
@@ -27,11 +33,11 @@ export class AuthController {
       })
     }
   }
-  public async loginUser(e: H3Event<EventHandlerRequest>) {
+  public loginUser = async (e: H3Event<EventHandlerRequest>) => {
     // validatebody
     const body = await readValidatedBody(e, authInputSchema.parse)
     const { email, password } = body
-    let user = await User.findOne({ email })
+    let user = await this.userModel.findOne({ email })
 
     if (!user) {
       throw createError({
@@ -55,9 +61,8 @@ export class AuthController {
     const payload = {
       id: user.id,
     }
-    const accessToken = jwt.sign(payload, config.jwtSecret, {
-      expiresIn: '7d',
-    })
+
+    const accessToken = this.userController.signToken(payload)
 
     setResponseStatus(e, 200, 'Login successful!')
     const status = getResponseStatus(e)
