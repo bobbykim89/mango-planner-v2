@@ -1,8 +1,9 @@
-import { type Document, Schema, model } from 'mongoose'
+import { type Document, Schema, model, type Types } from 'mongoose'
 
 const modelName: string = 'token'
 
 export interface TokenModel extends Document {
+  _id: Types.ObjectId
   userId: Schema.Types.ObjectId
   token: string
   createAt: Date

@@ -1,8 +1,9 @@
-import { Schema, model, type Document } from 'mongoose'
+import { Schema, model, type Document, type Types } from 'mongoose'
 
 const modelName: string = 'profile'
 
 export interface ProfileModel extends Document {
+  _id: Types.ObjectId
   user: Schema.Types.ObjectId
   profilePicture: string
   plansOrder: string[]
