@@ -1,9 +1,10 @@
-import { Schema, model, type Document } from 'mongoose'
+import { Schema, model, type Document, type Types } from 'mongoose'
 import { TypeInputLiteralType } from '@/types'
 
 const modelName: string = 'plan'
 
 export interface PlanModel extends Document {
+  _id: Types.ObjectId
   title: string
   content: string
   author: Schema.Types.ObjectId

@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { Collapse, vCollapse } from '@bobbykim/manguito-theme'
-import { Plan } from '@/server/models'
-
-type PlanItemType = InstanceType<typeof Plan>
+import { PlanModel } from '@/server/models'
 
 const props = withDefaults(
   defineProps<{
-    item: PlanItemType
+    item: PlanModel
     visible?: boolean
     showHandle?: boolean
   }>(),
@@ -18,7 +16,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'toggle-complete', event: Event, id: string, complete: boolean): void
-  (e: 'edit', event: Event, item: PlanItemType): void
+  (e: 'edit', event: Event, item: PlanModel): void
   (e: 'delete', event: Event, id: string): void
 }>()
 
