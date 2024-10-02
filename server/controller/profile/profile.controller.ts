@@ -1,12 +1,30 @@
-import { Plan, Profile, User } from '@/server/models'
+import {
+  Plan,
+  Profile,
+  User,
+  type PlanModel,
+  type ProfileModel,
+  type UserModel,
+} from '@/server/models'
 import { deleteCloudinaryImage } from '@/server/utils/cloudinary.util'
 import type { EventHandlerRequest, H3Event } from 'h3'
 import { createError, readValidatedBody } from 'h3'
 import { profileInputSchema, profileInputDarkSchema } from './dto'
+import { Model } from 'mongoose'
 
 export class ProfileController {
-  public async getCurrentProfile(e: H3Event<EventHandlerRequest>) {
-    const user = await User.findById(e.context.user.id).select('-password')
+  private planModel: Model<PlanModel>
+  private profileModel: Model<ProfileModel>
+  private userModel: Model<UserModel>
+  constructor() {
+    this.planModel = Plan
+    this.profileModel = Profile
+    this.userModel = User
+  }
+  public getCurrentProfile = async (e: H3Event<EventHandlerRequest>) => {
+    const user = await this.userModel
+      .findById(e.context.user.id)
+      .select('-password')
     if (!user) {
       throw createError({
         status: 404,
@@ -14,14 +32,14 @@ export class ProfileController {
         statusMessage: 'User not found',
       })
     }
-    const profile = await Profile.findOne({ user: user.id })
-    if (!profile) {
-      return null
-    }
+    const profile = await this.profileModel.findOne({ user: user.id })
+    if (!profile) return null
     return profile
   }
-  public async createNewProfile(e: H3Event<EventHandlerRequest>) {
-    const user = await User.findById(e.context.user.id).select('-password')
+  public createNewProfile = async (e: H3Event<EventHandlerRequest>) => {
+    const user = await this.userModel
+      .findById(e.context.user.id)
+      .select('-password')
     // check if user exists
     if (!user) {
       throw createError({
@@ -31,7 +49,7 @@ export class ProfileController {
       })
     }
     // throw error if user already have profile
-    const profileCheck = await Profile.findOne({ user: user.id })
+    const profileCheck = await this.profileModel.findOne({ user: user.id })
     if (profileCheck !== null) {
       throw createError({
         status: 401,
@@ -40,11 +58,11 @@ export class ProfileController {
       })
     }
     // push existing plans to plansOrder
-    const userPlans = await Plan.find({ author: user.id }).sort({
+    const userPlans = await this.planModel.find({ author: user.id }).sort({
       date: -1,
     })
     const plansOrder: string[] = userPlans.map((item) => item.id)
-    const newProfile = new Profile({
+    const newProfile = new this.profileModel({
       user: user.id,
       plansOrder,
     })
@@ -58,9 +76,11 @@ export class ProfileController {
     }
     return saveData
   }
-  public async updateProfilePicture(e: H3Event<EventHandlerRequest>) {
+  public updateProfilePicture = async (e: H3Event<EventHandlerRequest>) => {
     const file = e.context.file
-    const user = await User.findById(e.context.user.id).select('-password')
+    const user = await this.userModel
+      .findById(e.context.user.id)
+      .select('-password')
     if (!user) {
       throw createError({
         status: 404,
@@ -68,7 +88,7 @@ export class ProfileController {
         statusMessage: 'User not found',
       })
     }
-    const profile = await Profile.findOne({ user: user.id })
+    const profile = await this.profileModel.findOne({ user: user.id })
     if (profile === null) {
       throw createError({
         status: 404,
@@ -79,7 +99,7 @@ export class ProfileController {
     if (profile.profilePicture !== '') {
       await deleteCloudinaryImage(profile.profilePicture)
     }
-    const updatedProfile = await Profile.findByIdAndUpdate(
+    const updatedProfile = await this.profileModel.findByIdAndUpdate(
       profile.id,
       {
         profilePicture: file.imageId,
@@ -96,8 +116,10 @@ export class ProfileController {
     }
     return updatedProfile
   }
-  public async updatePlansOrder(e: H3Event<EventHandlerRequest>) {
-    const user = await User.findById(e.context.user.id).select('-password')
+  public updatePlansOrder = async (e: H3Event<EventHandlerRequest>) => {
+    const user = await this.userModel
+      .findById(e.context.user.id)
+      .select('-password')
     if (!user) {
       throw createError({
         status: 404,
@@ -105,7 +127,7 @@ export class ProfileController {
         statusMessage: 'User not found',
       })
     }
-    const profile = await Profile.findOne({ user: user.id })
+    const profile = await this.profileModel.findOne({ user: user.id })
     if (profile === null) {
       throw createError({
         status: 404,
@@ -114,7 +136,7 @@ export class ProfileController {
       })
     }
     const body = await readValidatedBody(e, profileInputSchema.parse)
-    const updatedProfile = await Profile.findByIdAndUpdate(
+    const updatedProfile = await this.profileModel.findByIdAndUpdate(
       profile.id,
       { ...body, updatedAt: new Date() },
       {
@@ -131,8 +153,10 @@ export class ProfileController {
     }
     return updatedProfile
   }
-  public async updateDarkMode(e: H3Event<EventHandlerRequest>) {
-    const user = await User.findById(e.context.user.id).select('-password')
+  public updateDarkMode = async (e: H3Event<EventHandlerRequest>) => {
+    const user = await this.userModel
+      .findById(e.context.user.id)
+      .select('-password')
     if (!user) {
       throw createError({
         status: 404,
@@ -140,7 +164,7 @@ export class ProfileController {
         statusMessage: 'User not found',
       })
     }
-    const profile = await Profile.findOne({ user: user.id })
+    const profile = await this.profileModel.findOne({ user: user.id })
     if (profile === null) {
       throw createError({
         status: 404,
@@ -149,7 +173,7 @@ export class ProfileController {
       })
     }
     const body = await readValidatedBody(e, profileInputDarkSchema.parse)
-    const updatedProfile = await Profile.findByIdAndUpdate(
+    const updatedProfile = await this.profileModel.findByIdAndUpdate(
       profile.id,
       { ...body, updatedAt: new Date() },
       {

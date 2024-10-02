@@ -1,5 +1,10 @@
 import { useRuntimeConfig } from '#imports'
-import { Profile, User } from '@/server/models'
+import {
+  Profile,
+  User,
+  type UserModel,
+  type ProfileModel,
+} from '@/server/models'
 import bcrypt from 'bcryptjs'
 import {
   EventHandlerRequest,
@@ -12,15 +17,27 @@ import {
 } from 'h3'
 import jwt from 'jsonwebtoken'
 import { userInputSchema, usernameSchema, pwUpdateInputSchema } from './dto'
+import { type Model } from 'mongoose'
+import { RuntimeConfig } from 'nuxt/schema'
 
-const config = useRuntimeConfig()
+// const config = useRuntimeConfig()
 
 export class UserController {
-  public async signupUser(e: H3Event<EventHandlerRequest>) {
+  private config: RuntimeConfig
+  private userModel: Model<UserModel>
+  private profileModel: Model<ProfileModel>
+  constructor() {
+    this.config = useRuntimeConfig()
+    this.userModel = User
+    this.profileModel = Profile
+  }
+  public signupUser = async (e: H3Event<EventHandlerRequest>) => {
     // validate body
-    const body = await readValidatedBody(e, userInputSchema.parse)
-    const { name, email, password } = body
-    let user = await User.findOne({ email })
+    const { name, email, password } = await readValidatedBody(
+      e,
+      userInputSchema.parse
+    )
+    let user = await this.userModel.findOne({ email })
     if (user) {
       throw createError({
         status: 400,
@@ -29,13 +46,12 @@ export class UserController {
           'Bad Request: following email address is already in use, please use different email address',
       })
     }
-    user = new User({
+    user = new this.userModel({
       name,
       email,
       password,
     })
-    const salt = await bcrypt.genSalt(10)
-    user.password = await bcrypt.hash(password, salt)
+    user.password = await this.hashPassword(password)
     const saveUserData = await user.save()
     if (!saveUserData) {
       throw createError({
@@ -45,7 +61,7 @@ export class UserController {
       })
     }
     // create user profile for new users
-    const userProfile = new Profile({
+    const userProfile = new this.profileModel({
       user: user.id,
     })
     const saveUserProfile = await userProfile.save()
@@ -60,9 +76,7 @@ export class UserController {
       id: user.id,
     }
     // set access token
-    const accessToken = jwt.sign(payload, config.jwtSecret, {
-      expiresIn: '7d',
-    })
+    const accessToken = this.signToken(payload)
 
     setResponseStatus(e, 200, 'Successfully created new user')
     const status = getResponseStatus(e)
@@ -74,8 +88,8 @@ export class UserController {
       access_token: `Bearer ${accessToken}`,
     }
   }
-  public async updatePassword(e: H3Event<EventHandlerRequest>) {
-    const user = await User.findById(e.context.user.id)
+  public updatePassword = async (e: H3Event<EventHandlerRequest>) => {
+    const user = await this.userModel.findById(e.context.user.id)
     if (!user) {
       throw createError({
         status: 404,
@@ -84,8 +98,10 @@ export class UserController {
       })
     }
     // validate body
-    const body = await readValidatedBody(e, pwUpdateInputSchema.parse)
-    const { currentPassword, newPassword } = body
+    const { currentPassword, newPassword } = await readValidatedBody(
+      e,
+      pwUpdateInputSchema.parse
+    )
     // check if current password matches
     const isMatch = await bcrypt.compare(currentPassword!, user.password)
     if (!isMatch) {
@@ -95,9 +111,8 @@ export class UserController {
         statusMessage: 'Invalid credential: please check your password again',
       })
     }
-    const salt = await bcrypt.genSalt(10)
-    const hashedNewPassword = await bcrypt.hash(newPassword!, salt)
-    const updatedUser = await User.findByIdAndUpdate(
+    const hashedNewPassword = await this.hashPassword(newPassword)
+    const updatedUser = await this.userModel.findByIdAndUpdate(
       user.id,
       { password: hashedNewPassword },
       { new: true, returnDocument: 'after' }
@@ -118,8 +133,8 @@ export class UserController {
       message: text,
     }
   }
-  public async updateUserName(e: H3Event<EventHandlerRequest>) {
-    const user = await User.findById(e.context.user.id)
+  public updateUserName = async (e: H3Event<EventHandlerRequest>) => {
+    const user = await this.userModel.findById(e.context.user.id)
     if (!user) {
       throw createError({
         status: 404,
@@ -129,7 +144,7 @@ export class UserController {
     }
     // validate body
     const body = await readValidatedBody(e, usernameSchema.parse)
-    const updatedUser = await User.findByIdAndUpdate(
+    const updatedUser = await this.userModel.findByIdAndUpdate(
       user.id,
       { name: body.username },
       { new: true, returnDocument: 'after' }
@@ -142,5 +157,13 @@ export class UserController {
       })
     }
     return updatedUser
+  }
+  private hashPassword = async (password: string): Promise<string> => {
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(password, salt)
+    return hashedPassword
+  }
+  public signToken = (payload: { id: string }) => {
+    return jwt.sign(payload, this.config.jwtSecret, { expiresIn: '7d' })
   }
 }
