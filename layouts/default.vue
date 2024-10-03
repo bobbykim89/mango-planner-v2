@@ -176,7 +176,6 @@ watch(
 </script>
 
 <template>
-  <NuxtPwaManifest />
   <div class="relative">
     <HeaderHorizontal
       ref="headerRef"
@@ -187,30 +186,25 @@ watch(
       <template #content
         ><div class="flex flex-shrink-0 items-center self-center md:py-3xs">
           <div class="h-md md:h-lg mr-2xs md:mr-sm align-middle">
-            <a
-              :href="menuItemData.logoLink"
-              target="_self"
-              @click="handleTitleClick($event, menuItemData.logoLink, '_self')"
+            <NuxtLink
+              :to="menuItemData.logoLink"
+              aria-label="mango planner logo"
             >
               <img
                 :src="menuItemData.logo"
                 :alt="menuItemData.logoAlt"
                 class="h-full inline-block"
               />
-            </a>
+            </NuxtLink>
           </div>
           <div class="flex flex-col justify-center ml-2">
-            <a
-              :href="menuItemData.logoLink"
-              target="_self"
-              @click="handleTitleClick($event, menuItemData.logoLink, '_self')"
-            >
+            <NuxtLink :to="menuItemData.logoLink">
               <h2
                 class="inline-block align-middle tracking-wider h2-md text-warning"
               >
                 {{ menuItemData.title }}
               </h2>
-            </a>
+            </NuxtLink>
           </div>
         </div></template
       >
