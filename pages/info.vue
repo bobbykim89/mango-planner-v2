@@ -2,11 +2,19 @@
 import { useUserStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 
+const url = useRequestURL()
+
 useHead({
-  title: 'Mango Planner | Info',
+  title: 'Info | Mango Planner',
   meta: [
-    { name: 'description', content: 'info page' },
-    { property: 'og:title', content: 'Mango Planner | Info' },
+    { property: 'og:title', content: 'Info | Mango Planner' },
+    { property: 'og:url', content: url.href },
+    { property: 'twitter:domain', content: url.host },
+    { property: 'twitter:url', content: url.href },
+    {
+      name: 'twitter:title',
+      content: 'Info | Mango Planner',
+    },
   ],
 })
 

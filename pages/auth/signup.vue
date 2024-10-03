@@ -4,13 +4,24 @@ import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { MclFormGroup, MclInputText } from '@bobbykim/mcl-forms'
 import { storeToRefs } from 'pinia'
 
+const url = useRequestURL()
+
 definePageMeta({
   middleware: ['guest-route'],
 })
 
 useHead({
-  title: 'Mango Planner | Signup',
-  meta: [{ property: 'og:title', content: 'Mango Planner | Signup' }],
+  title: 'Signup | Mango Planner',
+  meta: [
+    { property: 'og:title', content: 'Signup | Mango Planner' },
+    { property: 'og:url', content: url.href },
+    { property: 'twitter:domain', content: url.host },
+    { property: 'twitter:url', content: url.href },
+    {
+      name: 'twitter:title',
+      content: 'Signup | Mango Planner',
+    },
+  ],
 })
 
 const router = useRouter()

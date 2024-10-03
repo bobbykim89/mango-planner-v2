@@ -18,13 +18,24 @@ import { Modal } from '@bobbykim/manguito-theme'
 import { storeToRefs } from 'pinia'
 import draggable from 'vuedraggable'
 
+const url = useRequestURL()
+
 definePageMeta({
   middleware: ['auth-route'],
 })
 
 useHead({
-  title: 'Mango Planner | Home',
-  meta: [{ property: 'og:title', content: 'Mango Planner | Home' }],
+  title: 'Main | Mango Planner',
+  meta: [
+    { property: 'og:title', content: 'Main | Mango Planner' },
+    { property: 'og:url', content: url.href },
+    { property: 'twitter:domain', content: url.host },
+    { property: 'twitter:url', content: url.href },
+    {
+      name: 'twitter:title',
+      content: 'Main | Mango Planner',
+    },
+  ],
 })
 
 type PlanDisplayStyle = 'all' | 'incomplete' | 'custom' | 'search'
