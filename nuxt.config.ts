@@ -12,11 +12,36 @@ export default defineNuxtConfig({
       meta: [
         {
           name: 'description',
-          content: 'Simple planner app for daily use',
+          content:
+            'A user-friendly daily planner app to organize tasks and stay productive.',
         },
         { property: 'og:title', content: 'Mango Planner' },
         {
+          property: 'og:description',
+          content:
+            'A user-friendly daily planner app to organize tasks and stay productive.',
+        },
+        { property: 'og:type', content: 'website' },
+        {
           property: 'og:image',
+          content:
+            'https://res.cloudinary.com/dwgni1x3t/image/upload/v1712540581/mango-planner/assets/pwa-512x512_y540s7.png',
+        },
+        {
+          name: 'twitter:card',
+          content: 'summary_large_image',
+        },
+        {
+          name: 'twitter:title',
+          content: 'Mango Planner',
+        },
+        {
+          name: 'twitter:description',
+          content:
+            'A user-friendly daily planner app to organize tasks and stay productive.',
+        },
+        {
+          name: 'twitter:image',
           content:
             'https://res.cloudinary.com/dwgni1x3t/image/upload/v1712540581/mango-planner/assets/pwa-512x512_y540s7.png',
         },
