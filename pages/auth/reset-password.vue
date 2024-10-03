@@ -5,13 +5,24 @@ import { MclFormGroup, MclInputText } from '@bobbykim/mcl-forms'
 import type { H3Error } from 'h3'
 import { storeToRefs } from 'pinia'
 
+const url = useRequestURL()
+
 definePageMeta({
   middleware: ['guest-route'],
 })
 
 useHead({
-  title: 'Mango Planner | Request Reset',
-  meta: [{ property: 'og:title', content: 'Mango Planner | Request Reset' }],
+  title: 'Reset Password | Mango Planner',
+  meta: [
+    { property: 'og:title', content: 'Reset Password | Mango Planner' },
+    { property: 'og:url', content: url.href },
+    { property: 'twitter:domain', content: url.host },
+    { property: 'twitter:url', content: url.href },
+    {
+      name: 'twitter:title',
+      content: 'Reset Password | Mango Planner',
+    },
+  ],
 })
 
 const route = useRoute()
