@@ -1,6 +1,13 @@
 import type { EventHandlerRequest, H3Event } from 'h3'
 
-import { Plan, Profile, User } from '@/server/models'
+import {
+  Plan,
+  Profile,
+  User,
+  type PlanModel,
+  type ProfileModel,
+  type UserModel,
+} from '@/server/models'
 import {
   createError,
   getResponseStatus,
@@ -10,12 +17,23 @@ import {
   setResponseStatus,
 } from 'h3'
 import { planInputSchema, planInputCompleteSchema } from './dto'
+import { Model } from 'mongoose'
 
 export class PlanController {
-  public async getAllPostByUser(e: H3Event<EventHandlerRequest>) {
-    const plans = await Plan.find({ author: e.context.user.id }).sort({
-      updatedAt: -1,
-    })
+  private planModel: Model<PlanModel>
+  private profileModel: Model<ProfileModel>
+  private userModel: Model<UserModel>
+  constructor() {
+    this.planModel = Plan
+    this.profileModel = Profile
+    this.userModel = User
+  }
+  public getAllPostByUser = async (e: H3Event<EventHandlerRequest>) => {
+    const plans = await this.planModel
+      .find({ author: e.context.user.id })
+      .sort({
+        updatedAt: -1,
+      })
     if (!plans) {
       throw createError({
         status: 404,
@@ -25,9 +43,12 @@ export class PlanController {
     }
     return plans
   }
-  public async createNewPlan(e: H3Event<EventHandlerRequest>) {
+  public createNewPlan = async (e: H3Event<EventHandlerRequest>) => {
     const user = e.context.user
-    const body = await readValidatedBody(e, planInputSchema.parse)
+    const { title, content, type } = await readValidatedBody(
+      e,
+      planInputSchema.parse
+    )
     const currentUser = await User.findById(user.id).select('-password')
     if (!currentUser) {
       throw createError({
@@ -36,8 +57,7 @@ export class PlanController {
         statusMessage: 'Access denied: user not found',
       })
     }
-    const { title, content, type } = body
-    const newPlan = new Plan({
+    const newPlan = new this.planModel({
       title,
       content,
       type,
@@ -51,26 +71,28 @@ export class PlanController {
         statusMessage: 'Unexpected error occurred, please try again.',
       })
     }
-    const userProfile = await Profile.findOne({ user: currentUser.id })
+    const userProfile = await this.profileModel.findOne({
+      user: currentUser.id,
+    })
     if (userProfile) {
       const updatedBody = {
         plansOrder: [saveData.id, ...userProfile.plansOrder],
       }
-      await Profile.findByIdAndUpdate(userProfile.id, updatedBody, {
+      await this.profileModel.findByIdAndUpdate(userProfile.id, updatedBody, {
         new: true,
         returnDocument: 'after',
       })
     }
     return saveData
   }
-  public async updatePlan(e: H3Event<EventHandlerRequest>) {
+  public updatePlan = async (e: H3Event<EventHandlerRequest>) => {
     const user = e.context.user
     const planId = getRouterParam(e, 'id')
 
     // validator
     const body = await readValidatedBody(e, planInputSchema.parse)
 
-    const plan = await Plan.findById(planId)
+    const plan = await this.planModel.findById(planId)
 
     if (!plan) {
       throw createError({
@@ -87,7 +109,7 @@ export class PlanController {
           'Access denied: Current user is not authorized to update this item',
       })
     }
-    const updatedPlan = await Plan.findByIdAndUpdate(
+    const updatedPlan = await this.planModel.findByIdAndUpdate(
       planId,
       { ...body, updatedAt: new Date() },
       {
@@ -97,12 +119,12 @@ export class PlanController {
     )
     return updatedPlan
   }
-  public async togglePlanCompleteById(e: H3Event<EventHandlerRequest>) {
+  public togglePlanCompleteById = async (e: H3Event<EventHandlerRequest>) => {
     const user = e.context.user
     const planId = getRouterParam(e, 'id')
     // validator
     const body = await readValidatedBody(e, planInputCompleteSchema.parse)
-    const plan = await Plan.findById(planId)
+    const plan = await this.planModel.findById(planId)
 
     if (!plan) {
       throw createError({
@@ -119,7 +141,7 @@ export class PlanController {
           'Access denied: Current user is not authorized to update this item',
       })
     }
-    const updatedPlan = await Plan.findByIdAndUpdate(
+    const updatedPlan = await this.planModel.findByIdAndUpdate(
       planId,
       { ...body, updatedAt: new Date() },
       {
@@ -129,10 +151,12 @@ export class PlanController {
     )
     return updatedPlan
   }
-  public async deletePlanById(e: H3Event<EventHandlerRequest>) {
+  public deletePlanById = async (e: H3Event<EventHandlerRequest>) => {
     const user = e.context.user
     const planId = getRouterParam(e, 'id')
-    const currentUser = await User.findById(user.id).select('-password')
+    const currentUser = await this.userModel
+      .findById(user.id)
+      .select('-password')
     if (!currentUser) {
       throw createError({
         status: 404,
@@ -140,7 +164,7 @@ export class PlanController {
         statusMessage: 'Access denied: user not found',
       })
     }
-    const plan = await Plan.findById(planId)
+    const plan = await this.planModel.findById(planId)
     // check if item exists in db
     if (!plan) {
       throw createError({
@@ -160,7 +184,7 @@ export class PlanController {
     }
     // delete item
     try {
-      await Plan.findByIdAndDelete(planId)
+      await this.planModel.findByIdAndDelete(planId)
     } catch (error) {
       throw createError({
         status: 500,
@@ -169,12 +193,14 @@ export class PlanController {
           'Internal server error: unexpected error happened, please try again.',
       })
     }
-    const userProfile = await Profile.findOne({ user: currentUser.id })
+    const userProfile = await this.profileModel.findOne({
+      user: currentUser.id,
+    })
     if (userProfile) {
       const updatedBody = {
         plansOrder: userProfile.plansOrder.filter((item) => item !== plan.id),
       }
-      await Profile.findByIdAndUpdate(userProfile.id, updatedBody, {
+      await this.profileModel.findByIdAndUpdate(userProfile.id, updatedBody, {
         new: true,
         returnDocument: 'after',
       })

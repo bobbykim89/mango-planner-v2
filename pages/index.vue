@@ -114,7 +114,7 @@ const handleCollapseToggle = async (
 const handleCollapseEdit = (e: Event, item: InstanceType<typeof Plan>) => {
   e.preventDefault()
   modalForm.value = 'update'
-  selectedPost.value = item._id.toString()
+  selectedPost.value = item._id!.toString()
   updateDataForm.title = item.title
   updateDataForm.type = item.type as TypeInputLiteralType
   if (item.content) {
@@ -145,7 +145,7 @@ const handleCollapseDelete = async (e: Event, id: string) => {
 }
 const onOrderUpdate = async () => {
   const itemsOrder: string[] = customOrderData.value.map((item) => {
-    return item._id.toString()
+    return item._id!.toString()
   })
   await profileStore.updateUserPlansOrder({ plansOrder: itemsOrder })
   await profileStore.getCurrentUserProfile()
@@ -265,7 +265,7 @@ const getPlans = computed(() => {
             <PlanCollapsable
               v-for="item in getPlans"
               :item="item"
-              :key="item._id.toString()"
+              :key="item._id!.toString()"
               @toggle-complete="handleCollapseToggle"
               @edit="handleCollapseEdit"
               @delete="handleCollapseDelete"
@@ -276,7 +276,7 @@ const getPlans = computed(() => {
             <PlanCollapsable
               v-for="item in getPlans"
               :item="item"
-              :key="item._id.toString()"
+              :key="item._id!.toString()"
               @toggle-complete="handleCollapseToggle"
               @edit="handleCollapseEdit"
               @delete="handleCollapseDelete"

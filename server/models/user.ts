@@ -1,6 +1,16 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Document, type Types } from 'mongoose'
 
-const userSchema = new Schema({
+const modelName: string = 'user'
+
+export interface UserModel extends Document {
+  _id: Types.ObjectId
+  name: string
+  email: string
+  password: string
+  date: Date
+}
+
+const userSchema = new Schema<UserModel>({
   name: {
     type: String,
     required: true,
@@ -18,6 +28,6 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-});
+})
 
-export const User = model("user", userSchema);
+export const User = model<UserModel>(modelName, userSchema)

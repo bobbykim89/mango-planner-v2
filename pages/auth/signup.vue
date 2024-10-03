@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { useInitPiniaStore, useProfileStore, useUserStore } from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { MclFormGroup, MclInputText } from '@bobbykim/mcl-forms'
-import { useUserStore, useInitPiniaStore, useProfileStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 
 definePageMeta({
@@ -9,11 +9,8 @@ definePageMeta({
 })
 
 useHead({
-  title: 'Mango Planner | Login',
-  meta: [
-    { name: 'description', content: 'login page' },
-    { property: 'og:title', content: 'Mango Planner | Login' },
-  ],
+  title: 'Mango Planner | Signup',
+  meta: [{ property: 'og:title', content: 'Mango Planner | Signup' }],
 })
 
 const router = useRouter()
@@ -107,7 +104,9 @@ const formTextColor = computed<ColorPalette>(() => {
               v-model="signUpCred.password"
             ></MclInputText>
           </MclFormGroup>
-          <button role="submit" class="btn btn-warning btn-full">Submit</button>
+          <button role="button" type="submit" class="btn btn-warning btn-full">
+            Submit
+          </button>
         </form>
       </div>
     </div>

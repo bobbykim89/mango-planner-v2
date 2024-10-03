@@ -1,18 +1,16 @@
-import { Profile } from '@/server/models'
 import type { H3Error } from 'h3'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { useAlertStore, useInitPiniaStore, useUserStore } from './'
-
-type ProfileType = InstanceType<typeof Profile>
+import { useAlertStore, useUserStore } from './'
+import type { ProfileModel } from '@/server/models'
+import type { ProfileInputDark } from '@/server/controller/profile/dto'
 
 export const useProfileStore = defineStore('profile', () => {
   const alertStore = useAlertStore()
   const userStore = useUserStore()
-  const initPiniaStore = useInitPiniaStore()
   const cookie = useAuthToken()
   // state
-  const userProfile = ref<ProfileType | null>(null)
+  const userProfile = ref<ProfileModel | null>(null)
   // getters
   const getPlansOrder = computed<string[]>(() => {
     if (userProfile.value === null) {
@@ -22,28 +20,20 @@ export const useProfileStore = defineStore('profile', () => {
   })
   // actions
   const getCurrentUserProfile = async () => {
+    const { isAuthenticated } = userStore.getCurrentAuthInfo
+    if (!cookie.value || !isAuthenticated) {
+      alertStore.setAlert('No user authentication found, please login')
+      return
+    }
     try {
-      const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated) {
-        alertStore.setAlert('No user authentication found, please login')
-        return
-      }
-      const res = await $fetch<ProfileType | null>('/api/profile', {
+      const res = await $fetch<ProfileModel | null>('/api/profile', {
         method: 'GET',
         headers: { Authorization: cookie.value },
       })
-      initPiniaStore.setLoading(true)
-      if (!res) {
-        userProfile.value = null
-        initPiniaStore.setLoading(false)
-        return
-      }
       userProfile.value = res
-      initPiniaStore.setLoading(false)
     } catch (error) {
       alertStore.setAlert((error as H3Error).statusMessage!)
       userProfile.value = null
-      initPiniaStore.setLoading(false)
     }
   }
   const postNewUserProfile = async () => {
@@ -52,21 +42,16 @@ export const useProfileStore = defineStore('profile', () => {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
-    const res = await $fetch<ProfileType>('/api/profile', {
-      method: 'POST',
-      headers: { Authorization: cookie.value },
-    })
-    initPiniaStore.setLoading(true)
-    if (!res) {
-      alertStore.setAlert(
-        'Failed to get response from server, please try again'
-      )
-      initPiniaStore.setLoading(false)
-      return
+    try {
+      await $fetch<ProfileModel>('/api/profile', {
+        method: 'POST',
+        headers: { Authorization: cookie.value },
+      })
+      await getCurrentUserProfile()
+      alertStore.setAlert('Successfully created user profile!', 'success')
+    } catch (error) {
+      alertStore.setAlert((error as H3Error).statusMessage!)
     }
-    await getCurrentUserProfile()
-    initPiniaStore.setLoading(false)
-    alertStore.setAlert('Successfully created user profile!', 'success')
   }
   const updateUserProfilePicture = async (payload: FormData) => {
     const { isAuthenticated } = userStore.getCurrentAuthInfo
@@ -74,24 +59,19 @@ export const useProfileStore = defineStore('profile', () => {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
-    const res = await $fetch<ProfileType>('/api/profile/profile-picture', {
-      method: 'PUT',
-      headers: {
-        Authorization: cookie.value,
-      },
-      body: payload,
-    })
-    initPiniaStore.setLoading(true)
-    if (!res) {
-      alertStore.setAlert(
-        'Failed to get response from server, please try again'
-      )
-      initPiniaStore.setLoading(false)
-      return
+    try {
+      await $fetch<ProfileModel>('/api/profile/profile-picture', {
+        method: 'PUT',
+        headers: {
+          Authorization: cookie.value,
+        },
+        body: payload,
+      })
+      await getCurrentUserProfile()
+      alertStore.setAlert('Successfully updated profile picture!', 'success')
+    } catch (error) {
+      alertStore.setAlert((error as H3Error).statusMessage!)
     }
-    await getCurrentUserProfile()
-    initPiniaStore.setLoading(false)
-    alertStore.setAlert('Successfully updated profile picture!', 'success')
   }
   const updateUserPlansOrder = async (payload: { plansOrder: string[] }) => {
     const { isAuthenticated } = userStore.getCurrentAuthInfo
@@ -99,47 +79,37 @@ export const useProfileStore = defineStore('profile', () => {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
-    const res = await $fetch<ProfileType>('/api/profile/plans-order', {
-      method: 'PUT',
-      headers: { Authorization: cookie.value },
-      body: payload,
-    })
-    initPiniaStore.setLoading(true)
-    if (!res) {
-      alertStore.setAlert(
-        'Failed to get response from server, please try again'
-      )
-      initPiniaStore.setLoading(false)
-      return
+    try {
+      const res = await $fetch<ProfileModel>('/api/profile/plans-order', {
+        method: 'PUT',
+        headers: { Authorization: cookie.value },
+        body: payload,
+      })
+      userProfile.value = res
+    } catch (error) {
+      alertStore.setAlert((error as H3Error).statusMessage!)
     }
-    userProfile.value = res
-    initPiniaStore.setLoading(false)
   }
-  const toggleUserDarkMode = async (payload: { dark: boolean }) => {
+  const toggleUserDarkMode = async (payload: ProfileInputDark) => {
     const { isAuthenticated } = userStore.getCurrentAuthInfo
     if (!cookie.value || !isAuthenticated) {
       alertStore.setAlert('No user authentication found, please login')
       return
     }
-    const res = await $fetch<ProfileType>('/api/profile/dark', {
-      method: 'PUT',
-      headers: { Authorization: cookie.value },
-      body: payload,
-    })
-    initPiniaStore.setLoading(true)
-    if (!res) {
+    try {
+      await $fetch<ProfileModel>('/api/profile/dark', {
+        method: 'PUT',
+        headers: { Authorization: cookie.value },
+        body: payload,
+      })
+      await getCurrentUserProfile()
       alertStore.setAlert(
-        'Failed to get response from server, please try again'
+        `Darkmode ${userProfile.value?.dark ? 'enabled' : 'disabled'}`,
+        'success'
       )
-      initPiniaStore.setLoading(false)
-      return
+    } catch (error) {
+      alertStore.setAlert((error as H3Error).statusMessage!)
     }
-    await getCurrentUserProfile()
-    initPiniaStore.setLoading(false)
-    alertStore.setAlert(
-      `Darkmode ${userProfile.value?.dark ? 'enabled' : 'disabled'}`,
-      'success'
-    )
   }
   const clearProfileData = () => {
     userProfile.value = null

@@ -86,14 +86,24 @@ const formTextColor = computed<ColorPalette>(() => {
               v-model="loginCred.password"
             ></MclInputText>
           </MclFormGroup>
-          <button role="submit" class="btn btn-warning btn-full">Submit</button>
+          <button role="button" type="submit" class="btn btn-warning btn-full">
+            Submit
+          </button>
         </form>
         <p class="mt-sm text-dark-3 dark:text-light-3 text-center">
-          <span> Don't have account? Click</span>
+          <span>Don't have account? Click</span>
           <NuxtLink
             to="/auth/signup"
             class="mx-3xs font-bold mcl-link text-warning"
             >Sign up</NuxtLink
+          >
+        </p>
+        <p class="mt-2xs text-dark-3 dark:text-light-3 text-center">
+          <span>Forgot Password? Click</span>
+          <NuxtLink
+            to="/auth/request"
+            class="mx-3xs font-bold mcl-link text-warning"
+            >Here</NuxtLink
           >
         </p>
       </div>
