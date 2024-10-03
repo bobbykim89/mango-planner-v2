@@ -1,6 +1,20 @@
-import { Schema, model } from 'mongoose'
+import { Schema, model, type Document, type Types } from 'mongoose'
+import { TypeInputLiteralType } from '@/types'
 
-const planSchema = new Schema({
+const modelName: string = 'plan'
+
+export interface PlanModel extends Document {
+  _id: Types.ObjectId
+  title: string
+  content: string
+  author: Schema.Types.ObjectId
+  complete: boolean
+  type: TypeInputLiteralType
+  date: Date
+  updatedAt: Date
+}
+
+const planSchema = new Schema<PlanModel>({
   title: {
     type: String,
     required: true,
@@ -30,4 +44,4 @@ const planSchema = new Schema({
   },
 })
 
-export const Plan = model('plan', planSchema)
+export const Plan = model<PlanModel>(modelName, planSchema)
