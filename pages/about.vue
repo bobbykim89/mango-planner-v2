@@ -1,11 +1,19 @@
 <script setup lang="ts">
 import AboutImage from '@/assets/images/about.jpg'
 
+const url = useRequestURL()
+
 useHead({
-  title: 'Mango Planner | About',
+  title: 'About | Mango Planner',
   meta: [
-    { name: 'description', content: 'About page' },
-    { property: 'og:title', content: 'Mango Planner | About' },
+    { property: 'og:title', content: 'About | Mango Planner' },
+    { property: 'og:url', content: url.href },
+    { property: 'twitter:domain', content: url.host },
+    { property: 'twitter:url', content: url.href },
+    {
+      name: 'twitter:title',
+      content: 'About | Mango Planner',
+    },
   ],
 })
 
