@@ -34,6 +34,8 @@ export default defineNuxtConfig({
     cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
     cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
     cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
+    mailerEmailAddress: process.env.MAILER_EMAIL_ADDRESS,
+    mailerAppPassword: process.env.MAILER_APP_PASSWORD,
     public: {
       openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
     },
