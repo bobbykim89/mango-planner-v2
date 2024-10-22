@@ -100,6 +100,9 @@ export default defineNuxtConfig({
   },
   pwa: {
     strategies: 'generateSW',
+    client: {
+      installPrompt: true,
+    },
     manifest: {
       short_name: 'MangoPlanner',
       name: 'Mango Planner',
