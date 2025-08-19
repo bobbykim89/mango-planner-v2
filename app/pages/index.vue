@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import type {
+  PlanDto,
+  PlanFormInput,
+  TypeInputLiteralType,
+} from '#shared/types'
 import MobileUtilityBlock from '@/components/plans/MobileUtilityBlock.vue'
 import MobileUtilityToggleButton from '@/components/plans/MobileUtilityToggleButton.vue'
 import NavigateToInfo from '@/components/plans/NavigateToInfo.vue'
 import PlanCollapsable from '@/components/plans/PlanCollapsable.vue'
 import PlanInputForm from '@/components/plans/PlanInputForm.vue'
 import UtilityBlock from '@/components/plans/UtilityBlock.vue'
-import { Plan } from '@/server/models'
 import {
   useInitPiniaStore,
   usePlanStore,
@@ -16,7 +20,6 @@ import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { Modal } from '@bobbykim/manguito-theme'
 import { storeToRefs } from 'pinia'
 import draggable from 'vuedraggable'
-import type { PlanFormInput, TypeInputLiteralType } from '~/shared/types'
 
 const url = useRequestURL()
 
@@ -58,7 +61,7 @@ const updateDataForm = reactive<PlanFormInput>({
   content: '',
   type: 'personal',
 })
-const customOrderData = ref<InstanceType<typeof Plan>[]>([])
+const customOrderData = ref<PlanDto[]>([])
 const selectedPost = ref<string>('')
 
 const userProfileStatus = computed<boolean>(() => {
@@ -122,7 +125,7 @@ const handleCollapseToggle = async (
   customOrderData.value = planStore.getPlansByOrder
   onClear()
 }
-const handleCollapseEdit = (e: Event, item: InstanceType<typeof Plan>) => {
+const handleCollapseEdit = (e: Event, item: PlanDto) => {
   e.preventDefault()
   modalForm.value = 'update'
   selectedPost.value = item._id!.toString()

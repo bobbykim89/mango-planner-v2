@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { PlanFormInput, TypeInputLiteralType } from '#shared/types'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import {
   MclFormGroup,
@@ -6,7 +7,6 @@ import {
   MclInputText,
   MclTextArea,
 } from '@bobbykim/mcl-forms'
-import type { PlanFormInput, TypeInputLiteralType } from '~/shared/types'
 
 const props = withDefaults(
   defineProps<{

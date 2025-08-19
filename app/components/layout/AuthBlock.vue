@@ -1,15 +1,13 @@
 <script setup lang="ts">
+import { ProfileDto, UserDto } from '#shared/types'
 import type { CtaTarget } from '@bobbykim/manguito-theme'
-import { User, Profile } from '@/server/models'
-type UserType = InstanceType<typeof User>
-type ProfileType = InstanceType<typeof Profile>
 const props = defineProps<{
   loginUrl: string
   signupUrl: string
   urlTarget: CtaTarget
   auth: boolean
-  username?: UserType['name']
-  profilePicture?: ProfileType['profilePicture']
+  username?: UserDto['name']
+  profilePicture?: ProfileDto['profilePicture']
 }>()
 type AuthTarget = 'login' | 'signup'
 const emit = defineEmits<{

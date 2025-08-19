@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { PlanDto } from '#shared/types'
 import { Collapse, vCollapse } from '@bobbykim/manguito-theme'
-import { PlanModel } from '@/server/models'
 
 const props = withDefaults(
   defineProps<{
-    item: PlanModel
+    item: PlanDto
     visible?: boolean
     showHandle?: boolean
   }>(),
@@ -16,7 +16,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'toggle-complete', event: Event, id: string, complete: boolean): void
-  (e: 'edit', event: Event, item: PlanModel): void
+  (e: 'edit', event: Event, item: PlanDto): void
   (e: 'delete', event: Event, id: string): void
 }>()
 

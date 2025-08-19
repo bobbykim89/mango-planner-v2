@@ -5,11 +5,13 @@ import type {
   PwUpdateInput,
   UserInput,
 } from '#shared/dto/user'
-import type { UserModel } from '#shared/models'
+import type { UserDto } from '#shared/types'
 import type { H3Error } from 'h3'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { useAlertStore, usePlanStore, useProfileStore } from './'
+import { useAlertStore } from './alertStore'
+import { usePlanStore } from './planStore'
+import { useProfileStore } from './profileStore'
 
 interface AuthToken {
   access_token: string
@@ -21,7 +23,7 @@ export const useUserStore = defineStore('user', () => {
   const profileStore = useProfileStore()
   const cookie = useAuthToken()
   // state
-  const currentUser = ref<UserModel | null>(null)
+  const currentUser = ref<UserDto | null>(null)
   const isAuthenticated = ref<boolean>(false)
   // getters
   const getCurrentAuthInfo = computed(() => {
@@ -34,7 +36,7 @@ export const useUserStore = defineStore('user', () => {
   const authUser = async () => {
     if (!cookie.value) return
     try {
-      const res = await $fetch<UserModel>('/api/auth', {
+      const res = await $fetch<UserDto>('/api/auth', {
         method: 'GET',
         headers: { Authorization: cookie.value },
       })
@@ -49,7 +51,7 @@ export const useUserStore = defineStore('user', () => {
   const getCurrentUser = async () => {
     if (!cookie.value) return
     try {
-      const res = await $fetch<UserModel>('/api/auth', {
+      const res = await $fetch<UserDto>('/api/auth', {
         method: 'GET',
         headers: { Authorization: cookie.value },
       })
