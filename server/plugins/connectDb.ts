@@ -22,7 +22,19 @@ class DatabaseConfig {
     const dbUrl = this.setMongoUrl()
     try {
       console.log('attempting to connect DB..')
-      await connect(dbUrl)
+      console.log('Environment: ', process.env.NODE_ENV)
+      await connect(dbUrl, {
+        serverSelectionTimeoutMS: 30000,
+        connectTimeoutMS: 30000,
+        socketTimeoutMS: 45000,
+        maxPoolSize: 10,
+        retryWrites: true,
+        retryReads: true,
+        // Force IPv4 to avoid IPv6 DNS issues
+        family: 4,
+        // Disable buffering for immediate connection feedback
+        bufferCommands: false,
+      })
       console.log('successfully connected to DB!')
     } catch (error) {
       console.error(error)

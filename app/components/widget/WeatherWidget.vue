@@ -52,7 +52,7 @@ await useAsyncData('weather-widget', () => getWeatherData())
 const iconSrc = computed<string | null>(() => {
   if (weatherData.weather) {
     return new URL(
-      `../../assets/images/weather/${weatherData.icon}.png`,
+      `@/assets/images/weather/${weatherData.icon}.png`,
       import.meta.url
     ).href
   }
