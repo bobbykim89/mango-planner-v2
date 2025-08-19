@@ -1,4 +1,4 @@
-import { tokenController } from '@/server/controller'
+import { tokenController } from '../../controller'
 
 export default defineEventHandler({
   handler: eventHandler(tokenController.sendToken),

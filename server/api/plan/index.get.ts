@@ -1,6 +1,6 @@
-import { planController } from "@/server/controller";
+import { planController } from '../../controller'
 
 export default defineEventHandler({
   onRequest: [defineRequestMiddleware(checkAuth)],
   handler: eventHandler(planController.getAllPostByUser),
-});
+})

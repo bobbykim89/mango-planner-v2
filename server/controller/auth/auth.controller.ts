@@ -1,4 +1,5 @@
-import { User, type UserModel } from '@/server/models'
+import { authInputSchema } from '#shared/dto/auth'
+import { User, type UserModel } from '#shared/models'
 import bcrypt from 'bcryptjs'
 import type { EventHandlerRequest, H3Event } from 'h3'
 import {
@@ -8,7 +9,6 @@ import {
   readValidatedBody,
   setResponseStatus,
 } from 'h3'
-import { authInputSchema } from './dto'
 import { type Model } from 'mongoose'
 import { UserController } from '../user/user.controller'
 
