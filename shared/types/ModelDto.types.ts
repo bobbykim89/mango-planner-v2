@@ -15,7 +15,7 @@ type ToDto<T> = T extends Types.ObjectId
 // 2. Special case for "populated or not" fields
 type WithPopulate<T, DTO> = ToDto<T> | DTO
 
-export type UserDto = ToDto<UserModel>
+export type UserDto = ToDto<Omit<UserModel, 'password'>>
 
 export type ProfileDto = Omit<ToDto<ProfileModel>, 'user'> & {
   user: WithPopulate<ProfileModel['user'], UserDto>

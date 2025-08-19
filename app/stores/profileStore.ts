@@ -1,16 +1,17 @@
 import type { ProfileInputDark } from '#shared/dto/profile'
-import type { ProfileModel } from '#shared/models'
+import type { ProfileDto } from '#shared/types'
 import type { H3Error } from 'h3'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { useAlertStore, useUserStore } from './'
+import { useAlertStore } from './alertStore'
+import { useUserStore } from './userStore'
 
 export const useProfileStore = defineStore('profile', () => {
   const alertStore = useAlertStore()
   const userStore = useUserStore()
   const cookie = useAuthToken()
   // state
-  const userProfile = ref<ProfileModel | null>(null)
+  const userProfile = ref<ProfileDto | null>(null)
   // getters
   const getPlansOrder = computed<string[]>(() => {
     if (userProfile.value === null) {
@@ -26,7 +27,7 @@ export const useProfileStore = defineStore('profile', () => {
       return
     }
     try {
-      const res = await $fetch<ProfileModel | null>('/api/profile', {
+      const res = await $fetch<ProfileDto | null>('/api/profile', {
         method: 'GET',
         headers: { Authorization: cookie.value },
       })
@@ -43,7 +44,7 @@ export const useProfileStore = defineStore('profile', () => {
       return
     }
     try {
-      await $fetch<ProfileModel>('/api/profile', {
+      await $fetch<ProfileDto>('/api/profile', {
         method: 'POST',
         headers: { Authorization: cookie.value },
       })
@@ -60,7 +61,7 @@ export const useProfileStore = defineStore('profile', () => {
       return
     }
     try {
-      await $fetch<ProfileModel>('/api/profile/profile-picture', {
+      await $fetch<ProfileDto>('/api/profile/profile-picture', {
         method: 'PUT',
         headers: {
           Authorization: cookie.value,
@@ -80,7 +81,7 @@ export const useProfileStore = defineStore('profile', () => {
       return
     }
     try {
-      const res = await $fetch<ProfileModel>('/api/profile/plans-order', {
+      const res = await $fetch<ProfileDto>('/api/profile/plans-order', {
         method: 'PUT',
         headers: { Authorization: cookie.value },
         body: payload,
@@ -97,7 +98,7 @@ export const useProfileStore = defineStore('profile', () => {
       return
     }
     try {
-      await $fetch<ProfileModel>('/api/profile/dark', {
+      await $fetch<ProfileDto>('/api/profile/dark', {
         method: 'PUT',
         headers: { Authorization: cookie.value },
         body: payload,

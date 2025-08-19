@@ -40,9 +40,11 @@ const getWeatherData = async () => {
   if (latitude !== null && latitude !== Infinity) {
     const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=imperial`
     const res = await $fetch<ApiReturnType>(apiUrl)
+    const weatherInfo = res.weather[0]
+    if (!weatherInfo) return
     weatherData.city = res.name
-    weatherData.icon = res.weather[0].icon
-    weatherData.weather = res.weather[0].main
+    weatherData.icon = weatherInfo.icon
+    weatherData.weather = weatherInfo.main
     weatherData.temperature = res.main.temp
   }
 }
