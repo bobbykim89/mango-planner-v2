@@ -1,10 +1,15 @@
 import { useRuntimeConfig } from '#imports'
 import {
+  pwUpdateInputSchema,
+  userInputSchema,
+  usernameSchema,
+} from '#shared/dto/user'
+import {
   Profile,
   User,
-  type UserModel,
   type ProfileModel,
-} from '@/server/models'
+  type UserModel,
+} from '#shared/models'
 import bcrypt from 'bcryptjs'
 import {
   EventHandlerRequest,
@@ -16,11 +21,8 @@ import {
   setResponseStatus,
 } from 'h3'
 import jwt from 'jsonwebtoken'
-import { userInputSchema, usernameSchema, pwUpdateInputSchema } from './dto'
 import { type Model } from 'mongoose'
 import { RuntimeConfig } from 'nuxt/schema'
-
-// const config = useRuntimeConfig()
 
 export class UserController {
   private config: RuntimeConfig

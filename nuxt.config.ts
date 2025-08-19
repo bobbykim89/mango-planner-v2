@@ -65,12 +65,7 @@ export default defineNuxtConfig({
       openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
     },
   },
-  modules: [
-    '@pinia/nuxt',
-    '@nuxtjs/tailwindcss',
-    '@nuxtjs/color-mode',
-    '@vite-pwa/nuxt',
-  ],
+  modules: ['@pinia/nuxt', '@nuxtjs/color-mode', '@vite-pwa/nuxt'],
   typescript: {
     typeCheck: true,
     strict: true,
@@ -86,12 +81,11 @@ export default defineNuxtConfig({
   colorMode: {
     classSuffix: '',
   },
-  css: ['~/assets/css/page_transition.scss'],
-  tailwindcss: {
-    cssPath: '~/assets/css/tailwind.css',
-    configPath: 'tailwind.config.ts',
-    exposeConfig: false,
-    viewer: true,
+  css: ['~/assets/css/page_transition.scss', '~/assets/css/styles.css'],
+  postcss: {
+    plugins: {
+      '@tailwindcss/postcss': {},
+    },
   },
   nitro: {
     experimental: {

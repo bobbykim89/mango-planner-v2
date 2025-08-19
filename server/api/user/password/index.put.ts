@@ -1,4 +1,4 @@
-import { userController } from '@/server/controller'
+import { userController } from '../../../controller'
 
 export default defineEventHandler({
   onRequest: [defineRequestMiddleware(checkAuth)],
