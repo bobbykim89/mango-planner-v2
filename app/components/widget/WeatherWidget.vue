@@ -55,7 +55,7 @@ const iconSrc = computed<string | null>(() => {
     //   `@/assets/images/weather/${weatherData.icon}.png`,
     //   import.meta.url
     // ).href
-    return `~/assets/images/weather/${weatherData.icon}.png`
+    return `/assets/img/weather/${weatherData.icon}.png`
   }
   return null
 })
@@ -67,8 +67,8 @@ const iconSrc = computed<string | null>(() => {
   >
     <div class="flex items-center gap-xs justify-center">
       <img
-        v-if="iconSrc"
-        :src="iconSrc"
+        v-if="weatherData.icon !== ''"
+        :src="`~/assets/images/weather/${weatherData.icon}.png`"
         :alt="weatherData.weather.toLowerCase()"
         class="object-center object-cover aspect-square h-xl md:h-auto"
       />
