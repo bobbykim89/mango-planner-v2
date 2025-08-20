@@ -67,8 +67,8 @@ const iconSrc = computed<string | null>(() => {
   >
     <div class="flex items-center gap-xs justify-center">
       <img
-        v-if="weatherData.icon !== ''"
-        :src="`~/assets/images/weather/${weatherData.icon}.png`"
+        v-if="iconSrc"
+        :src="iconSrc"
         :alt="weatherData.weather.toLowerCase()"
         class="object-center object-cover aspect-square h-xl md:h-auto"
       />
