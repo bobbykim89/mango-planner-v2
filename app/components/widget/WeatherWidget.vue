@@ -55,7 +55,7 @@ const iconSrc = computed<string | null>(() => {
     //   `@/assets/images/weather/${weatherData.icon}.png`,
     //   import.meta.url
     // ).href
-    return `/assets/img/weather/${weatherData.icon}.png`
+    return `/img/weather/${weatherData.icon}.png`
   }
   return null
 })
