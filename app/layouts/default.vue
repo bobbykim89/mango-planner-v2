@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import MPLogo from '@/assets/images/logo.png'
-import {
-  CtaTarget,
-  HeaderHorizontal,
-  Alert,
-  Sidebar,
-} from '@bobbykim/manguito-theme'
-import type { ColorPalette } from '@bobbykim/manguito-theme'
-import type { MenuItemType, SocialUrl } from '@bobbykim/mcl-footer'
-import { MclFooterA } from '@bobbykim/mcl-footer'
-import { useAlertStore, useUserStore, useProfileStore } from '@/stores'
-import { storeToRefs } from 'pinia'
-import WeatherWidget from '@/components/widget/WeatherWidget.vue'
+import CreateProfileWidget from '@/components/widget/CreateProfileWidget.vue'
 import DarkmodeWidget from '@/components/widget/DarkmodeWidget.vue'
 import UserInfoWidget from '@/components/widget/UserInfoWidget.vue'
-import CreateProfileWidget from '@/components/widget/CreateProfileWidget.vue'
+import WeatherWidget from '@/components/widget/WeatherWidget.vue'
+import { useAlertStore, useProfileStore, useUserStore } from '@/stores'
+import type { ColorPalette } from '@bobbykim/manguito-theme'
+import {
+  Alert,
+  CtaTarget,
+  HeaderHorizontal,
+  Sidebar,
+} from '@bobbykim/manguito-theme'
+import type { MenuItemType, SocialUrl } from '@bobbykim/mcl-footer'
+import { MclFooterA } from '@bobbykim/mcl-footer'
 import { useGeolocation, useWindowScroll } from '@vueuse/core'
+import imageCompression from 'browser-image-compression'
+import { storeToRefs } from 'pinia'
 
 const config = useRuntimeConfig()
 const router = useRouter()
@@ -135,7 +136,12 @@ const onUsernameChange = async (e: Event, name: string) => {
 const onFileUpload = async (e: Event, file: File) => {
   e.preventDefault()
   const fileFormData = new FormData()
-  fileFormData.append('image', file)
+  const compressedFile = await imageCompression(file, {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1000,
+    useWebWorker: true,
+  })
+  fileFormData.append('image', compressedFile)
   if (import.meta.client && window.confirm('Please confirm file upload.')) {
     await profileStore.updateUserProfilePicture(fileFormData)
   }
