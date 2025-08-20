@@ -1,4 +1,4 @@
-import { profileController } from '@/server/controller'
+import { profileController } from '../../controller'
 
 export default defineEventHandler({
   onRequest: [defineRequestMiddleware(checkAuth)],

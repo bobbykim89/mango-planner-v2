@@ -1,4 +1,5 @@
-import { sendEmail } from '@/server/utils/sendEmail.util'
+import { resetPwInputSchema, tokenEmailInputSchema } from '#shared/dto/token'
+import { type TokenModel, type UserModel, Token, User } from '#shared/models'
 import type { EventHandlerRequest, H3Event } from 'h3'
 import {
   createError,
@@ -7,9 +8,8 @@ import {
   readValidatedBody,
 } from 'h3'
 import { Model } from 'mongoose'
-import { type TokenModel, type UserModel, Token, User } from '~/server/models'
+import { sendEmail } from '../../utils/sendEmail.util'
 import { UserController } from '../user/user.controller'
-import { resetPwInputSchema, tokenEmailInputSchema } from './dto'
 
 export class TokenController {
   private tokenModel: Model<TokenModel>

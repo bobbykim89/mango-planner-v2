@@ -1,5 +1,4 @@
-import type { EventHandlerRequest, H3Event } from 'h3'
-
+import { planInputCompleteSchema, planInputSchema } from '#shared/dto/plan'
 import {
   Plan,
   Profile,
@@ -7,7 +6,8 @@ import {
   type PlanModel,
   type ProfileModel,
   type UserModel,
-} from '@/server/models'
+} from '#shared/models'
+import type { EventHandlerRequest, H3Event } from 'h3'
 import {
   createError,
   getResponseStatus,
@@ -16,7 +16,6 @@ import {
   readValidatedBody,
   setResponseStatus,
 } from 'h3'
-import { planInputSchema, planInputCompleteSchema } from './dto'
 import { Model } from 'mongoose'
 
 export class PlanController {

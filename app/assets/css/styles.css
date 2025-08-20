@@ -1,0 +1,9 @@
+@import 'tailwindcss';
+@import '@bobbykim/manguito-theme/mcl-theme-v4.css';
+@source "../../../node_modules/@bobbykim";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --mcl-primary: #312e81;
+  --mcl-info: #14532d;
+}
