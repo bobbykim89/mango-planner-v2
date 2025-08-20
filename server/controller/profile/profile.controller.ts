@@ -1,3 +1,4 @@
+import { profileInputDarkSchema, profileInputSchema } from '#shared/dto/profile'
 import {
   Plan,
   Profile,
@@ -5,12 +6,11 @@ import {
   type PlanModel,
   type ProfileModel,
   type UserModel,
-} from '@/server/models'
-import { deleteCloudinaryImage } from '@/server/utils/cloudinary.util'
+} from '#shared/models'
 import type { EventHandlerRequest, H3Event } from 'h3'
 import { createError, readValidatedBody } from 'h3'
-import { profileInputSchema, profileInputDarkSchema } from './dto'
 import { Model } from 'mongoose'
+import { deleteCloudinaryImage } from '../../utils/cloudinary.util'
 
 export class ProfileController {
   private planModel: Model<PlanModel>

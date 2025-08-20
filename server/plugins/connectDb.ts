@@ -22,6 +22,7 @@ class DatabaseConfig {
     const dbUrl = this.setMongoUrl()
     try {
       console.log('attempting to connect DB..')
+      console.log('Environment: ', process.env.NODE_ENV)
       await connect(dbUrl)
       console.log('successfully connected to DB!')
     } catch (error) {
