@@ -95,7 +95,7 @@ watch(
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 448 512"
             fill="currentColor"
-            class="w-xs text-dark-3/80 dark:text-light-3/80 handle"
+            class="min-w-xs h-xs text-dark-3/80 dark:text-light-3/80 handle"
           >
             <!-- !Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
             <path
