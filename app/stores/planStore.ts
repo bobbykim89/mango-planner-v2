@@ -41,19 +41,8 @@ export const usePlanStore = defineStore('plan', () => {
       return plans.value.slice()
     }
 
-    // const order: Record<string, number> = {}
-    // plansOrder.forEach((id, idx) => {
-    //   order[id] = idx
-    // })
-
     const orderMap = Object.fromEntries(plansOrder.map((id, idx) => [id, idx]))
 
-    // return plans.value.sort((a, b) => {
-    //   const objA = order[a._id.toString()]
-    //   const objB = order[b._id.toString()]
-    //   if (!objA || !objB) return 0
-    //   return objA - objB
-    // })
     return plans.value
       .slice() // avoid mutating original array
       .sort((a, b) => {
