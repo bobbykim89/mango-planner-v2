@@ -20,9 +20,9 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@bobbykim/manguito-theme": "^0.27.0",
-    "@bobbykim/mcl-footer": "0.9.5",
-    "@bobbykim/mcl-forms": "^0.9.6",
+    "@bobbykim/manguito-theme": "^0.28.0",
+    "@bobbykim/mcl-footer": "^0.9.6",
+    "@bobbykim/mcl-forms": "^0.9.7",
     "@pinia/nuxt": "^0.11.2",
     "@vueuse/core": "^13.7.0",
     "bcryptjs": "^3.0.2",
@@ -33,7 +33,8 @@
     "nodemailer": "^7.0.5",
     "nuxt": "4.0.3",
     "pinia": "3.0.3",
-    "vue": "latest",
+    "vue": "^3.5.21",
+    "vue-router": "^4.5.1",
     "vuedraggable": "^4.1.0",
     "zod": "^4.0.17"
   },
