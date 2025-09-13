@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import MPLogo from '@/assets/images/logo.png'
+import MPLogo from '@/assets/images/logo.webp'
 import CreateProfileWidget from '@/components/widget/CreateProfileWidget.vue'
 import DarkmodeWidget from '@/components/widget/DarkmodeWidget.vue'
 import UserInfoWidget from '@/components/widget/UserInfoWidget.vue'
@@ -17,6 +17,7 @@ import { MclFooterA } from '@bobbykim/mcl-footer'
 import { useGeolocation, useWindowScroll } from '@vueuse/core'
 import imageCompression from 'browser-image-compression'
 import { storeToRefs } from 'pinia'
+import { onMounted } from 'vue'
 
 const config = useRuntimeConfig()
 const router = useRouter()
@@ -28,6 +29,7 @@ const { currentUser, isAuthenticated } = storeToRefs(userStore)
 const { userProfile } = storeToRefs(profileStore)
 const sidebarRef = ref<InstanceType<typeof Sidebar>>()
 const headerRef = ref<InstanceType<typeof HeaderHorizontal>>()
+const currentYear = ref<number>()
 const { coords } = useGeolocation()
 const { y } = useWindowScroll({ behavior: 'smooth' })
 const { $pwa } = useNuxtApp()
@@ -162,23 +164,20 @@ const onProfileCreate = async (e: Event) => {
   await profileStore.postNewUserProfile()
   headerRef.value?.headerClose()
 }
-watch(
-  () => isAuthenticated.value,
-  (newValue) => {
-    if (newValue === false) {
-      useColorMode().preference = 'light'
-    }
+watch(isAuthenticated, (newValue) => {
+  if (newValue === false) {
+    useColorMode().preference = 'light'
   }
-)
-watch(
-  () => userProfile.value,
-  (newValue) => {
-    if (newValue === null) {
-      useColorMode().preference = 'light'
-    }
-    useColorMode().preference = newValue?.dark ? 'dark' : 'light'
+})
+watch(userProfile, (newValue) => {
+  if (newValue === null) {
+    useColorMode().preference = 'light'
   }
-)
+  useColorMode().preference = newValue?.dark ? 'dark' : 'light'
+})
+onMounted(() => {
+  currentYear.value = new Date().getFullYear()
+})
 </script>
 
 <template>
@@ -466,11 +465,9 @@ watch(
       @menu-click="handleFooterMenuClick"
     >
       <div>
-        <ClientOnly>
-          <span class="text-dark-3 dark:text-light-3"
-            >&copy; Mango Planner {{ new Date().getFullYear() }}</span
-          >
-        </ClientOnly>
+        <span class="text-dark-3 dark:text-light-3"
+          >&copy; Mango Planner {{ currentYear }}</span
+        >
       </div>
     </MclFooterA>
   </div>
