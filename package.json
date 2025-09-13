@@ -20,9 +20,9 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@bobbykim/manguito-theme": "^0.27.0",
-    "@bobbykim/mcl-footer": "0.9.5",
-    "@bobbykim/mcl-forms": "^0.9.6",
+    "@bobbykim/manguito-theme": "^0.28.0",
+    "@bobbykim/mcl-footer": "^0.9.6",
+    "@bobbykim/mcl-forms": "^0.9.7",
     "@pinia/nuxt": "^0.11.2",
     "@vueuse/core": "^13.7.0",
     "bcryptjs": "^3.0.2",
