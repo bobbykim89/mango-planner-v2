@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AboutImage from '@/assets/images/about.jpg'
+import AboutImage from '@/assets/images/about.webp'
 
 const url = useRequestURL()
 
