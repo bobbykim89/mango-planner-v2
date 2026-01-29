@@ -8,7 +8,7 @@
     "url": "https://www.devbobbykim.com/"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "build": "nuxt build",
@@ -20,37 +20,37 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@bobbykim/manguito-theme": "^0.28.0",
-    "@bobbykim/mcl-footer": "^0.9.6",
-    "@bobbykim/mcl-forms": "^0.9.7",
-    "@pinia/nuxt": "^0.11.2",
-    "@vueuse/core": "^13.7.0",
-    "bcryptjs": "^3.0.2",
+    "@bobbykim/manguito-theme": "^0.28.2",
+    "@bobbykim/mcl-footer": "^0.9.8",
+    "@bobbykim/mcl-forms": "^0.9.9",
+    "@pinia/nuxt": "^0.11.3",
+    "@vueuse/core": "^14.1.0",
+    "bcryptjs": "^3.0.3",
     "browser-image-compression": "^2.0.2",
-    "cloudinary": "^2.4.0",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.17.1",
-    "nodemailer": "^7.0.5",
-    "nuxt": "4.0.3",
-    "pinia": "3.0.3",
-    "vue": "^3.5.21",
-    "vue-router": "^4.5.1",
+    "cloudinary": "^2.9.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.1.5",
+    "nodemailer": "^7.0.13",
+    "nuxt": "4.3.0",
+    "pinia": "3.0.4",
+    "vue": "^3.5.27",
+    "vue-router": "^4.6.4",
     "vuedraggable": "^4.1.0",
-    "zod": "^4.0.17"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@nuxtjs/color-mode": "^3.5.2",
+    "@nuxtjs/color-mode": "^4.0.0",
     "@tailwindcss/postcss": "^4.1.12",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^24.3.0",
-    "@types/nodemailer": "^7.0.0",
-    "@vite-pwa/nuxt": "^1.0.4",
+    "@types/node": "^25.0.10",
+    "@types/nodemailer": "^7.0.9",
+    "@vite-pwa/nuxt": "^1.1.0",
     "postcss": "^8.5.6",
     "sass": "^1.90.0",
-    "tailwindcss": "^4.1.12",
-    "typescript": "^5.9.2",
-    "vite": "^7.1.2",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
     "vue-tsc": "3.0.5"
   },
   "packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748",
