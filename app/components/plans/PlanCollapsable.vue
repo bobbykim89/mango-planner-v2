@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { PlanDto } from '#shared/types'
-import { Collapse, vCollapse } from '@bobbykim/manguito-theme'
+import { Collapse } from '@bobbykim/manguito-theme'
+import { vCollapse } from '@bobbykim/manguito-theme/directives'
 
 const props = withDefaults(
   defineProps<{
@@ -11,7 +12,7 @@ const props = withDefaults(
   {
     visible: false,
     showHandle: false,
-  }
+  },
 )
 
 const emit = defineEmits<{
@@ -74,7 +75,7 @@ watch(
   () => props.visible,
   (newValue) => {
     collapseState.value = newValue
-  }
+  },
 )
 </script>
 

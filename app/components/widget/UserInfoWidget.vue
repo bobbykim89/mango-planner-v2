@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import DefaultProfile from '@/assets/images/defaultProfile.webp'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
-import { Collapse, vCollapse } from '@bobbykim/manguito-theme'
+import { Collapse } from '@bobbykim/manguito-theme'
+import { vCollapse } from '@bobbykim/manguito-theme/directives'
 import { MclFormGroup, MclInputFile, MclInputText } from '@bobbykim/mcl-forms'
 
 const props = defineProps<{
