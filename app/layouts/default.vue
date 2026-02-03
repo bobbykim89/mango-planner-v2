@@ -20,6 +20,7 @@ import { storeToRefs } from 'pinia'
 import { onMounted } from 'vue'
 
 const config = useRuntimeConfig()
+const colorMode = useColorMode()
 const router = useRouter()
 const alertStore = useAlertStore()
 const userStore = useUserStore()
@@ -112,7 +113,7 @@ const onLogout = () => {
   userStore.logoutUser()
   sidebarClose()
   headerRef.value?.headerClose()
-  useColorMode().preference = 'light'
+  colorMode.preference = 'light'
   router.push({ path: '/auth/login' })
 }
 const onDarkModeClick = async (e: Event, dark: boolean) => {
@@ -162,9 +163,9 @@ watch(isAuthenticated, (newValue) => {
 })
 watch(userProfile, (newValue) => {
   if (newValue === null) {
-    useColorMode().preference = 'light'
+    colorMode.preference = 'light'
   }
-  useColorMode().preference = newValue?.dark ? 'dark' : 'light'
+  colorMode.preference = newValue?.dark ? 'dark' : 'light'
 })
 onMounted(() => {
   currentYear.value = new Date().getFullYear()
@@ -180,7 +181,7 @@ onMounted(() => {
       :scroll-distance="100"
     >
       <template #content
-        ><div class="flex flex-shrink-0 items-center self-center md:py-3xs">
+        ><div class="flex shrink-0 items-center self-center md:py-3xs">
           <div class="h-md md:h-lg mr-2xs md:mr-sm align-middle">
             <NuxtLink
               :to="menuItemData.logoLink"
@@ -338,7 +339,7 @@ onMounted(() => {
           <span>New version of SW available, please reload</span>
           <button
             @click="$pwa?.updateServiceWorker()"
-            class="p-[6px] bg-warning rounded-md hover:bg-warning/75 transition-all duration-300 ease-linear"
+            class="p-1.5 bg-warning rounded-md hover:bg-warning/75 transition-all duration-300 ease-linear"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
