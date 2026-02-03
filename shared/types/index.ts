@@ -1,4 +1,5 @@
 export * from './ColorTheme.types'
+export * from './draft.types'
 export * from './ModelDto.types'
 export * from './NewFormInput.types'
 export * from './PlanInput.types'

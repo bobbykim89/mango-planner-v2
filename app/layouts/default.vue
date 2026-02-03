@@ -26,7 +26,7 @@ const userStore = useUserStore()
 const profileStore = useProfileStore()
 const { alert, alertColor } = storeToRefs(alertStore)
 const { currentUser, isAuthenticated } = storeToRefs(userStore)
-const { userProfile } = storeToRefs(profileStore)
+const { userProfile, darkMode } = storeToRefs(profileStore)
 const sidebarRef = ref<InstanceType<typeof Sidebar>>()
 const headerRef = ref<InstanceType<typeof HeaderHorizontal>>()
 const currentYear = ref<number>()
@@ -72,22 +72,13 @@ const menuItemData = reactive<{
 })
 
 const handleBgColors = computed<ColorPalette>(() => {
-  if (userProfile.value !== null && userProfile.value.dark) {
-    return 'dark-3'
-  }
-  return 'light-3'
+  return darkMode.value ? 'dark-3' : 'light-3'
 })
 const handleFooterMenuColor = computed<ColorPalette>(() => {
-  if (userProfile.value !== null && userProfile.value.dark) {
-    return 'light-2'
-  }
-  return 'dark-2'
+  return darkMode.value ? 'light-2' : 'dark-2'
 })
 const handleMobileMenuBgColor = computed<ColorPalette>(() => {
-  if (userProfile.value !== null && userProfile.value.dark) {
-    return 'dark-2'
-  }
-  return 'light-4'
+  return darkMode.value ? 'dark-2' : 'light-4'
 })
 
 const handleTitleClick = (e: Event, url: string, target: CtaTarget) => {
