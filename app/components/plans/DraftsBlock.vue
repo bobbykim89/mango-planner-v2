@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import type { DraftFormattedType, PlanInput } from '#shared/types'
+import type { DraftFormInput, PlanFormInput } from '#shared/types'
 
 const props = defineProps<{
   visible: boolean
-  drafts: DraftFormattedType[]
+  drafts: DraftFormInput[]
 }>()
 
 const emit = defineEmits<{
-  (e: 'draft-click', id: string, data: PlanInput): void
+  (e: 'draft-click', id: string, data: PlanFormInput): void
 }>()
 
-const handleButtonClick = (id: string, data: PlanInput) => {
+const handleButtonClick = (id: string, data: PlanFormInput) => {
   emit('draft-click', id, data)
-  console.log(id, data)
 }
 </script>
 
