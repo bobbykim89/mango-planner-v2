@@ -1,6 +1,6 @@
 import type { PlanModel } from '#shared/models'
 import type {
-  DraftFormattedType,
+  DraftFormInput,
   DraftRawType,
   PlanDto,
   PlanInput,
@@ -26,7 +26,7 @@ export const usePlanStore = defineStore('plan', () => {
   const userStore = useUserStore()
   // state
   const plans = ref<PlanDto[]>([])
-  const drafts = ref<DraftFormattedType[]>([])
+  const drafts = ref<DraftFormInput[]>([])
   // getters
   const getAllPlans = computed<PlanDto[]>(() => {
     let incompletePlans: PlanDto[] = []

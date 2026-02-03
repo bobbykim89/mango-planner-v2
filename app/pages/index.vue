@@ -43,7 +43,7 @@ useHead({
 })
 
 type PlanDisplayStyle = 'all' | 'incomplete' | 'custom' | 'search'
-type ModalFormType = 'new' | 'update'
+type ModalFormType = 'new' | 'update' | 'draft'
 
 const userStore = useUserStore()
 const profileStore = useProfileStore()
@@ -59,6 +59,12 @@ const modalForm = ref<ModalFormType>('new')
 const mobileUtilityToggle = ref<boolean>(false)
 const displayStyle = ref<PlanDisplayStyle>('all')
 const updateDataForm = reactive<PlanFormInput>({
+  title: '',
+  content: '',
+  type: 'personal',
+})
+const selectedDraft = ref<string>('')
+const draftDataForm = reactive<PlanFormInput>({
   title: '',
   content: '',
   type: 'personal',
@@ -146,6 +152,42 @@ const onEditSubmit = async (e: Event, data: PlanFormInput) => {
   onClear()
   modalRef.value?.close()
 }
+const onDraftEditClick = (id: string, data: PlanFormInput) => {
+  modalForm.value = 'draft'
+
+  selectedDraft.value = id
+  draftDataForm.title = data.title
+  draftDataForm.type = data.type
+  if (data.content) {
+    draftDataForm.content = data.content
+  }
+
+  modalRef.value?.open()
+}
+const onDraftSave = async (e: Event, data: PlanFormInput) => {
+  e.preventDefault()
+  if (
+    import.meta.client &&
+    window.confirm('Please confirm to update this item.')
+  ) {
+    if (selectedDraft.value === 'new') {
+      await planStore.createNewPost(data)
+      customOrderData.value = planStore.getPlansByOrder
+    } else {
+      await planStore.updatePost({
+        id: selectedDraft.value,
+        body: data,
+      })
+    }
+    await planStore.deleteDraft(selectedDraft.value)
+    selectedDraft.value = ''
+    draftDataForm.title = ''
+    draftDataForm.content = ''
+    draftDataForm.type = 'personal'
+
+    modalRef.value?.close()
+  }
+}
 const handleCollapseDelete = async (e: Event, id: string) => {
   e.preventDefault()
   if (
@@ -229,6 +271,7 @@ const getPlans = computed(() => {
         <DraftsBlock
           :visible="drafts.length !== 0"
           :drafts="drafts"
+          @draft-click="onDraftEditClick"
         ></DraftsBlock>
 
         <div class="flex justify-end">
@@ -323,7 +366,8 @@ const getPlans = computed(() => {
         <div class="flex justify-between py-xs border-b-2">
           <h3 class="h3-md text-warning">
             <span v-if="modalForm === 'new'">Create New Plan</span>
-            <span v-else>Update Plan</span>
+            <span v-else-if="modalForm === 'update'">Update Plan</span>
+            <span v-else>Saved Draft</span>
           </h3>
           <button @click="(onClear(), close())">
             <svg
@@ -348,11 +392,18 @@ const getPlans = computed(() => {
             @form-submit="handleNewFormSubmit"
           ></PlanInputForm>
           <PlanInputForm
-            v-else
+            v-else-if="modalForm === 'update'"
             prefix="update"
             :post-input="updateDataForm"
             submit-text="Update"
             @form-submit="onEditSubmit"
+          ></PlanInputForm>
+          <PlanInputForm
+            v-else
+            prefix="draft"
+            :post-input="draftDataForm"
+            submit-text="Save"
+            @form-submit="onDraftSave"
           ></PlanInputForm>
         </div>
       </template>
