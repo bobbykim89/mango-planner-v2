@@ -1,11 +1,23 @@
 import type { PlanModel } from '#shared/models'
-import type { PlanDto, PlanInput } from '#shared/types'
-import type { H3Error } from 'h3'
+import type {
+  DraftFormattedType,
+  DraftRawType,
+  PlanDto,
+  PlanInput,
+} from '#shared/types'
+import localforage from 'localforage'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useAlertStore } from './alertStore'
 import { useProfileStore } from './profileStore'
 import { useUserStore } from './userStore'
+
+// config localforage
+localforage.config({
+  driver: localforage.INDEXEDDB,
+  name: 'MangoPlannerV2',
+  storeName: 'drafts',
+})
 
 export const usePlanStore = defineStore('plan', () => {
   const cookie = useAuthToken()
@@ -14,6 +26,7 @@ export const usePlanStore = defineStore('plan', () => {
   const userStore = useUserStore()
   // state
   const plans = ref<PlanDto[]>([])
+  const drafts = ref<DraftFormattedType[]>([])
   // getters
   const getAllPlans = computed<PlanDto[]>(() => {
     let incompletePlans: PlanDto[] = []
@@ -53,28 +66,30 @@ export const usePlanStore = defineStore('plan', () => {
   })
   // actions
   const getAllPostByUser = async () => {
-    const { isAuthenticated } = userStore.getCurrentAuthInfo
-    if (!cookie.value || !isAuthenticated) {
-      alertStore.setAlert('No user authentication found, please login')
-      return
-    }
     try {
+      const { isAuthenticated } = userStore.getCurrentAuthInfo
+      if (!cookie.value || !isAuthenticated)
+        throw new Error('No user authentication found, please login')
+
       const res = await $fetch<PlanDto[]>('/api/plan', {
         method: 'GET',
         headers: { Authorization: cookie.value },
       })
+
       plans.value = res
+      await loadAllDrafts()
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
+      handleError(error)
     }
   }
   const createNewPost = async (payload: PlanInput) => {
-    const { isAuthenticated } = userStore.getCurrentAuthInfo
-    if (!cookie.value || !isAuthenticated) {
-      alertStore.setAlert('No user authentication found, please login')
-      return
-    }
     try {
+      const { isAuthenticated } = userStore.getCurrentAuthInfo
+      if (!cookie.value || !isAuthenticated) {
+        await saveDraft('new', payload)
+        throw new Error('No user authentication found, please login')
+      }
+
       const res = await $fetch<PlanDto>('/api/plan', {
         method: 'POST',
         headers: { Authorization: cookie.value },
@@ -83,16 +98,17 @@ export const usePlanStore = defineStore('plan', () => {
       plans.value = [res, ...plans.value]
       alertStore.setAlert('Successfully created new plan!', 'success')
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
+      handleError(error)
     }
   }
   const updatePost = async (payload: { id: string; body: PlanInput }) => {
-    const { isAuthenticated } = userStore.getCurrentAuthInfo
-    if (!cookie.value || !isAuthenticated) {
-      alertStore.setAlert('No user authentication found, please login')
-      return
-    }
     try {
+      const { isAuthenticated } = userStore.getCurrentAuthInfo
+      if (!cookie.value || !isAuthenticated) {
+        await saveDraft(payload.id, payload.body)
+        throw new Error('No user authentication found, please login')
+      }
+
       await $fetch<PlanModel>(`/api/plan/${payload.id}`, {
         method: 'PUT',
         headers: { Authorization: cookie.value },
@@ -101,16 +117,15 @@ export const usePlanStore = defineStore('plan', () => {
       await getAllPostByUser()
       alertStore.setAlert('Successfully updated plan!', 'success')
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
+      handleError(error)
     }
   }
   const toggleComplete = async (payload: { id: string; body: PlanInput }) => {
-    const { isAuthenticated } = userStore.getCurrentAuthInfo
-    if (!cookie.value || !isAuthenticated) {
-      alertStore.setAlert('No user authentication found, please login')
-      return
-    }
     try {
+      const { isAuthenticated } = userStore.getCurrentAuthInfo
+      if (!cookie.value || !isAuthenticated)
+        throw new Error('No user authentication found, please login')
+
       const res = await $fetch<PlanModel>(`/api/plan/${payload.id}/toggle`, {
         method: 'PUT',
         headers: { Authorization: cookie.value },
@@ -121,19 +136,18 @@ export const usePlanStore = defineStore('plan', () => {
         `Successfully marked the plan ${
           res.complete ? 'completed' : 'incomplete'
         }`,
-        'success'
+        'success',
       )
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
+      handleError(error)
     }
   }
   const deletePost = async (payload: string) => {
-    const { isAuthenticated } = userStore.getCurrentAuthInfo
-    if (!cookie.value || !isAuthenticated) {
-      alertStore.setAlert('No user authentication found, please login')
-      return
-    }
     try {
+      const { isAuthenticated } = userStore.getCurrentAuthInfo
+      if (!cookie.value || !isAuthenticated)
+        throw new Error('No user authentication found, please login')
+
       await $fetch(`/api/plan/${payload}`, {
         method: 'DELETE',
         headers: { Authorization: cookie.value },
@@ -141,14 +155,89 @@ export const usePlanStore = defineStore('plan', () => {
       await getAllPostByUser()
       alertStore.setAlert('Successfully deleted plan!', 'success')
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
+      handleError(error)
     }
   }
   const clearPlanData = () => {
     plans.value = []
   }
+  const handleError = (err: unknown) => {
+    let errorMessage: string = 'Unknown Error.'
+    if (err && typeof err === 'object' && 'statusMessage' in err) {
+      errorMessage = String(err.statusMessage)
+    } else if (err instanceof Error) {
+      errorMessage = err.message
+    }
+    console.error(errorMessage)
+    alertStore.setAlert(errorMessage)
+  }
+  const saveDraft = async (key: string, data: PlanInput) => {
+    try {
+      if (import.meta.client) {
+        // convert to plain obj and remove any non-serializable values
+        const plainData = JSON.parse(JSON.stringify(data))
+        console.log(plainData)
+        await localforage.setItem(key, {
+          data: plainData,
+          timestamp: Date.now(),
+        })
+        console.log('Draft saved successfully')
+      }
+    } catch (error) {
+      console.error('Failed to save draft: ', error)
+    }
+  }
+  const getDraft = async (key: string) => {
+    try {
+      if (import.meta.client) {
+        const draft = await localforage.getItem<{
+          data: PlanInput
+          timestamp: number
+        }>(key)
+        if (draft === null) throw new Error('Failed to retrieve draft')
+
+        return {
+          id: key,
+          ...draft?.data,
+        }
+      }
+    } catch (error) {
+      handleError(error)
+    }
+  }
+  const deleteDraft = async (key: string) => {
+    try {
+      if (import.meta.client) {
+        await localforage.removeItem(key)
+        console.log('Draft deleted successfully')
+      }
+    } catch (error) {
+      console.error('Failed to delete draft:', error)
+    }
+  }
+  const loadAllDrafts = async () => {
+    try {
+      const keys = await localforage.keys()
+      const mappedDrafts = await Promise.all(
+        keys.map(async (key) => {
+          const draft = await localforage.getItem<DraftRawType>(key)
+          if (draft !== null) {
+            return {
+              id: key,
+              ...draft,
+            }
+          }
+        }),
+      )
+      drafts.value = mappedDrafts.filter((item) => item !== undefined)
+      console.info(`${drafts.value.length} drafts are found.`)
+    } catch (error) {
+      console.error('Failed to get all drafts:', error)
+    }
+  }
   return {
     plans,
+    drafts,
     getAllPlans,
     getIncompletePlans,
     getPlansByOrder,
@@ -158,5 +247,7 @@ export const usePlanStore = defineStore('plan', () => {
     toggleComplete,
     deletePost,
     clearPlanData,
+    getDraft,
+    deleteDraft,
   }
 })

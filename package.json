@@ -29,6 +29,7 @@
     "browser-image-compression": "^2.0.2",
     "cloudinary": "^2.9.0",
     "jsonwebtoken": "^9.0.3",
+    "localforage": "^1.10.0",
     "mongoose": "^9.1.5",
     "nodemailer": "^7.0.13",
     "nuxt": "4.3.0",

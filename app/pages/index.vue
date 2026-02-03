@@ -4,6 +4,7 @@ import type {
   PlanFormInput,
   TypeInputLiteralType,
 } from '#shared/types'
+import DraftsBlock from '@/components/plans/DraftsBlock.vue'
 import MobileUtilityBlock from '@/components/plans/MobileUtilityBlock.vue'
 import MobileUtilityToggleButton from '@/components/plans/MobileUtilityToggleButton.vue'
 import NavigateToInfo from '@/components/plans/NavigateToInfo.vue'
@@ -49,8 +50,9 @@ const profileStore = useProfileStore()
 const planStore = usePlanStore()
 const initPiniaStore = useInitPiniaStore()
 const { isAuthenticated } = storeToRefs(userStore)
-const { userProfile } = storeToRefs(profileStore)
+const { userProfile, darkMode } = storeToRefs(profileStore)
 const { mounted } = storeToRefs(initPiniaStore)
+const { drafts } = storeToRefs(planStore)
 const searchTerm = ref<string>('')
 const modalRef = ref<InstanceType<typeof Modal>>()
 const modalForm = ref<ModalFormType>('new')
@@ -72,10 +74,7 @@ const userProfileStatus = computed<boolean>(() => {
 })
 
 const handleBgColors = computed<ColorPalette>(() => {
-  if (userProfile.value !== null && userProfile.value.dark) {
-    return 'dark-3'
-  }
-  return 'light-3'
+  return darkMode.value ? 'dark-3' : 'light-3'
 })
 
 const handleShowAllClick = (e: Event) => {
@@ -119,7 +118,7 @@ const handleNewFormSubmit = async (e: Event, item: PlanFormInput) => {
 const handleCollapseToggle = async (
   e: Event,
   id: string,
-  complete: boolean
+  complete: boolean,
 ) => {
   await planStore.toggleComplete({ id, body: { complete: !complete } })
   customOrderData.value = planStore.getPlansByOrder
@@ -187,7 +186,7 @@ const getPlans = computed(() => {
     <div
       v-if="mounted"
       class="grid md:grid-cols-2 gap-xs md:gap-md grid-flow-row px-sm md:px-xs relative"
-      @keyup.esc="closeModal(), onClear()"
+      @keyup.esc="(closeModal(), onClear())"
     >
       <!-- mobile utility block -->
       <MobileUtilityToggleButton
@@ -225,10 +224,17 @@ const getPlans = computed(() => {
           @show-custom="handleShowCustomClick"
           @search-update="updateSearchTerm"
         ></UtilityBlock>
+
+        <!-- draft block (desktop) -->
+        <DraftsBlock
+          :visible="drafts.length !== 0"
+          :drafts="drafts"
+        ></DraftsBlock>
+
         <div class="flex justify-end">
           <!-- mobile new button -->
           <button
-            class="btn btn-warning text-dark-3 md:!hidden px-md"
+            class="btn btn-warning text-dark-3 md:hidden! px-md"
             aria-label="new"
             title="new"
             @click="openModal"
@@ -319,7 +325,7 @@ const getPlans = computed(() => {
             <span v-if="modalForm === 'new'">Create New Plan</span>
             <span v-else>Update Plan</span>
           </h3>
-          <button @click="onClear(), close()">
+          <button @click="(onClear(), close())">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               height="1em"
@@ -358,7 +364,9 @@ const getPlans = computed(() => {
 /* plan items transition animation */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .fade-enter-from {

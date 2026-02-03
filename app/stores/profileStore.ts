@@ -12,6 +12,7 @@ export const useProfileStore = defineStore('profile', () => {
   const cookie = useAuthToken()
   // state
   const userProfile = ref<ProfileDto | null>(null)
+  const darkMode = ref<boolean>(false)
   // getters
   const getPlansOrder = computed<string[]>(() => {
     if (userProfile.value === null) {
@@ -31,7 +32,10 @@ export const useProfileStore = defineStore('profile', () => {
         method: 'GET',
         headers: { Authorization: cookie.value },
       })
-      userProfile.value = res
+      if (res) {
+        userProfile.value = res
+        darkMode.value = userProfile.value?.dark
+      }
     } catch (error) {
       alertStore.setAlert((error as H3Error).statusMessage!)
       userProfile.value = null
@@ -106,7 +110,7 @@ export const useProfileStore = defineStore('profile', () => {
       await getCurrentUserProfile()
       alertStore.setAlert(
         `Darkmode ${userProfile.value?.dark ? 'enabled' : 'disabled'}`,
-        'success'
+        'success',
       )
     } catch (error) {
       alertStore.setAlert((error as H3Error).statusMessage!)
@@ -114,9 +118,11 @@ export const useProfileStore = defineStore('profile', () => {
   }
   const clearProfileData = () => {
     userProfile.value = null
+    darkMode.value = false
   }
   return {
     userProfile,
+    darkMode,
     getPlansOrder,
     getCurrentUserProfile,
     postNewUserProfile,
