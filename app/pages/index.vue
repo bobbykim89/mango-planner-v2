@@ -109,6 +109,10 @@ const onClear = () => {
   updateDataForm.title = ''
   updateDataForm.content = ''
   updateDataForm.type = 'personal'
+  selectedDraft.value = ''
+  draftDataForm.title = ''
+  draftDataForm.content = ''
+  draftDataForm.type = 'personal'
 }
 const updateSearchTerm = (text: string) => {
   displayStyle.value = 'search'
@@ -180,10 +184,7 @@ const onDraftSave = async (e: Event, data: PlanFormInput) => {
       })
     }
     await planStore.deleteDraft(selectedDraft.value)
-    selectedDraft.value = ''
-    draftDataForm.title = ''
-    draftDataForm.content = ''
-    draftDataForm.type = 'personal'
+    onClear()
 
     modalRef.value?.close()
   }
@@ -351,7 +352,7 @@ const getPlans = computed(() => {
     </div>
     <div v-else class="min-h-[60vh] flex items-center">
       <div
-        class="loader border-light-3 dark:border-light-4 border-t-warning dark:border-t-warning border-[20px] rounded-full w-[200px] h-[200px] mx-auto"
+        class="loader border-light-3 dark:border-light-4 border-t-warning dark:border-t-warning border-20 rounded-full w-50 h-50 mx-auto"
       ></div>
     </div>
     <Modal

@@ -44,7 +44,7 @@ const socialUrls = {
         >
           <div>
             <img
-              class="aspect-square rounded-full border-4 border-dark-1 dark:border-light-4 max-h-[384px]"
+              class="aspect-square rounded-full border-4 border-dark-1 dark:border-light-4 max-h-96"
               :src="AboutImage"
               alt="manguito sitting on monitor"
             />

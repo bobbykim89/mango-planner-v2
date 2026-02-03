@@ -86,7 +86,6 @@ export const usePlanStore = defineStore('plan', () => {
     try {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) {
-        await saveDraft('new', payload)
         throw new Error('No user authentication found, please login')
       }
 
@@ -98,6 +97,7 @@ export const usePlanStore = defineStore('plan', () => {
       plans.value = [res, ...plans.value]
       alertStore.setAlert('Successfully created new plan!', 'success')
     } catch (error) {
+      await saveDraft('new', payload)
       handleError(error)
     }
   }
@@ -105,7 +105,6 @@ export const usePlanStore = defineStore('plan', () => {
     try {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) {
-        await saveDraft(payload.id, payload.body)
         throw new Error('No user authentication found, please login')
       }
 
@@ -117,6 +116,7 @@ export const usePlanStore = defineStore('plan', () => {
       await getAllPostByUser()
       alertStore.setAlert('Successfully updated plan!', 'success')
     } catch (error) {
+      await saveDraft(payload.id, payload.body)
       handleError(error)
     }
   }
@@ -176,7 +176,11 @@ export const usePlanStore = defineStore('plan', () => {
       if (import.meta.client) {
         // convert to plain obj and remove any non-serializable values
         const plainData = JSON.parse(JSON.stringify(data))
-        console.log(plainData)
+        const checkExistence = await localforage.getItem(key)
+        if (checkExistence !== null) {
+          console.log('Removing existing draft...')
+          await localforage.removeItem(key)
+        }
         await localforage.setItem(key, {
           data: plainData,
           timestamp: Date.now(),
@@ -210,6 +214,7 @@ export const usePlanStore = defineStore('plan', () => {
       if (import.meta.client) {
         await localforage.removeItem(key)
         console.log('Draft deleted successfully')
+        drafts.value = drafts.value.filter((draft) => draft.id !== key)
       }
     } catch (error) {
       console.error('Failed to delete draft:', error)
