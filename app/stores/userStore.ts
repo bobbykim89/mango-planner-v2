@@ -1,4 +1,3 @@
-// import { type UserModel } from '@/server/models'
 import type { AuthInput } from '#shared/dto/auth'
 import type {
   NewUsernameInput,
@@ -6,7 +5,6 @@ import type {
   UserInput,
 } from '#shared/dto/user'
 import type { UserDto } from '#shared/types'
-import type { H3Error } from 'h3'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useAlertStore } from './alertStore'
@@ -104,7 +102,7 @@ export const useUserStore = defineStore('user', () => {
       await authUser()
       alertStore.setAlert('Successfully updated username!', 'success')
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
+      handleAuthError(error)
     }
   }
   const updatePassword = async (payload: PwUpdateInput) => {
@@ -120,7 +118,7 @@ export const useUserStore = defineStore('user', () => {
       await authUser()
       alertStore.setAlert('Successfully updated user password!', 'success')
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
+      handleAuthError(error)
     }
   }
   const clearUserStore = () => {
