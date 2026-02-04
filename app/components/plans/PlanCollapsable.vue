@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { PlanDto } from '#shared/types'
-import { Collapse, vCollapse } from '@bobbykim/manguito-theme'
+import { Collapse } from '@bobbykim/manguito-theme'
+import { vCollapse } from '@bobbykim/manguito-theme/directives'
 
 const props = withDefaults(
   defineProps<{
@@ -11,7 +12,7 @@ const props = withDefaults(
   {
     visible: false,
     showHandle: false,
-  }
+  },
 )
 
 const emit = defineEmits<{
@@ -74,7 +75,7 @@ watch(
   () => props.visible,
   (newValue) => {
     collapseState.value = newValue
-  }
+  },
 )
 </script>
 
@@ -111,6 +112,7 @@ watch(
           <button
             class="flex items-center p-3xs hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear"
             :class="getCheckColor"
+            :aria-label="item.complete ? 'completed' : 'incomplete'"
             @click="handleToggleCompleteClick"
           >
             <svg
@@ -147,6 +149,7 @@ watch(
             <!-- edit button -->
             <button
               class="p-3xs hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear"
+              aria-label="edit"
               @click="handleEditClick"
             >
               <svg
@@ -167,6 +170,7 @@ watch(
             <!-- delete button -->
             <button
               class="p-3xs hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear"
+              aria-label="delete"
               @click="handleDeleteClick"
             >
               <svg

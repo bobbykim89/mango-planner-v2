@@ -30,7 +30,7 @@ const router = useRouter()
 
 const profileStore = useProfileStore()
 const alertStore = useAlertStore()
-const { userProfile } = storeToRefs(profileStore)
+const { darkMode } = storeToRefs(profileStore)
 const emailInputRef = ref<string>('')
 
 const handleFormSubmit = async () => {
@@ -47,10 +47,7 @@ const handleFormSubmit = async () => {
   }
 }
 const formTextColor = computed<ColorPalette>(() => {
-  if (userProfile.value !== null && userProfile.value.dark) {
-    return 'light-3'
-  }
-  return 'dark-3'
+  return darkMode.value ? 'light-3' : 'dark-3'
 })
 </script>
 
@@ -58,7 +55,7 @@ const formTextColor = computed<ColorPalette>(() => {
   <div class="container">
     <div class="flex justify-center items-center min-h-[75vh]">
       <div
-        class="bg-light-3 dark:bg-dark-3 p-md rounded-md drop-shadow-md w-full max-w-[448px] mx-xs"
+        class="bg-light-3 dark:bg-dark-3 p-md rounded-md drop-shadow-md w-full max-w-112 mx-xs"
       >
         <h2 class="text-warning text-center mb-sm">Request Reset</h2>
         <form @submit.prevent="handleFormSubmit">

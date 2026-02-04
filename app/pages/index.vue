@@ -4,6 +4,7 @@ import type {
   PlanFormInput,
   TypeInputLiteralType,
 } from '#shared/types'
+import DraftsBlock from '@/components/plans/DraftsBlock.vue'
 import MobileUtilityBlock from '@/components/plans/MobileUtilityBlock.vue'
 import MobileUtilityToggleButton from '@/components/plans/MobileUtilityToggleButton.vue'
 import NavigateToInfo from '@/components/plans/NavigateToInfo.vue'
@@ -42,21 +43,28 @@ useHead({
 })
 
 type PlanDisplayStyle = 'all' | 'incomplete' | 'custom' | 'search'
-type ModalFormType = 'new' | 'update'
+type ModalFormType = 'new' | 'update' | 'draft'
 
 const userStore = useUserStore()
 const profileStore = useProfileStore()
 const planStore = usePlanStore()
 const initPiniaStore = useInitPiniaStore()
 const { isAuthenticated } = storeToRefs(userStore)
-const { userProfile } = storeToRefs(profileStore)
+const { userProfile, darkMode } = storeToRefs(profileStore)
 const { mounted } = storeToRefs(initPiniaStore)
+const { drafts } = storeToRefs(planStore)
 const searchTerm = ref<string>('')
 const modalRef = ref<InstanceType<typeof Modal>>()
 const modalForm = ref<ModalFormType>('new')
 const mobileUtilityToggle = ref<boolean>(false)
 const displayStyle = ref<PlanDisplayStyle>('all')
 const updateDataForm = reactive<PlanFormInput>({
+  title: '',
+  content: '',
+  type: 'personal',
+})
+const selectedDraft = ref<string>('')
+const draftDataForm = reactive<PlanFormInput>({
   title: '',
   content: '',
   type: 'personal',
@@ -72,10 +80,7 @@ const userProfileStatus = computed<boolean>(() => {
 })
 
 const handleBgColors = computed<ColorPalette>(() => {
-  if (userProfile.value !== null && userProfile.value.dark) {
-    return 'dark-3'
-  }
-  return 'light-3'
+  return darkMode.value ? 'dark-3' : 'light-3'
 })
 
 const handleShowAllClick = (e: Event) => {
@@ -104,6 +109,10 @@ const onClear = () => {
   updateDataForm.title = ''
   updateDataForm.content = ''
   updateDataForm.type = 'personal'
+  selectedDraft.value = ''
+  draftDataForm.title = ''
+  draftDataForm.content = ''
+  draftDataForm.type = 'personal'
 }
 const updateSearchTerm = (text: string) => {
   displayStyle.value = 'search'
@@ -119,7 +128,7 @@ const handleNewFormSubmit = async (e: Event, item: PlanFormInput) => {
 const handleCollapseToggle = async (
   e: Event,
   id: string,
-  complete: boolean
+  complete: boolean,
 ) => {
   await planStore.toggleComplete({ id, body: { complete: !complete } })
   customOrderData.value = planStore.getPlansByOrder
@@ -146,6 +155,39 @@ const onEditSubmit = async (e: Event, data: PlanFormInput) => {
   }
   onClear()
   modalRef.value?.close()
+}
+const onDraftEditClick = (id: string, data: PlanFormInput) => {
+  modalForm.value = 'draft'
+
+  selectedDraft.value = id
+  draftDataForm.title = data.title
+  draftDataForm.type = data.type
+  if (data.content) {
+    draftDataForm.content = data.content
+  }
+
+  modalRef.value?.open()
+}
+const onDraftSave = async (e: Event, data: PlanFormInput) => {
+  e.preventDefault()
+  if (
+    import.meta.client &&
+    window.confirm('Please confirm to update this item.')
+  ) {
+    if (selectedDraft.value === 'new') {
+      await planStore.createNewPost(data)
+      customOrderData.value = planStore.getPlansByOrder
+    } else {
+      await planStore.updatePost({
+        id: selectedDraft.value,
+        body: data,
+      })
+    }
+    await planStore.deleteDraft(selectedDraft.value)
+    onClear()
+
+    modalRef.value?.close()
+  }
 }
 const handleCollapseDelete = async (e: Event, id: string) => {
   e.preventDefault()
@@ -187,7 +229,7 @@ const getPlans = computed(() => {
     <div
       v-if="mounted"
       class="grid md:grid-cols-2 gap-xs md:gap-md grid-flow-row px-sm md:px-xs relative"
-      @keyup.esc="closeModal(), onClear()"
+      @keyup.esc="(closeModal(), onClear())"
     >
       <!-- mobile utility block -->
       <MobileUtilityToggleButton
@@ -225,10 +267,18 @@ const getPlans = computed(() => {
           @show-custom="handleShowCustomClick"
           @search-update="updateSearchTerm"
         ></UtilityBlock>
+
+        <!-- draft block (desktop) -->
+        <DraftsBlock
+          :visible="drafts.length !== 0"
+          :drafts="drafts"
+          @draft-click="onDraftEditClick"
+        ></DraftsBlock>
+
         <div class="flex justify-end">
           <!-- mobile new button -->
           <button
-            class="btn btn-warning text-dark-3 md:!hidden px-md"
+            class="btn btn-warning text-dark-3 md:hidden! px-md"
             aria-label="new"
             title="new"
             @click="openModal"
@@ -302,24 +352,27 @@ const getPlans = computed(() => {
     </div>
     <div v-else class="min-h-[60vh] flex items-center">
       <div
-        class="loader border-light-3 dark:border-light-4 border-t-warning dark:border-t-warning border-[20px] rounded-full w-[200px] h-[200px] mx-auto"
+        class="loader border-light-3 dark:border-light-4 border-t-warning dark:border-t-warning border-20 rounded-full w-50 h-50 mx-auto"
       ></div>
     </div>
     <Modal
       ref="modalRef"
       placement="center"
       :color="handleBgColors"
-      title="New Plan"
-      class-name="px-xs rounded-md"
+      class-name="px-xs rounded-md border dark:border-dark-1"
+      modal-width="large"
       @close="onClear"
     >
       <template #header="{ close }">
-        <div class="flex justify-between py-xs border-b-2">
+        <div
+          class="flex justify-between py-xs border-b-2 border-b-light-1 dark:border-b-dark-1"
+        >
           <h3 class="h3-md text-warning">
             <span v-if="modalForm === 'new'">Create New Plan</span>
-            <span v-else>Update Plan</span>
+            <span v-else-if="modalForm === 'update'">Update Plan</span>
+            <span v-else>Saved Draft</span>
           </h3>
-          <button @click="onClear(), close()">
+          <button @click="(onClear(), close())" aria-label="close modal">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               height="1em"
@@ -342,11 +395,18 @@ const getPlans = computed(() => {
             @form-submit="handleNewFormSubmit"
           ></PlanInputForm>
           <PlanInputForm
-            v-else
+            v-else-if="modalForm === 'update'"
             prefix="update"
             :post-input="updateDataForm"
             submit-text="Update"
             @form-submit="onEditSubmit"
+          ></PlanInputForm>
+          <PlanInputForm
+            v-else
+            prefix="draft"
+            :post-input="draftDataForm"
+            submit-text="Save"
+            @form-submit="onDraftSave"
           ></PlanInputForm>
         </div>
       </template>
@@ -358,7 +418,9 @@ const getPlans = computed(() => {
 /* plan items transition animation */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .fade-enter-from {
