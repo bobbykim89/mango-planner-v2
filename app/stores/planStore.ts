@@ -160,16 +160,51 @@ export const usePlanStore = defineStore('plan', () => {
   }
   const clearPlanData = () => {
     plans.value = []
+    drafts.value = []
+  }
+  const isAuthError = (err: unknown) => {
+    // check for 401 status code
+    if (
+      err &&
+      typeof err === 'object' &&
+      'statusCode' in err &&
+      err.statusCode === 401
+    ) {
+      return true
+    }
+    // check for auth-related error messages
+    if (
+      err instanceof Error &&
+      err.message.toLowerCase().includes('no user authentication found')
+    ) {
+      return true
+    }
+    return false
+  }
+  const extractErrorMessage = (err: unknown) => {
+    if (err && typeof err === 'object' && 'statusMessage' in err) {
+      return String(err.statusMessage)
+    }
+    if (err instanceof Error) {
+      return err.message
+    }
+    return 'Unknown Error.'
   }
   const handleError = (err: unknown) => {
-    let errorMessage: string = 'Unknown Error.'
-    if (err && typeof err === 'object' && 'statusMessage' in err) {
-      errorMessage = String(err.statusMessage)
-    } else if (err instanceof Error) {
-      errorMessage = err.message
-    }
+    let errorMessage: string = extractErrorMessage(err)
+    let shouldRedirectToLogin: boolean = isAuthError(err)
+
     console.error(errorMessage)
     alertStore.setAlert(errorMessage)
+
+    if (shouldRedirectToLogin) {
+      setTimeout(() => {
+        userStore.clearUserStore()
+        profileStore.clearProfileData()
+        clearPlanData()
+        navigateTo('/auth/login')
+      }, 1000)
+    }
   }
   const saveDraft = async (key: string, data: PlanInput) => {
     try {

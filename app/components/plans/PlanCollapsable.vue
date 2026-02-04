@@ -112,6 +112,7 @@ watch(
           <button
             class="flex items-center p-3xs hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear"
             :class="getCheckColor"
+            :aria-label="item.complete ? 'completed' : 'incomplete'"
             @click="handleToggleCompleteClick"
           >
             <svg
@@ -148,6 +149,7 @@ watch(
             <!-- edit button -->
             <button
               class="p-3xs hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear"
+              aria-label="edit"
               @click="handleEditClick"
             >
               <svg
@@ -168,6 +170,7 @@ watch(
             <!-- delete button -->
             <button
               class="p-3xs hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear"
+              aria-label="delete"
               @click="handleDeleteClick"
             >
               <svg

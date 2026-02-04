@@ -156,16 +156,15 @@ const onProfileCreate = async (e: Event) => {
   await profileStore.postNewUserProfile()
   headerRef.value?.headerClose()
 }
-watch(isAuthenticated, (newValue) => {
-  if (newValue === false) {
-    useColorMode().preference = 'light'
-  }
-})
-watch(userProfile, (newValue) => {
-  if (newValue === null) {
+
+watch([isAuthenticated, userProfile, darkMode], ([auth, profile, dark]) => {
+  // if not authenticated or no profile, force light mode
+  if (!auth || !profile) {
     colorMode.preference = 'light'
+    return
   }
-  colorMode.preference = newValue?.dark ? 'dark' : 'light'
+  // otherwise, respect user's darkmode preference
+  colorMode.preference = dark ? 'dark' : 'light'
 })
 onMounted(() => {
   currentYear.value = new Date().getFullYear()
@@ -367,7 +366,11 @@ onMounted(() => {
           <div
             class="flex items-center py-2xs px-3xs bg-light-3 dark:bg-dark-3 drop-shadow-md"
           >
-            <button @click="close" class="p-2xs text-dark-3 dark:text-light-3">
+            <button
+              @click="close"
+              aria-label="close sidebar"
+              class="p-2xs text-dark-3 dark:text-light-3"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 height="1em"

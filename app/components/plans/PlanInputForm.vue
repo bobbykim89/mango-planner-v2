@@ -135,7 +135,7 @@ const formTextColor = computed<ColorPalette>(() => {
           </MclFormGroup>
         </div>
       </div>
-      <button role="submit" class="btn btn-warning btn-full">
+      <button role="button" class="btn btn-warning btn-full">
         {{ submitText }}
       </button>
     </form>

@@ -372,7 +372,7 @@ const getPlans = computed(() => {
             <span v-else-if="modalForm === 'update'">Update Plan</span>
             <span v-else>Saved Draft</span>
           </h3>
-          <button @click="(onClear(), close())">
+          <button @click="(onClear(), close())" aria-label="close modal">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               height="1em"
