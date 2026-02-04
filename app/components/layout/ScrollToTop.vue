@@ -14,6 +14,7 @@ const handleScrollToTopClick = (e: Event) => {
   >
     <button
       class="p-2xs text-dark-3 dark:text-light-3 hover:opacity-65 transition-opacity duration-200 ease-linear"
+      aria-label="scroll to top"
       @click="handleScrollToTopClick"
     >
       <svg

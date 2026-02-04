@@ -34,8 +34,10 @@ export const useUserStore = defineStore('user', () => {
   })
   // actions
   const authUser = async () => {
-    if (!cookie.value) return
     try {
+      if (!cookie.value)
+        throw new Error('No user authentication found, please login')
+
       const res = await $fetch<UserDto>('/api/auth', {
         method: 'GET',
         headers: { Authorization: cookie.value },
@@ -43,14 +45,14 @@ export const useUserStore = defineStore('user', () => {
       currentUser.value = res
       isAuthenticated.value = true
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
-      currentUser.value = null
-      isAuthenticated.value = false
+      handleAuthError(error)
     }
   }
   const getCurrentUser = async () => {
-    if (!cookie.value) return
     try {
+      if (!cookie.value)
+        throw new Error('No user authentication found, please login')
+
       const res = await $fetch<UserDto>('/api/auth', {
         method: 'GET',
         headers: { Authorization: cookie.value },
@@ -59,9 +61,7 @@ export const useUserStore = defineStore('user', () => {
       isAuthenticated.value = true
       alertStore.setAlert('Successfully authenticated user', 'success')
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
-      currentUser.value = null
-      isAuthenticated.value = false
+      handleAuthError(error)
       cookie.value = null
     }
   }
@@ -75,9 +75,7 @@ export const useUserStore = defineStore('user', () => {
       await authUser()
       alertStore.setAlert('Login Successful!', 'success')
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
-      currentUser.value = null
-      isAuthenticated.value = false
+      handleAuthError(error)
     }
   }
   const signupNewUser = async (payload: UserInput) => {
@@ -90,14 +88,14 @@ export const useUserStore = defineStore('user', () => {
       await authUser()
       alertStore.setAlert('Signup Successful!', 'success')
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
-      currentUser.value = null
-      isAuthenticated.value = false
+      handleAuthError(error)
     }
   }
   const updateUsername = async (payload: NewUsernameInput) => {
-    if (!cookie.value) return
     try {
+      if (!cookie.value)
+        throw new Error('No user authentication found, please login')
+
       await $fetch('/api/user/username', {
         method: 'PUT',
         headers: { Authorization: cookie.value },
@@ -110,8 +108,10 @@ export const useUserStore = defineStore('user', () => {
     }
   }
   const updatePassword = async (payload: PwUpdateInput) => {
-    if (!cookie.value) return
     try {
+      if (!cookie.value)
+        throw new Error('No user authentication found, please login')
+
       await $fetch('/api/user/password', {
         method: 'PUT',
         headers: { Authorization: cookie.value },
@@ -123,13 +123,57 @@ export const useUserStore = defineStore('user', () => {
       alertStore.setAlert((error as H3Error).statusMessage!)
     }
   }
-  const logoutUser = () => {
+  const clearUserStore = () => {
     cookie.value = null
     currentUser.value = null
     isAuthenticated.value = false
+  }
+  const logoutUser = () => {
+    clearUserStore()
     planStore.clearPlanData()
     profileStore.clearProfileData()
     alertStore.setAlert('Logout Successful!', 'success')
+  }
+
+  const isAuthError = (err: unknown) => {
+    // check for 401 status code
+    if (
+      err &&
+      typeof err === 'object' &&
+      'statusCode' in err &&
+      err.statusCode === 401
+    ) {
+      return true
+    }
+    // check for auth-related error messages
+    if (
+      err instanceof Error &&
+      err.message.toLowerCase().includes('no user authentication found')
+    ) {
+      return true
+    }
+    return false
+  }
+  const extractErrorMessage = (err: unknown) => {
+    if (err && typeof err === 'object' && 'statusMessage' in err) {
+      return String(err.statusMessage)
+    }
+    if (err instanceof Error) {
+      return err.message
+    }
+    return 'Unknown Error.'
+  }
+  const handleAuthError = (err: unknown) => {
+    const errorMessage: string = extractErrorMessage(err)
+    const checkAuthError: boolean = isAuthError(err)
+
+    if (checkAuthError) {
+      currentUser.value = null
+      isAuthenticated.value = false
+    }
+
+    console.error(errorMessage)
+    alertStore.setAlert(errorMessage)
   }
   return {
     currentUser,
@@ -141,5 +185,6 @@ export const useUserStore = defineStore('user', () => {
     updateUsername,
     updatePassword,
     logoutUser,
+    clearUserStore,
   }
 })
