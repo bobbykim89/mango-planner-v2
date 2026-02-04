@@ -1,6 +1,5 @@
 import type { ProfileInputDark } from '#shared/dto/profile'
 import type { ProfileDto } from '#shared/types'
-import type { H3Error } from 'h3'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useAlertStore } from './alertStore'
@@ -12,6 +11,7 @@ export const useProfileStore = defineStore('profile', () => {
   const cookie = useAuthToken()
   // state
   const userProfile = ref<ProfileDto | null>(null)
+  const darkMode = ref<boolean>(false)
   // getters
   const getPlansOrder = computed<string[]>(() => {
     if (userProfile.value === null) {
@@ -21,29 +21,29 @@ export const useProfileStore = defineStore('profile', () => {
   })
   // actions
   const getCurrentUserProfile = async () => {
-    const { isAuthenticated } = userStore.getCurrentAuthInfo
-    if (!cookie.value || !isAuthenticated) {
-      alertStore.setAlert('No user authentication found, please login')
-      return
-    }
     try {
+      const { isAuthenticated } = userStore.getCurrentAuthInfo
+      if (!cookie.value || !isAuthenticated)
+        throw new Error('No user authentication found, please login')
+
       const res = await $fetch<ProfileDto | null>('/api/profile', {
         method: 'GET',
         headers: { Authorization: cookie.value },
       })
-      userProfile.value = res
+      if (res) {
+        userProfile.value = res
+        darkMode.value = userProfile.value?.dark
+      }
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
-      userProfile.value = null
+      handleProfileError(error)
     }
   }
   const postNewUserProfile = async () => {
-    const { isAuthenticated } = userStore.getCurrentAuthInfo
-    if (!cookie.value || !isAuthenticated) {
-      alertStore.setAlert('No user authentication found, please login')
-      return
-    }
     try {
+      const { isAuthenticated } = userStore.getCurrentAuthInfo
+      if (!cookie.value || !isAuthenticated)
+        throw new Error('No user authentication found, please login')
+
       await $fetch<ProfileDto>('/api/profile', {
         method: 'POST',
         headers: { Authorization: cookie.value },
@@ -51,16 +51,15 @@ export const useProfileStore = defineStore('profile', () => {
       await getCurrentUserProfile()
       alertStore.setAlert('Successfully created user profile!', 'success')
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
+      handleProfileError(error)
     }
   }
   const updateUserProfilePicture = async (payload: FormData) => {
-    const { isAuthenticated } = userStore.getCurrentAuthInfo
-    if (!cookie.value || !isAuthenticated) {
-      alertStore.setAlert('No user authentication found, please login')
-      return
-    }
     try {
+      const { isAuthenticated } = userStore.getCurrentAuthInfo
+      if (!cookie.value || !isAuthenticated)
+        throw new Error('No user authentication found, please login')
+
       await $fetch<ProfileDto>('/api/profile/profile-picture', {
         method: 'PUT',
         headers: {
@@ -71,16 +70,15 @@ export const useProfileStore = defineStore('profile', () => {
       await getCurrentUserProfile()
       alertStore.setAlert('Successfully updated profile picture!', 'success')
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
+      handleProfileError(error)
     }
   }
   const updateUserPlansOrder = async (payload: { plansOrder: string[] }) => {
-    const { isAuthenticated } = userStore.getCurrentAuthInfo
-    if (!cookie.value || !isAuthenticated) {
-      alertStore.setAlert('No user authentication found, please login')
-      return
-    }
     try {
+      const { isAuthenticated } = userStore.getCurrentAuthInfo
+      if (!cookie.value || !isAuthenticated)
+        throw new Error('No user authentication found, please login')
+
       const res = await $fetch<ProfileDto>('/api/profile/plans-order', {
         method: 'PUT',
         headers: { Authorization: cookie.value },
@@ -88,16 +86,15 @@ export const useProfileStore = defineStore('profile', () => {
       })
       userProfile.value = res
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
+      handleProfileError(error)
     }
   }
   const toggleUserDarkMode = async (payload: ProfileInputDark) => {
-    const { isAuthenticated } = userStore.getCurrentAuthInfo
-    if (!cookie.value || !isAuthenticated) {
-      alertStore.setAlert('No user authentication found, please login')
-      return
-    }
     try {
+      const { isAuthenticated } = userStore.getCurrentAuthInfo
+      if (!cookie.value || !isAuthenticated)
+        throw new Error('No user authentication found, please login')
+
       await $fetch<ProfileDto>('/api/profile/dark', {
         method: 'PUT',
         headers: { Authorization: cookie.value },
@@ -106,17 +103,31 @@ export const useProfileStore = defineStore('profile', () => {
       await getCurrentUserProfile()
       alertStore.setAlert(
         `Darkmode ${userProfile.value?.dark ? 'enabled' : 'disabled'}`,
-        'success'
+        'success',
       )
     } catch (error) {
-      alertStore.setAlert((error as H3Error).statusMessage!)
+      handleProfileError(error)
     }
   }
   const clearProfileData = () => {
     userProfile.value = null
+    darkMode.value = false
+  }
+  const handleProfileError = (err: unknown) => {
+    const errorMessage: string = extractErrorMessage(err)
+    const checkAuthError: boolean = isAuthError(err)
+
+    if (checkAuthError) {
+      userProfile.value = null
+      darkMode.value = false
+    }
+
+    console.error(errorMessage)
+    alertStore.setAlert(errorMessage)
   }
   return {
     userProfile,
+    darkMode,
     getPlansOrder,
     getCurrentUserProfile,
     postNewUserProfile,

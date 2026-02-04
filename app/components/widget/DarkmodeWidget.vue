@@ -20,6 +20,7 @@ const handleColorModeButtonClick = (e: Event) => {
     <div
       class="relative h-lg before:absolute before:h-xs before:w-full before:bg-warning/75 dark:before:bg-warning/50 before:rounded-lg before:top-1/2 before:-translate-y-1/2 cursor-pointer hover:opacity-80 transition-opacity duration-300 ease-linear"
       role="button"
+      aria-label="toggle dark mode"
       @click="handleColorModeButtonClick"
     >
       <div

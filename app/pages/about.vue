@@ -44,7 +44,7 @@ const socialUrls = {
         >
           <div>
             <img
-              class="aspect-square rounded-full border-4 border-dark-1 dark:border-light-4 max-h-[384px]"
+              class="aspect-square rounded-full border-4 border-dark-1 dark:border-light-4 max-h-96"
               :src="AboutImage"
               alt="manguito sitting on monitor"
             />
@@ -62,6 +62,7 @@ const socialUrls = {
                 :href="socialUrls.github.url"
                 :target="socialUrls.github.target"
                 rel="noreferrer"
+                aria-label="github"
                 class="hover:opacity-75 transition-opacity duration-300 ease-linear"
               >
                 <svg
@@ -81,6 +82,7 @@ const socialUrls = {
                 :href="socialUrls.linkedin.url"
                 :target="socialUrls.linkedin.target"
                 rel="noreferrer"
+                aria-label="linkedin"
                 class="hover:opacity-75 transition-opacity duration-300 ease-linear"
               >
                 <svg
@@ -100,6 +102,7 @@ const socialUrls = {
                 :href="socialUrls.email.url"
                 :target="socialUrls.email.target"
                 rel="noreferrer"
+                aria-label="email"
                 class="hover:opacity-75 transition-opacity duration-300 ease-linear"
               >
                 <svg

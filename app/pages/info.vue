@@ -35,7 +35,10 @@ const { isAuthenticated } = storeToRefs(userStore)
         <li>
           <!-- new button -->
           <div class="flex items-center gap-sm md:gap-md mb-sm">
-            <button class="btn btn-warning text-dark-3 px-xs min-w-[60px]">
+            <button
+              class="btn btn-warning text-dark-3 px-xs min-w-15"
+              aria-label="new button"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 448 512"
@@ -59,7 +62,8 @@ const { isAuthenticated } = storeToRefs(userStore)
           <!-- show all -->
           <div class="flex items-center gap-sm md:gap-md mb-sm">
             <button
-              class="btn btn-light-4 dark:btn-light-3 text-dark-3 px-xs min-w-[60px]"
+              aria-label="show all"
+              class="btn btn-light-4 dark:btn-light-3 text-dark-3 px-xs min-w-15"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -80,10 +84,11 @@ const { isAuthenticated } = storeToRefs(userStore)
           </div>
         </li>
         <li>
-          <!-- show complete -->
+          <!-- show incomplete -->
           <div class="flex items-center gap-sm md:gap-md mb-sm">
             <button
-              class="btn btn-light-4 dark:btn-light-3 text-dark-3 min-w-[60px]"
+              aria-label="show incomplete"
+              class="btn btn-light-4 dark:btn-light-3 text-dark-3 min-w-15"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -106,7 +111,8 @@ const { isAuthenticated } = storeToRefs(userStore)
           <!-- show draggable -->
           <div class="flex items-center gap-sm md:gap-md mb-sm">
             <button
-              class="btn btn-light-4 dark:btn-light-3 text-dark-3 min-w-[60px]"
+              aria-label="show draggable"
+              class="btn btn-light-4 dark:btn-light-3 text-dark-3 min-w-15"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

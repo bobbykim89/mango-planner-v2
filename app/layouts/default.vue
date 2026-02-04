@@ -20,13 +20,14 @@ import { storeToRefs } from 'pinia'
 import { onMounted } from 'vue'
 
 const config = useRuntimeConfig()
+const colorMode = useColorMode()
 const router = useRouter()
 const alertStore = useAlertStore()
 const userStore = useUserStore()
 const profileStore = useProfileStore()
 const { alert, alertColor } = storeToRefs(alertStore)
 const { currentUser, isAuthenticated } = storeToRefs(userStore)
-const { userProfile } = storeToRefs(profileStore)
+const { userProfile, darkMode } = storeToRefs(profileStore)
 const sidebarRef = ref<InstanceType<typeof Sidebar>>()
 const headerRef = ref<InstanceType<typeof HeaderHorizontal>>()
 const currentYear = ref<number>()
@@ -72,22 +73,13 @@ const menuItemData = reactive<{
 })
 
 const handleBgColors = computed<ColorPalette>(() => {
-  if (userProfile.value !== null && userProfile.value.dark) {
-    return 'dark-3'
-  }
-  return 'light-3'
+  return darkMode.value ? 'dark-3' : 'light-3'
 })
 const handleFooterMenuColor = computed<ColorPalette>(() => {
-  if (userProfile.value !== null && userProfile.value.dark) {
-    return 'light-2'
-  }
-  return 'dark-2'
+  return darkMode.value ? 'light-2' : 'dark-2'
 })
 const handleMobileMenuBgColor = computed<ColorPalette>(() => {
-  if (userProfile.value !== null && userProfile.value.dark) {
-    return 'dark-2'
-  }
-  return 'light-4'
+  return darkMode.value ? 'dark-2' : 'light-4'
 })
 
 const handleTitleClick = (e: Event, url: string, target: CtaTarget) => {
@@ -121,7 +113,7 @@ const onLogout = () => {
   userStore.logoutUser()
   sidebarClose()
   headerRef.value?.headerClose()
-  useColorMode().preference = 'light'
+  colorMode.preference = 'light'
   router.push({ path: '/auth/login' })
 }
 const onDarkModeClick = async (e: Event, dark: boolean) => {
@@ -164,16 +156,15 @@ const onProfileCreate = async (e: Event) => {
   await profileStore.postNewUserProfile()
   headerRef.value?.headerClose()
 }
-watch(isAuthenticated, (newValue) => {
-  if (newValue === false) {
-    useColorMode().preference = 'light'
+
+watch([isAuthenticated, userProfile, darkMode], ([auth, profile, dark]) => {
+  // if not authenticated or no profile, force light mode
+  if (!auth || !profile) {
+    colorMode.preference = 'light'
+    return
   }
-})
-watch(userProfile, (newValue) => {
-  if (newValue === null) {
-    useColorMode().preference = 'light'
-  }
-  useColorMode().preference = newValue?.dark ? 'dark' : 'light'
+  // otherwise, respect user's darkmode preference
+  colorMode.preference = dark ? 'dark' : 'light'
 })
 onMounted(() => {
   currentYear.value = new Date().getFullYear()
@@ -189,7 +180,7 @@ onMounted(() => {
       :scroll-distance="100"
     >
       <template #content
-        ><div class="flex flex-shrink-0 items-center self-center md:py-3xs">
+        ><div class="flex shrink-0 items-center self-center md:py-3xs">
           <div class="h-md md:h-lg mr-2xs md:mr-sm align-middle">
             <NuxtLink
               :to="menuItemData.logoLink"
@@ -347,7 +338,7 @@ onMounted(() => {
           <span>New version of SW available, please reload</span>
           <button
             @click="$pwa?.updateServiceWorker()"
-            class="p-[6px] bg-warning rounded-md hover:bg-warning/75 transition-all duration-300 ease-linear"
+            class="p-1.5 bg-warning rounded-md hover:bg-warning/75 transition-all duration-300 ease-linear"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -375,7 +366,11 @@ onMounted(() => {
           <div
             class="flex items-center py-2xs px-3xs bg-light-3 dark:bg-dark-3 drop-shadow-md"
           >
-            <button @click="close" class="p-2xs text-dark-3 dark:text-light-3">
+            <button
+              @click="close"
+              aria-label="close sidebar"
+              class="p-2xs text-dark-3 dark:text-light-3"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 height="1em"
