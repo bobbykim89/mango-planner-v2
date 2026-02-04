@@ -162,34 +162,6 @@ export const usePlanStore = defineStore('plan', () => {
     plans.value = []
     drafts.value = []
   }
-  const isAuthError = (err: unknown) => {
-    // check for 401 status code
-    if (
-      err &&
-      typeof err === 'object' &&
-      'statusCode' in err &&
-      err.statusCode === 401
-    ) {
-      return true
-    }
-    // check for auth-related error messages
-    if (
-      err instanceof Error &&
-      err.message.toLowerCase().includes('no user authentication found')
-    ) {
-      return true
-    }
-    return false
-  }
-  const extractErrorMessage = (err: unknown) => {
-    if (err && typeof err === 'object' && 'statusMessage' in err) {
-      return String(err.statusMessage)
-    }
-    if (err instanceof Error) {
-      return err.message
-    }
-    return 'Unknown Error.'
-  }
   const handleError = (err: unknown) => {
     let errorMessage: string = extractErrorMessage(err)
     let shouldRedirectToLogin: boolean = isAuthError(err)
