@@ -17,7 +17,7 @@ const props = withDefaults(
   {
     prefix: 'form',
     submitText: 'Save',
-  }
+  },
 )
 
 interface TypeOptions {
@@ -121,8 +121,8 @@ const formTextColor = computed<ColorPalette>(() => {
               item.value === 'personal'
                 ? 'dark-3'
                 : item.value === 'work'
-                ? 'info'
-                : 'primary'
+                  ? 'info'
+                  : 'primary'
             "
             @change="setTypeValue"
           ></MclInputRadio>

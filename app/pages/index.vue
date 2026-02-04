@@ -359,12 +359,14 @@ const getPlans = computed(() => {
       ref="modalRef"
       placement="center"
       :color="handleBgColors"
-      title="New Plan"
-      class-name="px-xs rounded-md"
+      class-name="px-xs rounded-md border dark:border-dark-1"
+      modal-width="large"
       @close="onClear"
     >
       <template #header="{ close }">
-        <div class="flex justify-between py-xs border-b-2">
+        <div
+          class="flex justify-between py-xs border-b-2 border-b-light-1 dark:border-b-dark-1"
+        >
           <h3 class="h3-md text-warning">
             <span v-if="modalForm === 'new'">Create New Plan</span>
             <span v-else-if="modalForm === 'update'">Update Plan</span>
