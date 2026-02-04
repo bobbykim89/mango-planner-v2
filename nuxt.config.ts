@@ -1,7 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
 export default defineNuxtConfig({
   devtools: { enabled: true },
   compatibilityDate: '2025-07-15',
+  future: {
+    compatibilityVersion: 4,
+  },
   app: {
     pageTransition: { name: 'page', mode: 'out-in' },
     head: {
@@ -67,7 +71,7 @@ export default defineNuxtConfig({
   },
   modules: ['@pinia/nuxt', '@nuxtjs/color-mode', '@vite-pwa/nuxt'],
   typescript: {
-    typeCheck: true,
+    typeCheck: 'build',
     strict: true,
     tsConfig: {
       compilerOptions: {
@@ -80,6 +84,7 @@ export default defineNuxtConfig({
   },
   colorMode: {
     classSuffix: '',
+    preference: 'light',
   },
   css: ['~/assets/css/page_transition.scss', '~/assets/css/styles.css'],
   postcss: {

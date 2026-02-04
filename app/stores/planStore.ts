@@ -12,13 +12,6 @@ import { useAlertStore } from './alertStore'
 import { useProfileStore } from './profileStore'
 import { useUserStore } from './userStore'
 
-// config localforage
-localforage.config({
-  driver: localforage.INDEXEDDB,
-  name: 'MangoPlannerV2',
-  storeName: 'drafts',
-})
-
 export const usePlanStore = defineStore('plan', () => {
   const cookie = useAuthToken()
   const alertStore = useAlertStore()
@@ -229,20 +222,22 @@ export const usePlanStore = defineStore('plan', () => {
   }
   const loadAllDrafts = async () => {
     try {
-      const keys = await localforage.keys()
-      const mappedDrafts = await Promise.all(
-        keys.map(async (key) => {
-          const draft = await localforage.getItem<DraftRawType>(key)
-          if (draft !== null) {
-            return {
-              id: key,
-              ...draft,
+      if (import.meta.client) {
+        const keys = await localforage.keys()
+        const mappedDrafts = await Promise.all(
+          keys.map(async (key) => {
+            const draft = await localforage.getItem<DraftRawType>(key)
+            if (draft !== null) {
+              return {
+                id: key,
+                ...draft,
+              }
             }
-          }
-        }),
-      )
-      drafts.value = mappedDrafts.filter((item) => item !== undefined)
-      console.info(`${drafts.value.length} drafts are found.`)
+          }),
+        )
+        drafts.value = mappedDrafts.filter((item) => item !== undefined)
+        console.info(`${drafts.value.length} drafts are found.`)
+      }
     } catch (error) {
       console.error('Failed to get all drafts:', error)
     }

@@ -17,7 +17,8 @@
     "dev:prod": "nuxt dev --dotenv .env",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@bobbykim/manguito-theme": "^0.28.2",
@@ -31,11 +32,11 @@
     "jsonwebtoken": "^9.0.3",
     "localforage": "^1.10.0",
     "mongoose": "^9.1.5",
-    "nodemailer": "^7.0.13",
+    "nodemailer": "^8.0.0",
     "nuxt": "4.3.0",
     "pinia": "3.0.4",
     "vue": "^3.5.27",
-    "vue-router": "^4.6.4",
+    "vue-router": "^5.0.2",
     "vuedraggable": "^4.1.0",
     "zod": "^4.3.6"
   },
@@ -52,9 +53,9 @@
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
-    "vue-tsc": "3.0.5"
+    "vue-tsc": "3.2.4"
   },
-  "packageManager": "pnpm@10.14.0+sha512.ad27a79641b49c3e481a16a805baa71817a04bbe06a38d17e60e2eaee83f6a146c6a688125f5792e48dd5ba30e7da52a5cda4c3992b9ccf333f9ce223af84748",
+  "packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264",
   "repository": {
     "url": "https://github.com/bobbykim89/mango-planner-v2"
   }
