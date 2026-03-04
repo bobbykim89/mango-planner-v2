@@ -71,6 +71,8 @@ const handleDeleteClick = (e: Event) => {
   emit('delete', e, _id.toString())
 }
 
+const renderedContent = computed(() => useMarkdown(props.item.content))
+
 watch(
   () => props.visible,
   (newValue) => {
@@ -87,7 +89,10 @@ watch(
     <div
       class="py-xs pl-sm pr-xs cursor-pointer select-none"
       :class="getBgColor"
-      v-collapse:[item._id.toString()]
+      aria-label="collapse panel header"
+      tabindex="0"
+      role="button"
+      v-collapse:[item._id]
     >
       <div class="flex justify-between items-center">
         <div class="flex gap-4 items-center">
@@ -140,9 +145,10 @@ watch(
       <div class="py-xs">
         <div class="flex gap-2xs">
           <div
-            class="w-full pl-xs pr-2xs whitespace-pre-line text-dark-3 dark:text-light-3"
-            v-html="item.content"
-          ></div>
+            class="w-full pl-xs pr-2xs whitespace-pre-line text-dark-3 dark:text-light-3 md-content"
+          >
+            <div class="md-content" v-html="renderedContent"></div>
+          </div>
           <div
             class="px-xs border-l-2 border-dark-1 dark:border-light-3 flex flex-col items-center gap-2xs text-dark-1 dark:text-light-3"
           >
@@ -150,6 +156,7 @@ watch(
             <button
               class="p-3xs hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear"
               aria-label="edit"
+              tabindex="0"
               @click="handleEditClick"
             >
               <svg
@@ -171,6 +178,7 @@ watch(
             <button
               class="p-3xs hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear"
               aria-label="delete"
+              tabindex="0"
               @click="handleDeleteClick"
             >
               <svg
@@ -190,15 +198,16 @@ watch(
       </div>
     </Collapse>
     <div
-      class="py-1.5 px-sm cursor-pointer transition-all duration-500 flex justify-center items-center text-dark-3 dark:text-light-3"
+      class="py-1.5 px-sm cursor-pointer transition-all duration-500 text-dark-3 dark:text-light-3 grid grid-cols-3 items-center"
       :class="[getBgColor]"
-      v-collapse:[item._id.toString()]
+      aria-label="collapse panel footer"
+      v-collapse:[item._id]
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 448 512"
         fill="currentColor"
-        class="h-xs"
+        class="h-xs col-start-2 justify-self-center"
         :class="[
           !collapseState ? 'rotate-0' : 'rotate-180',
           'transition-transform duration-300 ease-in',
@@ -209,6 +218,11 @@ watch(
           d="M224 416c-8.188 0-16.38-3.125-22.62-9.375l-192-192c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L224 338.8l169.4-169.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-192 192C240.4 412.9 232.2 416 224 416z"
         />
       </svg>
+      <span class="text-xs opacity-60 justify-self-end">{{ item.type }}</span>
     </div>
   </div>
 </template>
+
+<style lang="scss">
+@use '~/assets/css/md-content.scss';
+</style>
