@@ -1,14 +1,27 @@
-import { useAlertStore, useInitPiniaStore, useUserStore } from '@/stores'
-import { storeToRefs } from 'pinia'
+import { useAlertStore, useUserStore } from '@/stores'
+
+// export default defineNuxtRouteMiddleware(async () => {
+//   const userStore = useUserStore()
+//   const initPiniaStore = useInitPiniaStore()
+//   const alertStore = useAlertStore()
+//   const { mounted } = storeToRefs(initPiniaStore)
+//   await userStore.getCurrentUser()
+//   const { isAuthenticated } = userStore.getCurrentAuthInfo
+//   if (mounted.value && isAuthenticated) {
+//     alertStore.setAlert('Guest only route: redirecting to main page')
+//     return navigateTo({ path: '/' })
+//   }
+// })
 
 export default defineNuxtRouteMiddleware(async () => {
   const userStore = useUserStore()
-  const initPiniaStore = useInitPiniaStore()
+  // const initPiniaStore = useInitPiniaStore()
   const alertStore = useAlertStore()
-  const { mounted } = storeToRefs(initPiniaStore)
+  // const { mounted } = storeToRefs(initPiniaStore)
   await userStore.getCurrentUser()
   const { isAuthenticated } = userStore.getCurrentAuthInfo
-  if (mounted.value && isAuthenticated) {
+
+  if (isAuthenticated) {
     alertStore.setAlert('Guest only route: redirecting to main page')
     return navigateTo({ path: '/' })
   }

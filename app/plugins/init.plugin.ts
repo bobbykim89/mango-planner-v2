@@ -2,10 +2,12 @@ import { useInitPiniaStore } from '@/stores'
 
 export default defineNuxtPlugin({
   name: 'stores-init',
-  async setup(nuxtApp) {
+  // enforce: 'pre', // runs before other plugins and middleware
+  dependsOn: ['pinia'],
+  async setup() {
     const initStore = useInitPiniaStore()
-    nuxtApp.hook('app:created', async () => {
-      await initStore.initStores()
-    })
+    await initStore.initStores()
+    // nuxtApp.hook('app:created', async () => {
+    // })
   },
 })
