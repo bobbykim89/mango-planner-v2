@@ -23,6 +23,6 @@ export default defineNuxtRouteMiddleware(async () => {
 
   if (isAuthenticated) {
     alertStore.setAlert('Guest only route: redirecting to main page')
-    return navigateTo({ path: '/' })
+    return await navigateTo({ path: '/' })
   }
 })

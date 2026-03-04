@@ -28,6 +28,6 @@ export default defineNuxtRouteMiddleware(async () => {
     alertStore.setAlert(
       'Authorized users only route: redirecting to login page',
     )
-    return navigateTo({ path: '/auth/login' })
+    return await navigateTo({ path: '/auth/login' })
   }
 })

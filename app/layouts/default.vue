@@ -207,6 +207,7 @@ onMounted(() => {
       <template #content-right
         ><div>
           <LayoutAuthBlock
+            data-allow-mismatch
             :auth="isAuthenticated"
             login-url="/auth/login"
             signup-url="/auth/signup"
@@ -221,6 +222,7 @@ onMounted(() => {
       <template #mobile-content
         ><div>
           <LayoutAuthBlock
+            data-allow-mismatch
             v-if="!isAuthenticated"
             :auth="false"
             login-url="/auth/login"
@@ -295,7 +297,7 @@ onMounted(() => {
       </template>
     </HeaderHorizontal>
     <div class="bg-light-4 dark:bg-dark-2">
-      <div class="container pt-xs px-sm md:px-xs">
+      <div class="container pt-xs px-sm md:px-xs" data-allow-mismatch>
         <Alert
           :show="alert !== null"
           :color="alertColor"
