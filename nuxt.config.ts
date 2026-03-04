@@ -157,6 +157,8 @@ export default defineNuxtConfig({
     },
     workbox: {
       globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+      navigateFallback: '/',
+      navigateFallbackDenylist: [/^\/api/],
     },
     registerType: 'autoUpdate',
     devOptions: {
