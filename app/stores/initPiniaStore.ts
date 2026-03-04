@@ -13,7 +13,9 @@ export const useInitPiniaStore = defineStore('init', () => {
   const mounted = ref<boolean>(false)
   // actions
   const initStores = async () => {
-    await userStore.getCurrentUser()
+    if (import.meta.client) {
+      await userStore.getCurrentUser()
+    }
     const { isAuthenticated } = storeToRefs(userStore)
     if (isAuthenticated.value === true) {
       await profileStore.getCurrentUserProfile()
