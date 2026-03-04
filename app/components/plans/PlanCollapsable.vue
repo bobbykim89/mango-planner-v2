@@ -71,6 +71,8 @@ const handleDeleteClick = (e: Event) => {
   emit('delete', e, _id.toString())
 }
 
+const renderedContent = computed(() => useMarkdown(props.item.content))
+
 watch(
   () => props.visible,
   (newValue) => {
@@ -140,9 +142,10 @@ watch(
       <div class="py-xs">
         <div class="flex gap-2xs">
           <div
-            class="w-full pl-xs pr-2xs whitespace-pre-line text-dark-3 dark:text-light-3"
-            v-html="item.content"
-          ></div>
+            class="w-full pl-xs pr-2xs whitespace-pre-line text-dark-3 dark:text-light-3 md-content"
+          >
+            <div class="md-content" v-html="renderedContent"></div>
+          </div>
           <div
             class="px-xs border-l-2 border-dark-1 dark:border-light-3 flex flex-col items-center gap-2xs text-dark-1 dark:text-light-3"
           >
@@ -212,3 +215,7 @@ watch(
     </div>
   </div>
 </template>
+
+<style lang="scss">
+@use '~/assets/css/md-content.scss';
+</style>
