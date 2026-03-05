@@ -16,6 +16,7 @@ interface AuthToken {
 }
 
 export const useUserStore = defineStore('user', () => {
+  const errorCheck = useErrorCheck()
   const alertStore = useAlertStore()
   const planStore = usePlanStore()
   const profileStore = useProfileStore()
@@ -129,8 +130,8 @@ export const useUserStore = defineStore('user', () => {
     alertStore.setAlert('Logout Successful!', 'success')
   }
   const handleAuthError = (err: unknown) => {
-    const errorMessage: string = extractErrorMessage(err)
-    const checkAuthError: boolean = isAuthError(err)
+    const errorMessage: string = errorCheck.extractErrorMessage(err)
+    const checkAuthError: boolean = errorCheck.isAuthError(err)
 
     if (checkAuthError) {
       currentUser.value = null

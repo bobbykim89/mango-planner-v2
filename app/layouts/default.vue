@@ -183,22 +183,31 @@ onMounted(() => {
           <div class="h-md md:h-lg mr-2xs md:mr-sm align-middle">
             <NuxtLink
               :to="menuItemData.logoLink"
-              aria-label="mango planner logo"
+              custom
+              v-slot="{ navigate, href }"
             >
-              <img
-                :src="menuItemData.logo"
-                :alt="menuItemData.logoAlt"
-                class="h-full inline-block"
-              />
+              <a :href="href" @click="navigate" aria-label="mango planner logo">
+                <img
+                  :src="menuItemData.logo"
+                  :alt="menuItemData.logoAlt"
+                  class="h-full inline-block"
+                />
+              </a>
             </NuxtLink>
           </div>
           <div class="flex flex-col justify-center ml-2">
-            <NuxtLink :to="menuItemData.logoLink">
-              <h2
-                class="inline-block align-middle tracking-wider h2-md text-warning"
-              >
-                {{ menuItemData.title }}
-              </h2>
+            <NuxtLink
+              :to="menuItemData.logoLink"
+              custom
+              v-slot="{ navigate, href }"
+            >
+              <a :href="href" @click="navigate">
+                <h2
+                  class="inline-block align-middle tracking-wider h2-md text-warning"
+                >
+                  {{ menuItemData.title }}
+                </h2>
+              </a>
             </NuxtLink>
           </div>
         </div></template
