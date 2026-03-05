@@ -6,6 +6,7 @@ import { useAlertStore } from './alertStore'
 import { useUserStore } from './userStore'
 
 export const useProfileStore = defineStore('profile', () => {
+  const errorCheck = useErrorCheck()
   const alertStore = useAlertStore()
   const userStore = useUserStore()
   const cookie = useAuthToken()
@@ -109,8 +110,8 @@ export const useProfileStore = defineStore('profile', () => {
     darkMode.value = false
   }
   const handleProfileError = (err: unknown) => {
-    const errorMessage: string = extractErrorMessage(err)
-    const checkAuthError: boolean = isAuthError(err)
+    const errorMessage: string = errorCheck.extractErrorMessage(err)
+    const checkAuthError: boolean = errorCheck.isAuthError(err)
 
     if (checkAuthError) {
       userProfile.value = null

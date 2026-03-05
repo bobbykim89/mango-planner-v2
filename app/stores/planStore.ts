@@ -13,6 +13,7 @@ import { useProfileStore } from './profileStore'
 import { useUserStore } from './userStore'
 
 export const usePlanStore = defineStore('plan', () => {
+  const errorCheck = useErrorCheck()
   const cookie = useAuthToken()
   const alertStore = useAlertStore()
   const profileStore = useProfileStore()
@@ -149,8 +150,8 @@ export const usePlanStore = defineStore('plan', () => {
     drafts.value = []
   }
   const handleError = (err: unknown) => {
-    let errorMessage: string = extractErrorMessage(err)
-    let shouldRedirectToLogin: boolean = isAuthError(err)
+    let errorMessage: string = errorCheck.extractErrorMessage(err)
+    let shouldRedirectToLogin: boolean = errorCheck.isAuthError(err)
 
     console.error(errorMessage)
     alertStore.setAlert(errorMessage)
