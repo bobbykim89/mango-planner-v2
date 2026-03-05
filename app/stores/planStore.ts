@@ -61,8 +61,7 @@ export const usePlanStore = defineStore('plan', () => {
   const getAllPostByUser = async () => {
     try {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated)
-        throw new Error('No user authentication found, please login')
+      if (!cookie.value || !isAuthenticated) return
 
       const res = await $fetch<PlanDto[]>('/api/plan', {
         method: 'GET',
@@ -78,9 +77,7 @@ export const usePlanStore = defineStore('plan', () => {
   const createNewPost = async (payload: PlanInput) => {
     try {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated) {
-        throw new Error('No user authentication found, please login')
-      }
+      if (!cookie.value || !isAuthenticated) return
 
       const res = await $fetch<PlanDto>('/api/plan', {
         method: 'POST',
@@ -97,9 +94,7 @@ export const usePlanStore = defineStore('plan', () => {
   const updatePost = async (payload: { id: string; body: PlanInput }) => {
     try {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated) {
-        throw new Error('No user authentication found, please login')
-      }
+      if (!cookie.value || !isAuthenticated) return
 
       await $fetch<PlanModel>(`/api/plan/${payload.id}`, {
         method: 'PUT',
@@ -116,8 +111,7 @@ export const usePlanStore = defineStore('plan', () => {
   const toggleComplete = async (payload: { id: string; body: PlanInput }) => {
     try {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated)
-        throw new Error('No user authentication found, please login')
+      if (!cookie.value || !isAuthenticated) return
 
       const res = await $fetch<PlanModel>(`/api/plan/${payload.id}/toggle`, {
         method: 'PUT',
@@ -138,8 +132,7 @@ export const usePlanStore = defineStore('plan', () => {
   const deletePost = async (payload: string) => {
     try {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated)
-        throw new Error('No user authentication found, please login')
+      if (!cookie.value || !isAuthenticated) return
 
       await $fetch(`/api/plan/${payload}`, {
         method: 'DELETE',
