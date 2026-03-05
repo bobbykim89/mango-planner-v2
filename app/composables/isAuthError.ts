@@ -14,12 +14,5 @@ export const isAuthError = (err: unknown) => {
   ) {
     return true
   }
-  // check for auth-related error messages
-  if (
-    err instanceof Error &&
-    err.message.toLowerCase().includes('no user authentication found')
-  ) {
-    return true
-  }
   return false
 }

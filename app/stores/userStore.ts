@@ -33,8 +33,7 @@ export const useUserStore = defineStore('user', () => {
   // actions
   const authUser = async () => {
     try {
-      if (!cookie.value)
-        throw new Error('No user authentication found, please login')
+      if (!cookie.value) return
 
       const res = await $fetch<UserDto>('/api/auth', {
         method: 'GET',
@@ -48,8 +47,7 @@ export const useUserStore = defineStore('user', () => {
   }
   const getCurrentUser = async () => {
     try {
-      if (!cookie.value)
-        throw new Error('No user authentication found, please login')
+      if (!cookie.value) return
 
       const res = await $fetch<UserDto>('/api/auth', {
         method: 'GET',
@@ -91,8 +89,7 @@ export const useUserStore = defineStore('user', () => {
   }
   const updateUsername = async (payload: NewUsernameInput) => {
     try {
-      if (!cookie.value)
-        throw new Error('No user authentication found, please login')
+      if (!cookie.value) return
 
       await $fetch('/api/user/username', {
         method: 'PUT',
@@ -107,8 +104,7 @@ export const useUserStore = defineStore('user', () => {
   }
   const updatePassword = async (payload: PwUpdateInput) => {
     try {
-      if (!cookie.value)
-        throw new Error('No user authentication found, please login')
+      if (!cookie.value) return
 
       await $fetch('/api/user/password', {
         method: 'PUT',

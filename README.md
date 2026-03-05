@@ -7,8 +7,8 @@ A repository for source code of [Mango Planner v2](https://mango-planner.vercel.
 Install dependencies:
 
 ```bash
-## yarn
-yarn install
+## pnpm
+pnpm install
 ```
 
 ## Dev server
@@ -16,8 +16,8 @@ yarn install
 Start dev server on port 3000
 
 ```bash
-## yarn
-yarn dev
+## pnpm
+pnpm dev
 ```
 
 ## Production
@@ -25,21 +25,40 @@ yarn dev
 Build application for production
 
 ```bash
-## yarn
-yarn build
-yarn preview ## locally preview production build
+## pnpm
+pnpm build
+pnpm preview ## locally preview production build
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
 
+## Features
+
+### Core Features
+
+- **TODO Management** — Full CRUD operations for managing todo items
+- **User Profile** — Set and update user profile picture and personal information
+- **Authentication** — Secure login with password reset via verification email
+- **Dark / Light Mode** — Toggle between dark and light themes
+- **Weather Widget** — Real-time weather information display
+
+### New Features
+
+- **Draft Recovery** — Automatically saves drafts to IndexedDB when a create or update operation fails, ensuring no work is lost
+- **Markdown Support** — Todo items support full Markdown rendering including:
+  - Headings, lists, blockquotes, tables, and code blocks
+  - Inline and block math equations via KaTeX (`$...$` and `$$...$$`)
+
 ## Tech stack
 
 > Vue
-> Nuxt 3
+> Nuxt 4
 > Nitro (H3)
 > MongoDB
 > Mongoose
-> TailwindCSS (tailwindcss, postCSS, autoprefixer)
-> vueuse
+> TailwindCSS 4
+> VueUse
 > Bcrypt
+> marked
+> KaTeX
 > Manguito Component Library (MCL)

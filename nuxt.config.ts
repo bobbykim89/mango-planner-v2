@@ -65,9 +65,7 @@ export default defineNuxtConfig({
     cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
     mailerEmailAddress: process.env.MAILER_EMAIL_ADDRESS,
     mailerAppPassword: process.env.MAILER_APP_PASSWORD,
-    public: {
-      openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
-    },
+    openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
   },
   modules: ['@pinia/nuxt', '@nuxtjs/color-mode', '@vite-pwa/nuxt'],
   typescript: {
@@ -157,6 +155,8 @@ export default defineNuxtConfig({
     },
     workbox: {
       globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
+      navigateFallback: '/',
+      navigateFallbackDenylist: [/^\/api/],
     },
     registerType: 'autoUpdate',
     devOptions: {

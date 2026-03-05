@@ -13,8 +13,12 @@ export const useAlertStore = defineStore('alert', () => {
   }
   const setAlert = (
     message: string,
-    color: Partial<ColorPalette> = 'danger'
+    color: Partial<ColorPalette> = 'danger',
   ) => {
+    if (alert.value) {
+      alert.value = null
+      alertColor.value = 'danger'
+    }
     alert.value = message
     alertColor.value = color
     clearAlert()

@@ -19,7 +19,6 @@ import imageCompression from 'browser-image-compression'
 import { storeToRefs } from 'pinia'
 import { onMounted } from 'vue'
 
-const config = useRuntimeConfig()
 const colorMode = useColorMode()
 const router = useRouter()
 const alertStore = useAlertStore()
@@ -207,6 +206,7 @@ onMounted(() => {
       <template #content-right
         ><div>
           <LayoutAuthBlock
+            data-allow-mismatch
             :auth="isAuthenticated"
             login-url="/auth/login"
             signup-url="/auth/signup"
@@ -221,6 +221,7 @@ onMounted(() => {
       <template #mobile-content
         ><div>
           <LayoutAuthBlock
+            data-allow-mismatch
             v-if="!isAuthenticated"
             :auth="false"
             login-url="/auth/login"
@@ -244,7 +245,6 @@ onMounted(() => {
               v-if="coords.latitude !== null && coords.latitude !== Infinity"
               :latitude="coords.latitude"
               :longitude="coords.longitude"
-              :api-key="config.public.openWeatherApiKey"
             ></WeatherWidget>
             <DarkmodeWidget
               v-if="userProfile !== null"
@@ -295,7 +295,7 @@ onMounted(() => {
       </template>
     </HeaderHorizontal>
     <div class="bg-light-4 dark:bg-dark-2">
-      <div class="container pt-xs px-sm md:px-xs">
+      <div class="container pt-xs px-sm md:px-xs" data-allow-mismatch>
         <Alert
           :show="alert !== null"
           :color="alertColor"
@@ -392,7 +392,6 @@ onMounted(() => {
               v-if="coords.latitude !== null && coords.latitude !== Infinity"
               :latitude="coords.latitude"
               :longitude="coords.longitude"
-              :api-key="config.public.openWeatherApiKey"
             ></WeatherWidget>
             <div v-if="userProfile !== null" class="mt-xs">
               <DarkmodeWidget
