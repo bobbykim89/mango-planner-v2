@@ -19,7 +19,6 @@ import imageCompression from 'browser-image-compression'
 import { storeToRefs } from 'pinia'
 import { onMounted } from 'vue'
 
-const config = useRuntimeConfig()
 const colorMode = useColorMode()
 const router = useRouter()
 const alertStore = useAlertStore()
@@ -246,7 +245,6 @@ onMounted(() => {
               v-if="coords.latitude !== null && coords.latitude !== Infinity"
               :latitude="coords.latitude"
               :longitude="coords.longitude"
-              :api-key="config.public.openWeatherApiKey"
             ></WeatherWidget>
             <DarkmodeWidget
               v-if="userProfile !== null"
@@ -394,7 +392,6 @@ onMounted(() => {
               v-if="coords.latitude !== null && coords.latitude !== Infinity"
               :latitude="coords.latitude"
               :longitude="coords.longitude"
-              :api-key="config.public.openWeatherApiKey"
             ></WeatherWidget>
             <div v-if="userProfile !== null" class="mt-xs">
               <DarkmodeWidget

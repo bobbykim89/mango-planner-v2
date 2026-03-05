@@ -20,7 +20,6 @@ interface ApiReturnType {
 const props = defineProps<{
   latitude: number
   longitude: number
-  apiKey: string
 }>()
 
 const weatherData = reactive<{
@@ -36,10 +35,14 @@ const weatherData = reactive<{
 })
 
 const getWeatherData = async () => {
-  const { latitude, longitude, apiKey } = props
+  const { latitude, longitude } = props
   if (latitude !== null && latitude !== Infinity) {
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=imperial`
-    const res = await $fetch<ApiReturnType>(apiUrl)
+    const res = await $fetch<ApiReturnType>('/api/weather', {
+      query: {
+        lat: latitude,
+        lon: longitude,
+      },
+    })
     const weatherInfo = res.weather[0]
     if (!weatherInfo) return
     weatherData.city = res.name
