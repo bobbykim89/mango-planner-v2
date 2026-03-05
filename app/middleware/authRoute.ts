@@ -1,33 +1,33 @@
-import { useAlertStore, useUserStore } from '@/stores'
-
-// export default defineNuxtRouteMiddleware(async () => {
-//   const userStore = useUserStore()
-//   const initPiniaStore = useInitPiniaStore()
-//   const alertStore = useAlertStore()
-//   const { mounted } = storeToRefs(initPiniaStore)
-//   await userStore.getCurrentUser()
-//   const { isAuthenticated } = userStore.getCurrentAuthInfo
-//   if (mounted.value && !isAuthenticated) {
-//     alertStore.setAlert(
-//       'Authorized users only route: redirecting to login page'
-//     )
-//     return navigateTo({ path: '/auth/login' })
-//   }
-// })
+import { useAlertStore, useInitPiniaStore, useUserStore } from '@/stores'
 
 export default defineNuxtRouteMiddleware(async () => {
-  if (import.meta.server) return
-
   const userStore = useUserStore()
+  const initPiniaStore = useInitPiniaStore()
   const alertStore = useAlertStore()
-  // const { mounted } = storeToRefs(initPiniaStore)
-  await userStore.getCurrentUser()
+  const { mounted } = storeToRefs(initPiniaStore)
+  // await userStore.getCurrentUser()
   const { isAuthenticated } = userStore.getCurrentAuthInfo
-
-  if (!isAuthenticated) {
+  if (mounted.value && !isAuthenticated) {
     alertStore.setAlert(
       'Authorized users only route: redirecting to login page',
     )
-    return await navigateTo({ path: '/auth/login' })
+    return navigateTo({ path: '/auth/login' })
   }
 })
+
+// export default defineNuxtRouteMiddleware(async () => {
+//   if (import.meta.server) return
+
+//   const userStore = useUserStore()
+//   const alertStore = useAlertStore()
+//   // const { mounted } = storeToRefs(initPiniaStore)
+//   // await userStore.getCurrentUser()
+//   const { isAuthenticated } = userStore.getCurrentAuthInfo
+
+//   if (!isAuthenticated) {
+//     alertStore.setAlert(
+//       'Authorized users only route: redirecting to login page',
+//     )
+//     return await navigateTo({ path: '/auth/login' })
+//   }
+// })
