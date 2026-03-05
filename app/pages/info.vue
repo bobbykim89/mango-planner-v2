@@ -148,11 +148,14 @@ const { isAuthenticated } = storeToRefs(userStore)
         <NuxtLink
           :to="isAuthenticated ? '/' : '/auth/login'"
           class="btn btn-warning"
-          >Go to {{ isAuthenticated ? 'Main' : 'Login' }} page</NuxtLink
+          custom
+          v-slot="{ navigate, href }"
         >
+          <a :href="href" @click="navigate" data-allow-mismatch>
+            Go to {{ isAuthenticated ? 'Main' : 'Login' }} page
+          </a>
+        </NuxtLink>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped></style>
