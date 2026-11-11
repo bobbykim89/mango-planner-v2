@@ -368,8 +368,8 @@ onMounted(() => {
         ref="sidebarRef"
         :color="handleBgColors"
         placement="right"
-        class-name="border-l-4 border-warning"
-        width="400"
+        custom-class="border-l-4 border-warning"
+        :width="400"
       >
         <template #header="{ close }">
           <div

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import DefaultProfile from '@/assets/images/defaultProfile.webp'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
-import { Collapse } from '@bobbykim/manguito-theme'
-import { vCollapse } from '@bobbykim/manguito-theme/directives'
+import { AccordionGroup, Collapse } from '@bobbykim/manguito-theme'
 import { MclFormGroup, MclInputFile, MclInputText } from '@bobbykim/mcl-forms'
 
 const props = defineProps<{
@@ -19,6 +18,9 @@ const usernameRef = ref<string>('')
 const profilePictureRef = ref<File | undefined>(undefined)
 const currentPasswordRef = ref<string>('')
 const newPasswordRef = ref<string>('')
+const usernameCollapseRef = ref<InstanceType<typeof Collapse>>()
+const pictureCollapseRef = ref<InstanceType<typeof Collapse>>()
+const passwordCollapseRef = ref<InstanceType<typeof Collapse>>()
 
 const cloudinaryBaseUrl: string =
   'https://res.cloudinary.com/dwgni1x3t/image/upload/c_scale,w_400/q_auto/v1700694621/'
@@ -77,132 +79,137 @@ const formTextColor = computed<ColorPalette>(() => {
       />
       <p class="font-bold">{{ username }}</p>
     </div>
-    <!-- username update -->
-    <div class="md:rounded-md drop-shadow-md overflow-hidden md:mb-xs">
-      <button
-        v-collapse:update-username
-        class="block w-full py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-opacity-60 transition-all duration-300 ease-linear text-left"
+    <AccordionGroup>
+      <!-- username update -->
+      <div class="md:rounded-md drop-shadow-md overflow-hidden md:mb-xs">
+        <button
+          type="button"
+          @click="usernameCollapseRef?.toggle()"
+          class="block w-full py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-light-3/60 dark:hover:bg-dark-3/60 transition-all duration-300 ease-linear text-left"
+        >
+          Update Username
+        </button>
+        <Collapse
+          ref="usernameCollapseRef"
+          id="update-username"
+          custom-class="bg-light-3/65 dark:bg-dark-3/65"
+        >
+          <div class="px-xs py-xs">
+            <form @submit="onUserNameUpdateSubmit">
+              <MclFormGroup
+                field-id="user-name"
+                label="Username:"
+                :text-color="formTextColor"
+                class="mb-xs"
+              >
+                <MclInputText
+                  id="user-name"
+                  rounded
+                  required
+                  highlight-color="warning"
+                  v-model="usernameRef"
+                ></MclInputText>
+              </MclFormGroup>
+              <div class="flex justify-end">
+                <button role="submit" class="btn btn-warning">Save</button>
+              </div>
+            </form>
+          </div>
+        </Collapse>
+      </div>
+      <!-- profile picture update -->
+      <div class="md:rounded-md drop-shadow-md overflow-hidden md:mb-xs">
+        <button
+          type="button"
+          @click="pictureCollapseRef?.toggle()"
+          class="block w-full py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-light-3/60 dark:hover:bg-dark-3/60 transition-all duration-300 ease-linear text-left"
+        >
+          Update Profile Picture
+        </button>
+        <Collapse
+          ref="pictureCollapseRef"
+          id="update-profile-picture"
+          custom-class="bg-light-3/65 dark:bg-dark-3/65"
+        >
+          <div class="px-xs py-xs">
+            <form @submit="onFileSubmit">
+              <MclFormGroup
+                field-id="profile-picture"
+                label="Profile picture:"
+                :text-color="formTextColor"
+                class="mb-xs"
+              >
+                <MclInputFile
+                  id="profile-picture"
+                  button-text="Browse"
+                  rounded
+                  required
+                  highlight-color="warning"
+                  v-model="profilePictureRef"
+                ></MclInputFile>
+              </MclFormGroup>
+              <div class="flex justify-end">
+                <button role="submit" class="btn btn-warning">Upload</button>
+              </div>
+            </form>
+          </div>
+        </Collapse>
+      </div>
+      <!-- password update -->
+      <div
+        class="rounded-b-md md:rounded-md drop-shadow-md overflow-hidden md:mb-xs"
       >
-        Update Username
-      </button>
-      <Collapse
-        id="update-username"
-        accordion="update-profile"
-        class-name="bg-light-3/65 dark:bg-dark-3/65"
-      >
-        <div class="px-xs py-xs">
-          <form @submit="onUserNameUpdateSubmit">
-            <MclFormGroup
-              label-for="user-name"
-              label="Username:"
-              :text-color="formTextColor"
-              class="mb-xs"
-            >
-              <MclInputText
-                id="user-name"
-                rounded
-                required
-                highlight-color="warning"
-                v-model="usernameRef"
-              ></MclInputText>
-            </MclFormGroup>
-            <div class="flex justify-end">
-              <button role="submit" class="btn btn-warning">Save</button>
-            </div>
-          </form>
-        </div>
-      </Collapse>
-    </div>
-    <!-- profile picture update -->
-    <div class="md:rounded-md drop-shadow-md overflow-hidden md:mb-xs">
-      <button
-        v-collapse:update-profile-picture
-        class="block w-full py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-opacity-60 transition-all duration-300 ease-linear text-left"
-      >
-        Update Profile Picture
-      </button>
-      <Collapse
-        id="update-profile-picture"
-        accordion="update-profile"
-        class-name="bg-light-3/65 dark:bg-dark-3/65"
-      >
-        <div class="px-xs py-xs">
-          <form @submit="onFileSubmit">
-            <MclFormGroup
-              label-for="profile-picture"
-              label="Profile picture:"
-              :text-color="formTextColor"
-              class="mb-xs"
-            >
-              <MclInputFile
-                id="profile-picture"
-                button-text="Browse"
-                rounded
-                is-required
-                highlight-color="warning"
-                v-model="profilePictureRef"
-              ></MclInputFile>
-            </MclFormGroup>
-            <div class="flex justify-end">
-              <button role="submit" class="btn btn-warning">Upload</button>
-            </div>
-          </form>
-        </div>
-      </Collapse>
-    </div>
-    <!-- password update -->
-    <div
-      class="rounded-b-md md:rounded-md drop-shadow-md overflow-hidden md:mb-xs"
-    >
-      <button
-        v-collapse:update-password
-        class="block w-full pt-3xs pb-2xs md:py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-opacity-60 transition-all duration-300 ease-linear text-left"
-      >
-        Update Password
-      </button>
-      <Collapse
-        id="update-password"
-        accordion="update-profile"
-        class-name="bg-light-3/65 dark:bg-dark-3/65"
-      >
-        <div class="px-xs py-xs">
-          <form @submit="onPasswordSubmit">
-            <MclFormGroup
-              label-for="current-pw"
-              label="Current password:"
-              :text-color="formTextColor"
-              class="mb-2xs"
-            >
-              <MclInputText
-                id="current-pw"
-                type="password"
-                rounded
-                required
-                highlight-color="warning"
-                v-model="currentPasswordRef"
-              ></MclInputText>
-            </MclFormGroup>
-            <MclFormGroup
-              label-for="new-pw"
-              label="New password:"
-              :text-color="formTextColor"
-              class="mb-xs"
-            >
-              <MclInputText
-                id="new-pw"
-                type="password"
-                rounded
-                required
-                highlight-color="warning"
-                v-model="newPasswordRef"
-              ></MclInputText>
-            </MclFormGroup>
-            <div class="flex justify-end">
-              <button role="submit" class="btn btn-warning">Save</button>
-            </div>
-          </form>
-        </div>
-      </Collapse>
-    </div>
+        <button
+          type="button"
+          @click="passwordCollapseRef?.toggle()"
+          class="block w-full pt-3xs pb-2xs md:py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-light-3/60 dark:hover:bg-dark-3/60 transition-all duration-300 ease-linear text-left"
+        >
+          Update Password
+        </button>
+        <Collapse
+          ref="passwordCollapseRef"
+          id="update-password"
+          custom-class="bg-light-3/65 dark:bg-dark-3/65"
+        >
+          <div class="px-xs py-xs">
+            <form @submit="onPasswordSubmit">
+              <MclFormGroup
+                field-id="current-pw"
+                label="Current password:"
+                :text-color="formTextColor"
+                class="mb-2xs"
+              >
+                <MclInputText
+                  id="current-pw"
+                  type="password"
+                  rounded
+                  required
+                  highlight-color="warning"
+                  v-model="currentPasswordRef"
+                ></MclInputText>
+              </MclFormGroup>
+              <MclFormGroup
+                field-id="new-pw"
+                label="New password:"
+                :text-color="formTextColor"
+                class="mb-xs"
+              >
+                <MclInputText
+                  id="new-pw"
+                  type="password"
+                  rounded
+                  required
+                  highlight-color="warning"
+                  v-model="newPasswordRef"
+                ></MclInputText>
+              </MclFormGroup>
+              <div class="flex justify-end">
+                <button role="submit" class="btn btn-warning">Save</button>
+              </div>
+            </form>
+          </div>
+        </Collapse>
+      </div>
+    </AccordionGroup>
   </div>
 </template>

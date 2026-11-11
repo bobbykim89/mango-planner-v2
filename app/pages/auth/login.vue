@@ -59,7 +59,7 @@ const formTextColor = computed<ColorPalette>(() => {
         <h2 class="text-warning text-center mb-sm">Login</h2>
         <form @submit.prevent="handleFormSubmit">
           <MclFormGroup
-            label-for="email"
+            field-id="email"
             label="Email:"
             :text-color="formTextColor"
             :text-bold="true"
@@ -76,7 +76,7 @@ const formTextColor = computed<ColorPalette>(() => {
             ></MclInputText>
           </MclFormGroup>
           <MclFormGroup
-            label-for="password"
+            field-id="password"
             label="Password:"
             :text-color="formTextColor"
             :text-bold="true"
