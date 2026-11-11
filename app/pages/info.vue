@@ -151,7 +151,7 @@ const { isAuthenticated } = storeToRefs(userStore)
           custom
           v-slot="{ navigate, href }"
         >
-          <a :href="href" @click="navigate" data-allow-mismatch>
+          <a :href="href ?? undefined" @click="navigate" data-allow-mismatch>
             Go to {{ isAuthenticated ? 'Main' : 'Login' }} page
           </a>
         </NuxtLink>

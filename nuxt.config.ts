@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -85,10 +86,8 @@ export default defineNuxtConfig({
     preference: 'light',
   },
   css: ['~/assets/css/page_transition.scss', '~/assets/css/styles.css'],
-  postcss: {
-    plugins: {
-      '@tailwindcss/postcss': {},
-    },
+  vite: {
+    plugins: [tailwindcss()],
   },
   nitro: {
     experimental: {
