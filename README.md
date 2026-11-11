@@ -4,6 +4,8 @@ A repository for source code of [Mango Planner v2](https://mango-planner.vercel.
 
 ## Setup
 
+Requires Node 24 (`nvm use`) and pnpm 12 (via `corepack enable`).
+
 Install dependencies:
 
 ```bash
