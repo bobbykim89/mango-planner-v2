@@ -186,7 +186,11 @@ onMounted(() => {
               custom
               v-slot="{ navigate, href }"
             >
-              <a :href="href" @click="navigate" aria-label="mango planner logo">
+              <a
+                :href="href ?? undefined"
+                @click="navigate"
+                aria-label="mango planner logo"
+              >
                 <img
                   :src="menuItemData.logo"
                   :alt="menuItemData.logoAlt"
@@ -201,7 +205,7 @@ onMounted(() => {
               custom
               v-slot="{ navigate, href }"
             >
-              <a :href="href" @click="navigate">
+              <a :href="href ?? undefined" @click="navigate">
                 <h2
                   class="inline-block align-middle tracking-wider h2-md text-warning"
                 >
