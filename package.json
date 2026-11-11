@@ -21,9 +21,9 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "@bobbykim/manguito-theme": "^0.28.2",
-    "@bobbykim/mcl-footer": "^0.9.8",
-    "@bobbykim/mcl-forms": "^0.9.9",
+    "@bobbykim/manguito-theme": "^1.2.0",
+    "@bobbykim/mcl-footer": "^0.10.5",
+    "@bobbykim/mcl-forms": "^0.12.1",
     "@pinia/nuxt": "^0.11.3",
     "@vueuse/core": "^14.1.0",
     "bcryptjs": "^3.0.3",

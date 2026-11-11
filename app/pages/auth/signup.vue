@@ -39,6 +39,12 @@ const signUpCred = reactive<{
   email: '',
   password: '',
 })
+const passwordPattern =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/
+const passwordInvalid = computed<boolean>(
+  () =>
+    signUpCred.password !== '' && !passwordPattern.test(signUpCred.password),
+)
 const handleFormSubmit = async () => {
   const { userName, email, password } = signUpCred
   await userStore.signupNewUser({ name: userName, email, password })
@@ -60,7 +66,7 @@ const formTextColor = computed<ColorPalette>(() => {
       >
         <h2 class="text-warning text-center mb-sm">Signup</h2>
         <MclFormGroup
-          label-for="user-name"
+          field-id="user-name"
           label="Username:"
           :text-color="formTextColor"
           :text-bold="true"
@@ -78,7 +84,7 @@ const formTextColor = computed<ColorPalette>(() => {
         </MclFormGroup>
         <form @submit.prevent="handleFormSubmit">
           <MclFormGroup
-            label-for="email"
+            field-id="email"
             label="Email:"
             :text-color="formTextColor"
             :text-bold="true"
@@ -95,7 +101,7 @@ const formTextColor = computed<ColorPalette>(() => {
             ></MclInputText>
           </MclFormGroup>
           <MclFormGroup
-            label-for="password"
+            field-id="password"
             label="Password:"
             :text-color="formTextColor"
             :text-bold="true"
@@ -108,6 +114,7 @@ const formTextColor = computed<ColorPalette>(() => {
               rounded
               required
               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$"
+              :invalid="passwordInvalid"
               invalid-feedback="Password must include one number, one uppercase and lowercase letter, one special character with at least 8 characters length."
               v-model="signUpCred.password"
             ></MclInputText>

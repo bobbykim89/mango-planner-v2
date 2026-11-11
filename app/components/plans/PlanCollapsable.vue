@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { PlanDto } from '#shared/types'
 import { Collapse } from '@bobbykim/manguito-theme'
-import { vCollapse } from '@bobbykim/manguito-theme/directives'
 
 const props = withDefaults(
   defineProps<{
@@ -21,11 +20,14 @@ const emit = defineEmits<{
   (e: 'delete', event: Event, id: string): void
 }>()
 
+const collapseRef = ref<InstanceType<typeof Collapse>>()
 const collapseState = ref<boolean>(props.visible)
 
 const toggleCollapse = (visible: boolean) => {
   collapseState.value = visible
-  // collapseRef.value?.toggle()
+}
+const onCollapseTrigger = () => {
+  collapseRef.value?.toggle()
 }
 
 const getBorderColor = computed<string>(() => {
@@ -92,7 +94,7 @@ watch(
       aria-label="collapse panel header"
       tabindex="0"
       role="button"
-      v-collapse:[item._id]
+      @click="onCollapseTrigger"
     >
       <div class="flex justify-between items-center">
         <div class="flex gap-4 items-center">
@@ -136,11 +138,11 @@ watch(
       </div>
     </div>
     <Collapse
+      ref="collapseRef"
       :id="item._id.toString()"
       @open="toggleCollapse"
       @close="toggleCollapse"
-      :class-name="getContentBgColor"
-      accordion="plans-accordion"
+      :custom-class="getContentBgColor"
     >
       <div class="py-xs">
         <div class="flex gap-2xs">
@@ -201,7 +203,7 @@ watch(
       class="py-1.5 px-sm cursor-pointer transition-all duration-500 text-dark-3 dark:text-light-3 grid grid-cols-3 items-center"
       :class="[getBgColor]"
       aria-label="collapse panel footer"
-      v-collapse:[item._id]
+      @click="onCollapseTrigger"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

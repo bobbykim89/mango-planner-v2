@@ -32,6 +32,13 @@ const alertStore = useAlertStore()
 const { darkMode } = storeToRefs(profileStore)
 const passwordInputRef = ref<string>('')
 
+const passwordPattern =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/
+const passwordInvalid = computed<boolean>(
+  () =>
+    passwordInputRef.value !== '' &&
+    !passwordPattern.test(passwordInputRef.value),
+)
 const handleFormSubmit = async () => {
   const userId = route.query.user
   const token = route.query.token
@@ -63,7 +70,7 @@ const formTextColor = computed<ColorPalette>(() => {
         <h2 class="text-warning text-center mb-sm">Reset Password</h2>
         <form @submit.prevent="handleFormSubmit">
           <MclFormGroup
-            label-for="new-password"
+            field-id="new-password"
             label="New Password:"
             :text-color="formTextColor"
             :text-bold="true"
@@ -77,6 +84,7 @@ const formTextColor = computed<ColorPalette>(() => {
               required
               v-model="passwordInputRef"
               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$"
+              :invalid="passwordInvalid"
               invalid-feedback="Password must include one number, one uppercase and lowercase letter, one special character with at least 8 characters length."
             ></MclInputText>
           </MclFormGroup>

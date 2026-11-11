@@ -1,6 +1,6 @@
 # Mango Planner v2
 
-Full-stack todo/planner app: Nuxt 4 (Vue 3) frontend + Nitro/H3 API in one repo, MongoDB via Mongoose. Features: plan CRUD with drag-to-reorder, Markdown + KaTeX in plan content, user profile with Cloudinary-hosted picture, JWT auth with email password reset, dark/light mode, OpenWeather widget, offline draft recovery (IndexedDB via localforage), installable PWA. Deployed on Vercel (https://mango-planner.vercel.app/).
+Full-stack todo/planner app: Nuxt 4 (Vue 3) frontend + Nitro/H3 API in one repo, MongoDB via Mongoose. Features: plan CRUD with drag-to-reorder, Markdown + KaTeX in plan content, user profile with Cloudinary-hosted picture, JWT auth with email password reset, dark/light mode, OpenWeather widget, offline draft recovery (IndexedDB via localforage), installable PWA. Deployed on Vercel (https://mango-planner.bobbykim.dev/).
 
 Current focus: hardening **security**, improving **performance**, and fixing intermittent runtime errors. Prefer small, verifiable changes over sweeping rewrites.
 

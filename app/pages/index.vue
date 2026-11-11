@@ -18,7 +18,7 @@ import {
   useUserStore,
 } from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
-import { Modal } from '@bobbykim/manguito-theme'
+import { AccordionGroup, Modal } from '@bobbykim/manguito-theme'
 import { storeToRefs } from 'pinia'
 import draggable from 'vuedraggable'
 
@@ -304,50 +304,52 @@ const getPlans = computed(() => {
         <NavigateToInfo
           v-if="planStore.getAllPlans.length === 0"
         ></NavigateToInfo>
-        <Transition name="fade" mode="out-in">
-          <div v-if="displayStyle === 'custom'">
-            <draggable
-              v-model="customOrderData"
-              item-key="_id"
-              handle=".handle"
-              @change="onOrderUpdate"
-            >
-              <template #item="{ element }">
-                <PlanCollapsable
-                  :item="element"
-                  :show-handle="true"
-                  :key="element._id.toString()"
-                  @toggle-complete="handleCollapseToggle"
-                  @edit="handleCollapseEdit"
-                  @delete="handleCollapseDelete"
-                  class="mb-sm last:mb-0"
-                ></PlanCollapsable>
-              </template>
-            </draggable>
-          </div>
-          <div v-else-if="displayStyle === 'incomplete'">
-            <PlanCollapsable
-              v-for="item in getPlans"
-              :item="item"
-              :key="item._id!.toString()"
-              @toggle-complete="handleCollapseToggle"
-              @edit="handleCollapseEdit"
-              @delete="handleCollapseDelete"
-              class="mb-sm last:mb-0"
-            ></PlanCollapsable>
-          </div>
-          <div v-else>
-            <PlanCollapsable
-              v-for="item in getPlans"
-              :item="item"
-              :key="item._id!.toString()"
-              @toggle-complete="handleCollapseToggle"
-              @edit="handleCollapseEdit"
-              @delete="handleCollapseDelete"
-              class="mb-sm last:mb-0"
-            ></PlanCollapsable>
-          </div>
-        </Transition>
+        <AccordionGroup>
+          <Transition name="fade" mode="out-in">
+            <div v-if="displayStyle === 'custom'">
+              <draggable
+                v-model="customOrderData"
+                item-key="_id"
+                handle=".handle"
+                @change="onOrderUpdate"
+              >
+                <template #item="{ element }">
+                  <PlanCollapsable
+                    :item="element"
+                    :show-handle="true"
+                    :key="element._id.toString()"
+                    @toggle-complete="handleCollapseToggle"
+                    @edit="handleCollapseEdit"
+                    @delete="handleCollapseDelete"
+                    class="mb-sm last:mb-0"
+                  ></PlanCollapsable>
+                </template>
+              </draggable>
+            </div>
+            <div v-else-if="displayStyle === 'incomplete'">
+              <PlanCollapsable
+                v-for="item in getPlans"
+                :item="item"
+                :key="item._id!.toString()"
+                @toggle-complete="handleCollapseToggle"
+                @edit="handleCollapseEdit"
+                @delete="handleCollapseDelete"
+                class="mb-sm last:mb-0"
+              ></PlanCollapsable>
+            </div>
+            <div v-else>
+              <PlanCollapsable
+                v-for="item in getPlans"
+                :item="item"
+                :key="item._id!.toString()"
+                @toggle-complete="handleCollapseToggle"
+                @edit="handleCollapseEdit"
+                @delete="handleCollapseDelete"
+                class="mb-sm last:mb-0"
+              ></PlanCollapsable>
+            </div>
+          </Transition>
+        </AccordionGroup>
       </div>
     </div>
     <div v-else class="min-h-[60vh] flex items-center">
@@ -359,8 +361,8 @@ const getPlans = computed(() => {
       ref="modalRef"
       placement="center"
       :color="handleBgColors"
-      class-name="px-xs rounded-md border dark:border-dark-1"
-      modal-width="large"
+      custom-class="px-xs rounded-md border dark:border-dark-1"
+      width="large"
       @close="onClear"
     >
       <template #header="{ close }">

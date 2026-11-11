@@ -60,7 +60,7 @@ const formTextColor = computed<ColorPalette>(() => {
         <h2 class="text-warning text-center mb-sm">Request Reset</h2>
         <form @submit.prevent="handleFormSubmit">
           <MclFormGroup
-            label-for="email"
+            field-id="email"
             label="Email:"
             :text-color="formTextColor"
             :text-bold="true"

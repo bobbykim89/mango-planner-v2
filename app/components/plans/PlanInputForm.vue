@@ -51,8 +51,10 @@ const typeOptions: TypeOptions[] = [
     value: 'chore',
   },
 ]
-const setTypeValue = (e: Event, value: string | number) => {
-  formContent.type = value as TypeInputLiteralType
+const typeIndicatorColor: Record<TypeInputLiteralType, ColorPalette> = {
+  personal: 'dark-3',
+  work: 'info',
+  chore: 'primary',
 }
 const clearInput = () => {
   formContent.title = ''
@@ -76,7 +78,7 @@ const formTextColor = computed<ColorPalette>(() => {
   <div>
     <form @submit.prevent="onFormSubmit">
       <MclFormGroup
-        :label-for="`${prefix}-title`"
+        :field-id="`${prefix}-title`"
         label="Title:"
         :text-color="formTextColor"
         :text-bold="true"
@@ -92,7 +94,7 @@ const formTextColor = computed<ColorPalette>(() => {
         ></MclInputText>
       </MclFormGroup>
       <MclFormGroup
-        :label-for="`${prefix}-content`"
+        :field-id="`${prefix}-content`"
         label="Content:"
         :text-color="formTextColor"
         :text-bold="true"
@@ -114,19 +116,15 @@ const formTextColor = computed<ColorPalette>(() => {
         >
           <MclInputRadio
             :id="item.id"
+            :name="`${prefix}-type`"
             :value="item.value"
-            :checked="formContent.type === item.value"
+            v-model="formContent.type"
             bg-color="warning"
-            :checked-color="
-              item.value === 'personal'
-                ? 'dark-3'
-                : item.value === 'work'
-                  ? 'info'
-                  : 'primary'
-            "
-            @change="setTypeValue"
+            checked-bg-color="warning"
+            border-color="warning"
+            :indicator-color="typeIndicatorColor[item.value]"
           ></MclInputRadio>
-          <MclFormGroup :label-for="item.id">
+          <MclFormGroup :field-id="item.id">
             <template #label>
               <p class="text-dark-3 dark:text-light-3 font-bold">
                 {{ item.text }}
