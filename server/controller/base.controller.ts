@@ -6,7 +6,7 @@ import {
   type ProfileDocument,
   type UserDocument,
 } from '#shared/models'
-import { readBody, type H3Event } from 'h3'
+import { getQuery, readBody, type H3Event } from 'h3'
 import { isValidObjectId } from 'mongoose'
 import type { z, ZodType } from 'zod'
 
@@ -25,6 +25,12 @@ export abstract class BaseController {
     }
     return schema.parse(body ?? {})
   }
+
+  /** Validates the query string; Zod errors become VALIDATION_FAILED. */
+  protected validateQuery = <S extends ZodType>(
+    e: H3Event,
+    schema: S,
+  ): z.infer<S> => schema.parse(getQuery(e))
 
   protected requireObjectId = (id: unknown): string => {
     if (typeof id !== 'string' || !isValidObjectId(id)) {

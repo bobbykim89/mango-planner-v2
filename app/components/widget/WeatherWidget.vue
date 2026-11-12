@@ -1,21 +1,5 @@
 <script setup lang="ts">
-type ApiWeatherType = {
-  id: number
-  main: string
-  description: string
-  icon: string
-}
-type ApiMainType = {
-  temp: number
-  feels_like: number
-  temp_min: number
-  temp_max: number
-}
-interface ApiReturnType {
-  name: string
-  weather: ApiWeatherType[]
-  main: ApiMainType
-}
+import type { WeatherData } from '#shared/types'
 
 const props = defineProps<{
   latitude: number
@@ -38,18 +22,16 @@ const weatherData = reactive<{
 const getWeatherData = async () => {
   const { latitude, longitude } = props
   if (latitude !== null && latitude !== Infinity) {
-    const res = await api<ApiReturnType>('/api/weather', {
+    const res = await api<WeatherData>('/api/weather', {
       query: {
         lat: latitude,
         lon: longitude,
       },
     })
-    const weatherInfo = res.weather[0]
-    if (!weatherInfo) return
-    weatherData.city = res.name
-    weatherData.icon = weatherInfo.icon
-    weatherData.weather = weatherInfo.main
-    weatherData.temperature = res.main.temp
+    weatherData.city = res.city
+    weatherData.icon = res.icon
+    weatherData.weather = res.condition
+    weatherData.temperature = res.temperature
   }
 }
 await useAsyncData('weather-widget', () => getWeatherData())
