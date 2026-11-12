@@ -136,7 +136,8 @@ const onMenuKeydown = (e: KeyboardEvent) => {
 
 const onItemClick = (item: MoveItem) => {
   if (item.disabled || props.disabled) return
-  closeMenu(false)
+  // focus goes back to the handle right away so it isn't lost while the order saves
+  closeMenu()
   emit('move', item.target)
 }
 
