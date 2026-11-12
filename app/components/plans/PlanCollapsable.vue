@@ -2,16 +2,24 @@
 import { PlanDto } from '#shared/types'
 import { Collapse } from '@bobbykim/manguito-theme'
 import { useCollapseTrigger } from '@bobbykim/manguito-theme/composable'
+import PlanMoveMenu from '@/components/plans/PlanMoveMenu.vue'
+import type { MoveTarget } from '~/utils/reorderPlans'
 
 const props = withDefaults(
   defineProps<{
     item: PlanDto
     visible?: boolean
     showHandle?: boolean
+    index?: number
+    total?: number
+    moveDisabled?: boolean
   }>(),
   {
     visible: false,
     showHandle: false,
+    index: 0,
+    total: 0,
+    moveDisabled: false,
   },
 )
 
@@ -19,6 +27,7 @@ const emit = defineEmits<{
   (e: 'toggle-complete', event: Event, id: string, complete: boolean): void
   (e: 'edit', event: Event, item: PlanDto): void
   (e: 'delete', event: Event, id: string): void
+  (e: 'move', id: string, target: MoveTarget): void
 }>()
 
 const collapseRef = ref<InstanceType<typeof Collapse>>()
@@ -95,20 +104,15 @@ const renderedContent = computed(() => useMarkdown(props.item.content))
     >
       <div class="flex justify-between items-center">
         <div class="flex gap-4 items-center min-w-0">
-          <svg
-            aria-hidden="true"
-            focusable="false"
+          <PlanMoveMenu
             v-if="showHandle"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 448 512"
-            fill="currentColor"
-            class="min-w-xs h-xs text-dark-3/80 dark:text-light-3/80 handle"
-          >
-            <!-- !Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
-            <path
-              d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"
-            />
-          </svg>
+            :plan-id="item._id.toString()"
+            :title="item.title"
+            :index="index"
+            :total="total"
+            :disabled="moveDisabled"
+            @move="(target) => emit('move', item._id.toString(), target)"
+          />
           <h2 class="h3-md text-dark-3 dark:text-light-3 min-w-0">
             <button
               type="button"

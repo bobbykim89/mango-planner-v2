@@ -71,6 +71,8 @@ const draftDataForm = reactive<PlanFormInput>({
 })
 const customOrderData = ref<PlanDto[]>([])
 const selectedPost = ref<string>('')
+const isSavingOrder = ref<boolean>(false)
+const { polite: announce } = useAnnouncer()
 
 const userProfileStatus = computed<boolean>(() => {
   if (isAuthenticated && userProfile.value !== null) {
@@ -200,12 +202,36 @@ const handleCollapseDelete = async (e: Event, id: string) => {
   customOrderData.value = planStore.getPlansByOrder
 }
 const onOrderUpdate = async () => {
-  const itemsOrder: string[] = customOrderData.value.map((item) => {
-    return item._id!.toString()
-  })
-  await profileStore.updateUserPlansOrder({ plansOrder: itemsOrder })
-  await profileStore.getCurrentUserProfile()
-  customOrderData.value = planStore.getPlansByOrder
+  isSavingOrder.value = true
+  try {
+    const itemsOrder: string[] = customOrderData.value.map((item) => {
+      return item._id!.toString()
+    })
+    await profileStore.updateUserPlansOrder({ plansOrder: itemsOrder })
+    await profileStore.getCurrentUserProfile()
+    customOrderData.value = planStore.getPlansByOrder
+  } finally {
+    isSavingOrder.value = false
+  }
+}
+// keyboard / tap reordering from the drag handle's Move menu
+const movePlan = async (id: string, target: MoveTarget) => {
+  if (isSavingOrder.value) return
+  const from = customOrderData.value.findIndex(
+    (item) => item._id!.toString() === id,
+  )
+  if (from === -1) return
+  const next = reorderPlans(customOrderData.value, from, target)
+  const newIndex = next.findIndex((item) => item._id!.toString() === id)
+  if (newIndex === from) return
+  const title = customOrderData.value[from]!.title
+  customOrderData.value = next
+  await onOrderUpdate()
+  announce(`"${title}" moved to position ${newIndex + 1} of ${next.length}`)
+  if (import.meta.client) {
+    await nextTick()
+    document.querySelector<HTMLElement>(`[data-move-handle="${id}"]`)?.focus()
+  }
 }
 const onMobileUtilityToggle = (open: boolean) => {
   mobileUtilityToggle.value = !open
@@ -314,12 +340,17 @@ const getPlans = computed(() => {
                 v-model="customOrderData"
                 item-key="_id"
                 handle=".handle"
+                :touch-start-threshold="5"
                 @change="onOrderUpdate"
               >
-                <template #item="{ element }">
+                <template #item="{ element, index }">
                   <PlanCollapsable
                     :item="element"
                     :show-handle="true"
+                    :index="index"
+                    :total="customOrderData.length"
+                    :move-disabled="isSavingOrder"
+                    @move="movePlan"
                     :key="element._id.toString()"
                     @toggle-complete="handleCollapseToggle"
                     @edit="handleCollapseEdit"
