@@ -77,6 +77,10 @@ const handleBgColors = computed<ColorPalette>(() => {
 const handleFooterMenuColor = computed<ColorPalette>(() => {
   return darkMode.value ? 'light-2' : 'dark-2'
 })
+const alertTextClass = computed<string>(() => {
+  // white fails contrast on the green success background
+  return alertColor.value === 'success' ? 'text-dark-3' : 'text-light-1'
+})
 const handleMobileMenuBgColor = computed<ColorPalette>(() => {
   return darkMode.value ? 'dark-2' : 'light-4'
 })
@@ -315,7 +319,7 @@ onMounted(() => {
           dismissible
           @close="onAlertClose"
         >
-          <div class="flex justify-center text-light-1">
+          <div class="flex justify-center" :class="alertTextClass">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 512 512"

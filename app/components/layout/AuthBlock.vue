@@ -61,7 +61,7 @@ const handleUsernameClick = (e: Event) => {
     <!-- guest btns -->
     <div
       v-else
-      class="flex flex-col md:flex-row justify-center md:justify-normal items-center gap-2xs md:gap-sm md:border-l-2 border-warning px-sm text-dark-3 dark:text-light-3 md:text-warning md:dark:text-warning"
+      class="flex flex-col md:flex-row justify-center md:justify-normal items-center gap-2xs md:gap-sm md:border-l-2 border-warning px-sm text-dark-3 dark:text-light-3 md:text-warning-text"
     >
       <!-- login btn -->
       <a

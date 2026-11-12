@@ -43,7 +43,7 @@ watch(
     <div class="flex gap-2xs mb-2xs">
       <label
         for="search-bar"
-        class="mb-0 bg-warning p-2xs text-light-1 h-full rounded-l-md"
+        class="mb-0 bg-warning p-2xs text-dark-3 h-full rounded-l-md"
         title="Search"
         tabindex="0"
       >

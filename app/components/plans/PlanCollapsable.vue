@@ -42,10 +42,10 @@ const getCheckColor = computed(() => {
 const getBgColor = computed<string>(() => {
   const { type } = props.item
   if (type === 'work') {
-    return 'bg-info/60 dark:bg-info'
+    return 'bg-info/40 dark:bg-info'
   }
   if (type === 'chore') {
-    return 'bg-primary/60 dark:bg-primary'
+    return 'bg-primary/40 dark:bg-primary'
   }
   return 'bg-light-3 dark:bg-dark-3'
 })
@@ -149,7 +149,11 @@ watch(
           <div
             class="w-full pl-xs pr-2xs whitespace-pre-line text-dark-3 dark:text-light-3 md-content"
           >
-            <div class="md-content" v-html="renderedContent"></div>
+            <div
+              class="md-content"
+              :class="{ 'md-content--tinted': item.type !== 'personal' }"
+              v-html="renderedContent"
+            ></div>
           </div>
           <div
             class="px-xs border-l-2 border-dark-1 dark:border-light-3 flex flex-col items-center gap-2xs text-dark-1 dark:text-light-3"
@@ -220,7 +224,9 @@ watch(
           d="M224 416c-8.188 0-16.38-3.125-22.62-9.375l-192-192c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L224 338.8l169.4-169.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-192 192C240.4 412.9 232.2 416 224 416z"
         />
       </svg>
-      <span class="text-xs opacity-60 justify-self-end">{{ item.type }}</span>
+      <span class="text-xs text-dark-3 dark:text-light-3 justify-self-end">{{
+        item.type
+      }}</span>
     </div>
   </div>
 </template>
