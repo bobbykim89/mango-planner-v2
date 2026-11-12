@@ -1,13 +1,11 @@
 import type { ApiSuccess } from '#shared/types'
+import type { RateLimitName } from './rateLimit'
 import {
   defineEventHandler,
   setResponseHeaders,
   setResponseStatus,
   type H3Event,
 } from 'h3'
-
-// Replaced by the union of limiter names when rate limiting is added.
-export type RateLimitName = string
 
 export interface ApiHandlerOptions<T> {
   /** Require a valid session token (sets e.context.user). */
@@ -24,6 +22,10 @@ export const defineApiHandler = <T>(options: ApiHandlerOptions<T>) =>
       e,
     ): Promise<ApiSuccess<T> | ReturnType<typeof toApiFailure>['body']> => {
       try {
+        const limiters = options.rateLimit
+          ? ([] as RateLimitName[]).concat(options.rateLimit)
+          : []
+        for (const name of limiters) await hitRateLimit(e, name)
         if (options.auth) requireAuth(e)
         const data = await options.handler(e)
         return { ok: true, data: (data ?? null) as T }
