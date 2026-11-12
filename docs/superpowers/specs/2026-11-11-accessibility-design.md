@@ -217,7 +217,7 @@ The user agreed to:
 
 These are the builder's calls, kept small. Point them out in the PR:
 
-- **Complete toggle icon:** keep the current filled check-circle for complete. Incomplete becomes an outlined circle, so state isn't shown by colour alone. Same size and colours.
+- **Complete toggle icon:** keep the current filled check-circle for complete. Incomplete becomes an outlined clock (the user picked it over an empty circle, ✕, minus and an outlined check), so state isn't shown by colour alone. Same size and colours.
 - **Success alert text:** dark (`dark-3`) instead of white on the green background. Leave the other alert colours unless they also fail.
 - **Search icon on the amber block:** dark instead of white.
 - **Skip link:** visible only when focused.
