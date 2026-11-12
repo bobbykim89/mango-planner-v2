@@ -1,6 +1,6 @@
 import { profileController } from '../../controller'
 
-export default defineEventHandler({
-  onRequest: [defineRequestMiddleware(checkAuth)],
-  handler: eventHandler(profileController.getCurrentProfile),
+export default defineApiHandler({
+  auth: true,
+  handler: profileController.getCurrentProfile,
 })

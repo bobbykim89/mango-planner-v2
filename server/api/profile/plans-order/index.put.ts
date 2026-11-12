@@ -1,6 +1,6 @@
 import { profileController } from '../../../controller'
 
-export default defineEventHandler({
-  onRequest: [defineRequestMiddleware(checkAuth)],
-  handler: eventHandler(profileController.updatePlansOrder),
+export default defineApiHandler({
+  auth: true,
+  handler: profileController.updatePlansOrder,
 })

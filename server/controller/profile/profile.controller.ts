@@ -1,193 +1,75 @@
 import { profileInputDarkSchema, profileInputSchema } from '#shared/dto/profile'
-import {
-  Plan,
-  Profile,
-  User,
-  type PlanModel,
-  type ProfileModel,
-  type UserModel,
-} from '#shared/models'
-import type { EventHandlerRequest, H3Event } from 'h3'
-import { createError, readValidatedBody } from 'h3'
-import { Model } from 'mongoose'
-import { deleteCloudinaryImage } from '../../utils/cloudinary.util'
+import { Plan, Profile } from '#shared/models'
+import type { H3Event } from 'h3'
+import { BaseController } from '../base.controller'
 
-export class ProfileController {
-  private planModel: Model<PlanModel>
-  private profileModel: Model<ProfileModel>
-  private userModel: Model<UserModel>
-  constructor() {
-    this.planModel = Plan
-    this.profileModel = Profile
-    this.userModel = User
+export class ProfileController extends BaseController {
+  public getCurrentProfile = async (e: H3Event) => {
+    const user = await this.requireUser(e)
+    return Profile.findOne({ user: user.id })
   }
-  public getCurrentProfile = async (e: H3Event<EventHandlerRequest>) => {
-    const user = await this.userModel
-      .findById(e.context.user.id)
-      .select('-password')
-    if (!user) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'User not found',
-      })
+
+  public createNewProfile = async (e: H3Event) => {
+    const user = await this.requireUser(e)
+    if (await Profile.exists({ user: user.id })) {
+      throw apiError.PROFILE_EXISTS()
     }
-    const profile = await this.profileModel.findOne({ user: user.id })
-    if (!profile) return null
-    return profile
-  }
-  public createNewProfile = async (e: H3Event<EventHandlerRequest>) => {
-    const user = await this.userModel
-      .findById(e.context.user.id)
-      .select('-password')
-    // check if user exists
-    if (!user) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'User not found',
-      })
-    }
-    // throw error if user already have profile
-    const profileCheck = await this.profileModel.findOne({ user: user.id })
-    if (profileCheck !== null) {
-      throw createError({
-        status: 401,
-        message: 'Unauthorized',
-        statusMessage: 'Each user is authorized to have only one profile',
-      })
-    }
-    // push existing plans to plansOrder
-    const userPlans = await this.planModel.find({ author: user.id }).sort({
-      date: -1,
-    })
-    const plansOrder: string[] = userPlans.map((item) => item.id)
-    const newProfile = new this.profileModel({
+    // existing plans start in their creation order
+    const plans = await Plan.find({ author: user.id }).sort({ date: -1 })
+    return new Profile({
       user: user.id,
-      plansOrder,
-    })
-    const saveData = await newProfile.save()
-    if (!saveData) {
-      throw createError({
-        status: 500,
-        message: 'Server error',
-        statusMessage: 'Unexpected error occurred, please try again.',
-      })
-    }
-    return saveData
+      plansOrder: plans.map((plan) => plan.id),
+    }).save()
   }
-  public updateProfilePicture = async (e: H3Event<EventHandlerRequest>) => {
-    const file = e.context.file
-    const user = await this.userModel
-      .findById(e.context.user.id)
-      .select('-password')
-    if (!user) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'User not found',
-      })
+
+  public updateProfilePicture = async (e: H3Event) => {
+    const user = await this.requireUser(e)
+    const profile = await this.requireProfile(user.id)
+    const file = await readImageUpload(e)
+    const imageId = await uploadImage(file)
+    const previous = profile.profilePicture
+    const updated = await Profile.findByIdAndUpdate(
+      profile.id,
+      { profilePicture: imageId, updatedAt: new Date() },
+      { returnDocument: 'after' },
+    )
+    if (previous) {
+      // best effort: a stale image must not fail the request
+      deleteCloudinaryImage(previous).catch((err) =>
+        console.error('[cloudinary] failed to delete old image:', err),
+      )
     }
-    const profile = await this.profileModel.findOne({ user: user.id })
-    if (profile === null) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'Profile for Current User not found',
-      })
-    }
-    if (profile.profilePicture !== '') {
-      await deleteCloudinaryImage(profile.profilePicture)
-    }
-    const updatedProfile = await this.profileModel.findByIdAndUpdate(
+    return updated
+  }
+
+  public updatePlansOrder = async (e: H3Event) => {
+    const user = await this.requireUser(e)
+    const profile = await this.requireProfile(user.id)
+    const { plansOrder } = await this.validateBody(e, profileInputSchema)
+    // keep only ids of the user's own plans, in the order given
+    const owned = await Plan.find(
+      { _id: { $in: plansOrder }, author: user.id },
+      { _id: 1 },
+    )
+    const ownedIds = new Set(owned.map((plan) => plan.id as string))
+    return Profile.findByIdAndUpdate(
       profile.id,
       {
-        profilePicture: file.imageId,
+        plansOrder: plansOrder.filter((id) => ownedIds.has(id)),
         updatedAt: new Date(),
       },
-      { new: true, returnDocument: 'after' },
+      { returnDocument: 'after' },
     )
-    if (!updatedProfile) {
-      throw createError({
-        status: 500,
-        message: 'Server error',
-        statusMessage: 'Unexpected error occurred, please try again.',
-      })
-    }
-    return updatedProfile
   }
-  public updatePlansOrder = async (e: H3Event<EventHandlerRequest>) => {
-    const user = await this.userModel
-      .findById(e.context.user.id)
-      .select('-password')
-    if (!user) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'User not found',
-      })
-    }
-    const profile = await this.profileModel.findOne({ user: user.id })
-    if (profile === null) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'Profile for Current User not found',
-      })
-    }
-    const body = await readValidatedBody(e, profileInputSchema.parse)
-    const updatedProfile = await this.profileModel.findByIdAndUpdate(
+
+  public updateDarkMode = async (e: H3Event) => {
+    const user = await this.requireUser(e)
+    const profile = await this.requireProfile(user.id)
+    const { dark } = await this.validateBody(e, profileInputDarkSchema)
+    return Profile.findByIdAndUpdate(
       profile.id,
-      { ...body, updatedAt: new Date() },
-      {
-        new: true,
-        returnDocument: 'after',
-      },
+      { dark, updatedAt: new Date() },
+      { returnDocument: 'after' },
     )
-    if (!updatedProfile) {
-      throw createError({
-        status: 500,
-        message: 'Server error',
-        statusMessage: 'Unexpected error occurred, please try again.',
-      })
-    }
-    return updatedProfile
-  }
-  public updateDarkMode = async (e: H3Event<EventHandlerRequest>) => {
-    const user = await this.userModel
-      .findById(e.context.user.id)
-      .select('-password')
-    if (!user) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'User not found',
-      })
-    }
-    const profile = await this.profileModel.findOne({ user: user.id })
-    if (profile === null) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'Profile for Current User not found',
-      })
-    }
-    const body = await readValidatedBody(e, profileInputDarkSchema.parse)
-    const updatedProfile = await this.profileModel.findByIdAndUpdate(
-      profile.id,
-      { ...body, updatedAt: new Date() },
-      {
-        new: true,
-        returnDocument: 'after',
-      },
-    )
-    if (!updatedProfile) {
-      throw createError({
-        status: 500,
-        message: 'Server error',
-        statusMessage: 'Unexpected error occurred, please try again.',
-      })
-    }
-    return updatedProfile
   }
 }
