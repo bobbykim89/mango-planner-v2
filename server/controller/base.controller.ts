@@ -23,6 +23,14 @@ export abstract class BaseController {
     } catch {
       throw apiError.BAD_REQUEST()
     }
+    // text/plain, multipart or JSON with a charset come back unparsed; none is a valid JSON object
+    if (
+      body !== undefined &&
+      body !== null &&
+      (typeof body !== 'object' || Array.isArray(body))
+    ) {
+      throw apiError.BAD_REQUEST()
+    }
     return schema.parse(body ?? {})
   }
 

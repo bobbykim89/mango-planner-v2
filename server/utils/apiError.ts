@@ -150,10 +150,14 @@ export const toApiFailure = (
     console.error('[api] unexpected error:', err)
     apiErr = apiError.INTERNAL_ERROR()
   }
-  const error: ApiFailure['error'] = {
-    code: apiErr.code,
-    message: apiErr.message,
-  }
+  // a single field error says exactly what's wrong, which matters for forms that only show an alert
+  const message =
+    apiErr.code === 'VALIDATION_FAILED' &&
+    apiErr.message === catalog.VALIDATION_FAILED.message &&
+    apiErr.fields?.length === 1
+      ? apiErr.fields[0]!.message
+      : apiErr.message
+  const error: ApiFailure['error'] = { code: apiErr.code, message }
   if (apiErr.fields?.length) error.fields = apiErr.fields
   return {
     status: apiErr.status,

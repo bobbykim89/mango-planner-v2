@@ -25,15 +25,13 @@ export const insertLegacyUser = async ({
   const res = await conn.connection
     .collection('users')
     .insertOne({ name, email, password: hash, date: new Date() })
-  await conn.connection
-    .collection('profiles')
-    .insertOne({
-      user: res.insertedId,
-      profilePicture: '',
-      plansOrder: [],
-      dark: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
+  await conn.connection.collection('profiles').insertOne({
+    user: res.insertedId,
+    profilePicture: '',
+    plansOrder: [],
+    dark: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  })
   return { id: res.insertedId.toString() }
 }

@@ -17,7 +17,7 @@ export class WeatherController extends BaseController {
     let res: OpenWeatherResponse
     try {
       res = await $fetch<OpenWeatherResponse>(
-        'https://api.openweathermap.org/data/2.5/weather',
+        useRuntimeConfig().openWeatherUrl,
         {
           query: {
             lat,
@@ -28,7 +28,14 @@ export class WeatherController extends BaseController {
         },
       )
     } catch (err) {
-      console.error('[weather] upstream request failed:', err)
+      // log only the status: the request URL carries the API key and the user's location
+      const { status, statusText } = (err ?? {}) as {
+        status?: number
+        statusText?: string
+      }
+      console.error(
+        `[weather] upstream request failed: ${status ?? 'no response'} ${statusText ?? ''}`.trim(),
+      )
       throw apiError.UPSTREAM_ERROR('Weather is unavailable right now.')
     }
     const current = res.weather?.[0]

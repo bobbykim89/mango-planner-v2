@@ -182,6 +182,9 @@ describe('PUT /api/user/*', () => {
     })
     expectError(tooLong, 400, 'VALIDATION_FAILED')
     expect(fieldsOf(tooLong).username).toBeTruthy()
+    expect(tooLong.json.error.message).toBe(
+      'Usernames can be at most 50 characters.',
+    )
     const ok = await api('PUT', '/api/user/username', {
       token: user.token,
       body: { username: '  New Name  ' },
@@ -199,6 +202,8 @@ describe('PUT /api/user/*', () => {
     })
     expectError(res, 400, 'VALIDATION_FAILED')
     expect(fieldsOf(res).currentPassword).toBeTruthy()
+    // forms that only show an alert need the specific message (review: Important 2)
+    expect(res.json.error.message).toBe("Your current password isn't right.")
     const changed = await api('PUT', '/api/user/password', {
       token: user.token,
       body: { currentPassword: user.password, newPassword: 'Another1!' },

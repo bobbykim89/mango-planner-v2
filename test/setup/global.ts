@@ -65,6 +65,7 @@ export default async function setup(project: TestProject) {
       NUXT_APP_URL: 'https://app.test',
       NUXT_MAILER_TRANSPORT: 'log',
       NUXT_OPEN_WEATHER_API_KEY: 'test',
+      NUXT_OPEN_WEATHER_URL: 'http://127.0.0.1:9/data/2.5/weather',
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   })

@@ -67,6 +67,7 @@ export default defineNuxtConfig({
     mailerEmailAddress: process.env.MAILER_EMAIL_ADDRESS,
     mailerAppPassword: process.env.MAILER_APP_PASSWORD,
     openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
+    openWeatherUrl: 'https://api.openweathermap.org/data/2.5/weather',
     // full MongoDB connection string; when set it replaces the Atlas URL built above (used by tests)
     mongoUri: process.env.MONGO_URI || '',
     // base URL for links in emails (password reset); development uses the request origin

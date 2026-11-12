@@ -34,15 +34,16 @@ export class TokenController extends BaseController {
       e,
       resetPwInputSchema,
     )
-    const user = await User.findById(userId)
-    const stored = user
-      ? await Token.findOne({ userId: user.id, token: sha256(token) })
-      : null
-    if (!user || !stored) throw apiError.RESET_TOKEN_INVALID()
+    // claim the token atomically so two uses of the same link can't both succeed
+    const claimed = await Token.findOneAndDelete({
+      userId,
+      token: sha256(token),
+    })
+    const user = claimed ? await User.findById(userId) : null
+    if (!claimed || !user) throw apiError.RESET_TOKEN_INVALID()
 
     user.password = await hashPassword(password)
     await user.save()
-    await stored.deleteOne()
     return null
   }
 }

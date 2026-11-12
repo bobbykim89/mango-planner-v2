@@ -128,6 +128,28 @@ describe('plan routes', () => {
     expectError(res, 400, 'BAD_REQUEST')
   })
 
+  it('treats non-JSON bodies as a bad request (non-json-body)', async () => {
+    const user = await createUser()
+    for (const contentType of [
+      'text/plain',
+      'application/json; charset=utf-8',
+    ]) {
+      const res = await api('POST', '/api/plan', {
+        token: user.token,
+        raw: '{"title":',
+        headers: { 'content-type': contentType },
+      })
+      expectError(res, 400, 'BAD_REQUEST')
+    }
+    const form = new FormData()
+    form.append('title', 'x')
+    expectError(
+      await api('POST', '/api/plan', { token: user.token, raw: form }),
+      400,
+      'BAD_REQUEST',
+    )
+  })
+
   it('requires a token (no-token)', async () => {
     expectError(await api('GET', '/api/plan'), 401, 'AUTH_TOKEN_MISSING')
   })

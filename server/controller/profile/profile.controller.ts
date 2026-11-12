@@ -34,10 +34,13 @@ export class ProfileController extends BaseController {
       { returnDocument: 'after' },
     )
     if (previous) {
-      // best effort: a stale image must not fail the request
-      deleteCloudinaryImage(previous).catch((err) =>
-        console.error('[cloudinary] failed to delete old image:', err),
-      )
+      // awaited, since serverless functions may stop once the response is sent;
+      // a stale image must still not fail the request
+      try {
+        await deleteCloudinaryImage(previous)
+      } catch (err) {
+        console.error('[cloudinary] failed to delete old image:', err)
+      }
     }
     return updated
   }

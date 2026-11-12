@@ -101,6 +101,17 @@ describe('password reset', () => {
     expectOk(await reset(second.userId, second.token, 'Brand-new1!'))
   })
 
+  it('lets only one of two simultaneous uses of a link succeed (token-race)', async () => {
+    const user = await createUser()
+    await requestReset(user.email)
+    const { userId, token } = await lastLink(user.email)
+    const results = await Promise.all([
+      reset(userId, token, 'Racer-one1!'),
+      reset(userId, token, 'Racer-two2!'),
+    ])
+    expect(results.map((r) => r.status).sort()).toEqual([200, 400])
+  })
+
   it('validates the token format (token-bad-format)', async () => {
     const user = await createUser()
     const res = await reset(user.id, 'abc', 'Brand-new1!')
