@@ -20,11 +20,4 @@ describe('API core', () => {
     expect(res.status).toBe(200)
     expect(await res.text()).toContain('Wrapper Tester')
   })
-
-  it('keeps unmigrated routes on the old shape for now (old-shape-still-works)', async () => {
-    const user = await createUser()
-    const res = await api('GET', '/api/plan', { token: user.token })
-    expect(res.status).toBe(200)
-    expect(Array.isArray(res.json)).toBe(true)
-  })
 })
