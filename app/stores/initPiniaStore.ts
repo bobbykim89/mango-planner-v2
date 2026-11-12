@@ -13,9 +13,9 @@ export const useInitPiniaStore = defineStore('init', () => {
   const mounted = ref<boolean>(false)
   // actions
   const initStores = async () => {
-    if (import.meta.client) {
-      await userStore.getCurrentUser()
-    }
+    // runs on the server too: the access_token cookie comes with the request, so
+    // server-side route middleware and rendering see the real auth state (#18)
+    await userStore.getCurrentUser()
     const { isAuthenticated } = storeToRefs(userStore)
     if (isAuthenticated.value === true) {
       await profileStore.getCurrentUserProfile()

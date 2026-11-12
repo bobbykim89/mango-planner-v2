@@ -12,6 +12,20 @@ import { useAlertStore } from './alertStore'
 import { useProfileStore } from './profileStore'
 import { useUserStore } from './userStore'
 
+// Drafts get their own localforage instance instead of the global config set in a
+// plugin: the stores can read drafts before that plugin runs, and a read before
+// config() locks localforage onto its default database (#18).
+type DraftDb = ReturnType<typeof localforage.createInstance>
+let draftDb: DraftDb | null = null
+const getDraftDb = (): DraftDb => {
+  draftDb ??= localforage.createInstance({
+    driver: localforage.INDEXEDDB,
+    name: 'MangoPlannerV2',
+    storeName: 'drafts',
+  })
+  return draftDb
+}
+
 export const usePlanStore = defineStore('plan', () => {
   const errorCheck = useErrorCheck()
   const cookie = useAuthToken()
@@ -170,12 +184,12 @@ export const usePlanStore = defineStore('plan', () => {
       if (import.meta.client) {
         // convert to plain obj and remove any non-serializable values
         const plainData = JSON.parse(JSON.stringify(data))
-        const checkExistence = await localforage.getItem(key)
+        const checkExistence = await getDraftDb().getItem(key)
         if (checkExistence !== null) {
           console.log('Removing existing draft...')
-          await localforage.removeItem(key)
+          await getDraftDb().removeItem(key)
         }
-        await localforage.setItem(key, {
+        await getDraftDb().setItem(key, {
           data: plainData,
           timestamp: Date.now(),
         })
@@ -188,7 +202,7 @@ export const usePlanStore = defineStore('plan', () => {
   const getDraft = async (key: string) => {
     try {
       if (import.meta.client) {
-        const draft = await localforage.getItem<{
+        const draft = await getDraftDb().getItem<{
           data: PlanInput
           timestamp: number
         }>(key)
@@ -206,7 +220,7 @@ export const usePlanStore = defineStore('plan', () => {
   const deleteDraft = async (key: string) => {
     try {
       if (import.meta.client) {
-        await localforage.removeItem(key)
+        await getDraftDb().removeItem(key)
         console.log('Draft deleted successfully')
         drafts.value = drafts.value.filter((draft) => draft.id !== key)
       }
@@ -217,10 +231,10 @@ export const usePlanStore = defineStore('plan', () => {
   const loadAllDrafts = async () => {
     try {
       if (import.meta.client) {
-        const keys = await localforage.keys()
+        const keys = await getDraftDb().keys()
         const mappedDrafts = await Promise.all(
           keys.map(async (key) => {
-            const draft = await localforage.getItem<DraftRawType>(key)
+            const draft = await getDraftDb().getItem<DraftRawType>(key)
             if (draft !== null) {
               return {
                 id: key,
@@ -250,5 +264,6 @@ export const usePlanStore = defineStore('plan', () => {
     clearPlanData,
     getDraft,
     deleteDraft,
+    loadAllDrafts,
   }
 })
