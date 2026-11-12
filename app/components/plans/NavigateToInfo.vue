@@ -23,6 +23,8 @@
         information.
       </p>
     </div>
-    <NuxtLink to="/info" class="btn btn-warning">Go to Info page</NuxtLink>
+    <NuxtLink to="/info" class="btn btn-warning text-dark-3"
+      >Go to Info page</NuxtLink
+    >
   </div>
 </template>

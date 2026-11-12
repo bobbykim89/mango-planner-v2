@@ -41,6 +41,8 @@ const handleUsernameClick = (e: Event) => {
       class="flex justify-center md:justify-normal items-center md:border-l-2 border-warning px-sm hover:opacity-60 transition-opacity duration-300 ease-linear"
     >
       <button
+        type="button"
+        aria-haspopup="dialog"
         @click="handleUsernameClick"
         class="flex items-center gap-xs md:gap-2xs"
       >

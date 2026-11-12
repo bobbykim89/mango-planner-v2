@@ -98,13 +98,24 @@ const handleShowCustomClick = (e: Event) => {
   customOrderData.value = planStore.getPlansByOrder
   displayStyle.value = 'custom'
 }
+// set when the modal is opened from the mobile tools block, which hides itself first;
+// focus then returns to the (still visible) tools toggle instead of a hidden button
+const returnFocusToToggle = ref<boolean>(false)
 const openModal = () => {
   modalForm.value = 'new'
+  returnFocusToToggle.value = mobileUtilityToggle.value
   mobileUtilityToggle.value = false
   modalRef.value!.open()
 }
-const closeModal = () => {
-  modalRef.value?.close()
+const onModalClose = async () => {
+  onClear()
+  if (returnFocusToToggle.value && import.meta.client) {
+    returnFocusToToggle.value = false
+    await nextTick()
+    document
+      .querySelector<HTMLElement>('[aria-controls="mobile-utility"]')
+      ?.focus()
+  }
 }
 const onClear = () => {
   selectedPost.value = ''
@@ -256,7 +267,6 @@ const getPlans = computed(() => {
     <div
       v-if="mounted"
       class="grid md:grid-cols-2 gap-xs md:gap-md grid-flow-row px-sm md:px-xs relative"
-      @keyup.esc="(closeModal(), onClear())"
     >
       <!-- mobile utility block -->
       <MobileUtilityToggleButton
@@ -397,13 +407,13 @@ const getPlans = computed(() => {
       :color="handleBgColors"
       custom-class="px-xs rounded-md border dark:border-dark-1"
       width="large"
-      @close="onClear"
+      @close="onModalClose"
     >
-      <template #header="{ close }">
+      <template #header="{ close, titleId }">
         <div
           class="flex justify-between py-xs border-b-2 border-b-light-1 dark:border-b-dark-1"
         >
-          <h2 class="h3-md text-warning">
+          <h2 :id="titleId" class="h3-md text-warning">
             <span v-if="modalForm === 'new'">Create New Plan</span>
             <span v-else-if="modalForm === 'update'">Update Plan</span>
             <span v-else>Saved Draft</span>

@@ -37,6 +37,7 @@ watch(
 <template>
   <!-- utility block -->
   <div
+    id="mobile-utility"
     class="fixed bottom-0 left-0 md:hidden z-10 w-11/12 bg-light-2 dark:bg-dark-3 rounded-tr-md p-xs drop-shadow-md mt-md"
   >
     <!-- search bar -->

@@ -30,7 +30,13 @@ const handleButtonClick = (e: Event) => {
       <span> Please create user profile for extra features! </span>
     </div>
     <div class="text-end">
-      <button class="btn btn-warning" @click="handleButtonClick">Create</button>
+      <button
+        type="button"
+        class="btn btn-warning text-dark-3"
+        @click="handleButtonClick"
+      >
+        Create
+      </button>
     </div>
   </div>
 </template>

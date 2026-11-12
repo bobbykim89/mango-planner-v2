@@ -382,6 +382,7 @@ onMounted(() => {
         ref="sidebarRef"
         :color="handleBgColors"
         placement="right"
+        aria-label="My account"
         custom-class="border-l-4 border-warning"
         :width="400"
       >

@@ -2,6 +2,7 @@
 import DefaultProfile from '@/assets/images/defaultProfile.webp'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { AccordionGroup, Collapse } from '@bobbykim/manguito-theme'
+import { useCollapseTrigger } from '@bobbykim/manguito-theme/composable'
 import { MclFormGroup, MclInputFile, MclInputText } from '@bobbykim/mcl-forms'
 
 const props = defineProps<{
@@ -21,6 +22,18 @@ const newPasswordRef = ref<string>('')
 const usernameCollapseRef = ref<InstanceType<typeof Collapse>>()
 const pictureCollapseRef = ref<InstanceType<typeof Collapse>>()
 const passwordCollapseRef = ref<InstanceType<typeof Collapse>>()
+const { attrs: usernameAttrs, toggle: toggleUsername } = useCollapseTrigger(
+  usernameCollapseRef,
+  { id: 'update-username' },
+)
+const { attrs: pictureAttrs, toggle: togglePicture } = useCollapseTrigger(
+  pictureCollapseRef,
+  { id: 'update-profile-picture' },
+)
+const { attrs: passwordAttrs, toggle: togglePassword } = useCollapseTrigger(
+  passwordCollapseRef,
+  { id: 'update-password' },
+)
 
 const cloudinaryBaseUrl: string =
   'https://res.cloudinary.com/dwgni1x3t/image/upload/c_scale,w_400/q_auto/v1700694621/'
@@ -84,7 +97,8 @@ const formTextColor = computed<ColorPalette>(() => {
       <div class="md:rounded-md drop-shadow-md overflow-hidden md:mb-xs">
         <button
           type="button"
-          @click="usernameCollapseRef?.toggle()"
+          v-bind="usernameAttrs"
+          @click="toggleUsername"
           class="block w-full py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-light-3/60 dark:hover:bg-dark-3/60 transition-all duration-300 ease-linear text-left"
         >
           Update Username
@@ -104,6 +118,7 @@ const formTextColor = computed<ColorPalette>(() => {
               >
                 <MclInputText
                   id="user-name"
+                  autocomplete="username"
                   rounded
                   required
                   highlight-color="warning"
@@ -111,7 +126,9 @@ const formTextColor = computed<ColorPalette>(() => {
                 ></MclInputText>
               </MclFormGroup>
               <div class="flex justify-end">
-                <button role="submit" class="btn btn-warning">Save</button>
+                <button type="submit" class="btn btn-warning text-dark-3">
+                  Save
+                </button>
               </div>
             </form>
           </div>
@@ -121,7 +138,8 @@ const formTextColor = computed<ColorPalette>(() => {
       <div class="md:rounded-md drop-shadow-md overflow-hidden md:mb-xs">
         <button
           type="button"
-          @click="pictureCollapseRef?.toggle()"
+          v-bind="pictureAttrs"
+          @click="togglePicture"
           class="block w-full py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-light-3/60 dark:hover:bg-dark-3/60 transition-all duration-300 ease-linear text-left"
         >
           Update Profile Picture
@@ -149,7 +167,9 @@ const formTextColor = computed<ColorPalette>(() => {
                 ></MclInputFile>
               </MclFormGroup>
               <div class="flex justify-end">
-                <button role="submit" class="btn btn-warning">Upload</button>
+                <button type="submit" class="btn btn-warning text-dark-3">
+                  Upload
+                </button>
               </div>
             </form>
           </div>
@@ -161,7 +181,8 @@ const formTextColor = computed<ColorPalette>(() => {
       >
         <button
           type="button"
-          @click="passwordCollapseRef?.toggle()"
+          v-bind="passwordAttrs"
+          @click="togglePassword"
           class="block w-full pt-3xs pb-2xs md:py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-light-3/60 dark:hover:bg-dark-3/60 transition-all duration-300 ease-linear text-left"
         >
           Update Password
@@ -182,6 +203,7 @@ const formTextColor = computed<ColorPalette>(() => {
                 <MclInputText
                   id="current-pw"
                   type="password"
+                  autocomplete="current-password"
                   rounded
                   required
                   highlight-color="warning"
@@ -197,6 +219,7 @@ const formTextColor = computed<ColorPalette>(() => {
                 <MclInputText
                   id="new-pw"
                   type="password"
+                  autocomplete="new-password"
                   rounded
                   required
                   highlight-color="warning"
@@ -204,7 +227,9 @@ const formTextColor = computed<ColorPalette>(() => {
                 ></MclInputText>
               </MclFormGroup>
               <div class="flex justify-end">
-                <button role="submit" class="btn btn-warning">Save</button>
+                <button type="submit" class="btn btn-warning text-dark-3">
+                  Save
+                </button>
               </div>
             </form>
           </div>
