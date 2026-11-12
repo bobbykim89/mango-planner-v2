@@ -18,9 +18,11 @@ Current focus: hardening **security**, improving **performance**, and fixing int
 | `pnpm dev:prod` | Dev server using `.env` (production credentials, so use with care) |
 | `pnpm build` / `pnpm build:local` | Production build (`build:local` loads `.env.local`) |
 | `pnpm preview` | Serve the production build |
-| `pnpm typecheck` | `vue-tsc --noEmit` |
+| `pnpm typecheck` | `nuxt typecheck` (vue-tsc across the app/server/shared project references) |
+| `pnpm test` | Vitest API tests (builds the app, runs it against an in-memory MongoDB) |
+| `pnpm test:watch` | Vitest in watch mode |
 
-There are **no tests and no linter yet**. Vitest is planned and will become a required PR check. Until then, verify changes with `pnpm typecheck` and `pnpm build`, and exercise the affected flow in `pnpm dev`.
+**Tests:** API tests live in `test/api/` (Vitest). The global setup (`test/setup/global.ts`) builds the app with the fake values in `test/test.env` (never the real `.env`), starts it against `mongodb-memory-server`, and the tests call the real `/api` routes. Set `SKIP_BUILD=1` to reuse an existing `.output` when only tests changed. CI (`.github/workflows/ci.yml`) runs `pnpm typecheck` and `pnpm test` on every PR. There is no linter yet; also exercise UI changes in `pnpm dev`.
 
 ## Layout
 

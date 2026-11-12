@@ -1,89 +1,49 @@
+import { useRuntimeConfig } from '#imports'
 import { resetPwInputSchema, tokenEmailInputSchema } from '#shared/dto/token'
-import { type TokenModel, type UserModel, Token, User } from '#shared/models'
-import type { EventHandlerRequest, H3Event } from 'h3'
-import {
-  createError,
-  getResponseStatus,
-  getResponseStatusText,
-  readValidatedBody,
-} from 'h3'
-import { Model } from 'mongoose'
-import { sendEmail } from '../../utils/sendEmail.util'
-import { UserController } from '../user/user.controller'
+import { Token, User } from '#shared/models'
+import { createHash, randomBytes } from 'node:crypto'
+import { getRequestURL, type H3Event } from 'h3'
+import { BaseController } from '../base.controller'
 
-export class TokenController {
-  private tokenModel: Model<TokenModel>
-  private userModel: Model<UserModel>
-  private userController: UserController
-  constructor() {
-    this.tokenModel = Token
-    this.userModel = User
-    this.userController = new UserController()
-  }
-  public sendToken = async (e: H3Event<EventHandlerRequest>) => {
-    const { email, url } = await readValidatedBody(
-      e,
-      tokenEmailInputSchema.parse
-    )
-    const user = await this.userModel.findOne({ email })
-    if (!user) {
-      throw createError({
-        status: 400,
-        message: 'Bad Request',
-        statusMessage:
-          'Bad Request: user with following email address is not found',
-      })
-    }
-    let token = await this.tokenModel.findOne({ userId: user.id })
-    if (!token) {
-      const tempPassword = Math.random().toString(36).slice(-8)
-      const hashedToken = await this.userController.hashPassword(tempPassword)
-      token = await new this.tokenModel({
-        userId: user.id,
-        token: hashedToken,
-      }).save()
-    }
-    const message: string = `Click the link below to reset your password. Please note that this link will only be valid for the next hour.\n${url}/auth/reset-password?user=${user.id}&token=${token.token}`
+const sha256 = (value: string) =>
+  createHash('sha256').update(value).digest('hex')
+
+export class TokenController extends BaseController {
+  /** Emails a reset link if the account exists; the response never says whether it does. */
+  public sendToken = async (e: H3Event) => {
+    const { email } = await this.validateBody(e, tokenEmailInputSchema)
+    const user = await this.findUserByEmail(email)
+    if (!user) return null
+
+    // one live link per user: a new request replaces the old one
+    await Token.deleteMany({ userId: user.id })
+    const raw = randomBytes(32).toString('hex')
+    await new Token({ userId: user.id, token: sha256(raw) }).save()
+
+    const base = import.meta.dev
+      ? getRequestURL(e).origin
+      : useRuntimeConfig().appUrl
+    const link = `${base}/auth/reset-password?user=${user.id}&token=${raw}`
+    const message = `Click the link below to reset your password. Please note that this link will only be valid for the next hour.\n${link}`
     await sendEmail(user.email, 'Password Reset Request', message)
-
-    const status = getResponseStatus(e)
-    const text = getResponseStatusText(e)
-    return {
-      status,
-      message: text,
-    }
+    return null
   }
-  public resetPasswordWithToken = async (e: H3Event<EventHandlerRequest>) => {
-    const { password, token, userId } = await readValidatedBody(
-      e,
-      resetPwInputSchema.parse
-    )
-    const user = await this.userModel.findById(userId)
-    if (!user) {
-      throw createError({
-        status: 400,
-        message: 'Not Found',
-        statusMessage: 'Not Found: User not found.',
-      })
-    }
-    const pwResetToken = await this.tokenModel.findOne({ userId, token })
-    if (!pwResetToken) {
-      throw createError({
-        status: 400,
-        message: 'Not Found',
-        statusMessage: 'Not Found: Token not found.',
-      })
-    }
-    const hashedPassword = await this.userController.hashPassword(password)
-    user.password = hashedPassword
-    await user.save()
-    await pwResetToken.deleteOne()
 
-    const status = getResponseStatus(e)
-    const text = getResponseStatusText(e)
-    return {
-      status,
-      message: text,
-    }
+  public resetPasswordWithToken = async (e: H3Event) => {
+    const { userId, token, password } = await this.validateBody(
+      e,
+      resetPwInputSchema,
+    )
+    // claim the token atomically so two uses of the same link can't both succeed
+    const claimed = await Token.findOneAndDelete({
+      userId,
+      token: sha256(token),
+    })
+    const user = claimed ? await User.findById(userId) : null
+    if (!claimed || !user) throw apiError.RESET_TOKEN_INVALID()
+
+    user.password = await hashPassword(password)
+    await user.save()
+    return null
   }
 }

@@ -1,8 +1,9 @@
 import { z } from 'zod'
+import { emailInputSchema } from '../user/userInput.dto'
 
+// The reset link's base URL comes from server config, never from the request.
 export const tokenEmailInputSchema = z.object({
-  url: z.string(),
-  email: z.email({ message: 'Invalid email address' }),
+  email: emailInputSchema,
 })
 
 export type TokenEmailInput = z.infer<typeof tokenEmailInputSchema>

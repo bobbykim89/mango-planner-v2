@@ -1,171 +1,63 @@
-import { useRuntimeConfig } from '#imports'
 import {
   pwUpdateInputSchema,
   userInputSchema,
   usernameSchema,
 } from '#shared/dto/user'
-import {
-  Profile,
-  User,
-  type ProfileModel,
-  type UserModel,
-} from '#shared/models'
+import { Profile, User } from '#shared/models'
 import bcrypt from 'bcryptjs'
-import {
-  EventHandlerRequest,
-  H3Event,
-  createError,
-  getResponseStatus,
-  getResponseStatusText,
-  readValidatedBody,
-  setResponseStatus,
-} from 'h3'
-import jwt from 'jsonwebtoken'
-import { type Model } from 'mongoose'
-import { RuntimeConfig } from 'nuxt/schema'
+import type { H3Event } from 'h3'
+import { BaseController } from '../base.controller'
 
-export class UserController {
-  private config: RuntimeConfig
-  private userModel: Model<UserModel>
-  private profileModel: Model<ProfileModel>
-  constructor() {
-    this.config = useRuntimeConfig()
-    this.userModel = User
-    this.profileModel = Profile
-  }
-  public signupUser = async (e: H3Event<EventHandlerRequest>) => {
-    // validate body
-    const { name, email, password } = await readValidatedBody(
+export class UserController extends BaseController {
+  public signupUser = async (e: H3Event) => {
+    const { name, email, password } = await this.validateBody(
       e,
-      userInputSchema.parse
+      userInputSchema,
     )
-    let user = await this.userModel.findOne({ email })
-    if (user) {
-      throw createError({
-        status: 400,
-        message: 'Bad Request',
-        statusMessage:
-          'Bad Request: following email address is already in use, please use different email address',
-      })
-    }
-    user = new this.userModel({
+    const existing = await User.findOne({ email }).collation({
+      locale: 'en',
+      strength: 2,
+    })
+    if (existing) throw apiError.EMAIL_IN_USE()
+
+    const user = await new User({
       name,
       email,
-      password,
-    })
-    user.password = await this.hashPassword(password)
-    const saveUserData = await user.save()
-    if (!saveUserData) {
-      throw createError({
-        status: 500,
-        message: 'Server error',
-        statusMessage: 'Unexpected error occurred, please try again.',
-      })
-    }
-    // create user profile for new users
-    const userProfile = new this.profileModel({
-      user: user.id,
-    })
-    const saveUserProfile = await userProfile.save()
-    if (!saveUserProfile) {
-      throw createError({
-        status: 500,
-        message: 'Server error',
-        statusMessage: 'Unexpected error occurred, please try again.',
-      })
-    }
-    const payload = {
-      id: user.id,
-    }
-    // set access token
-    const accessToken = this.signToken(payload)
+      password: await hashPassword(password),
+    }).save()
+    // every new user starts with a profile
+    await new Profile({ user: user.id }).save()
 
-    setResponseStatus(e, 200, 'Successfully created new user')
-    const status = getResponseStatus(e)
-    const text = getResponseStatusText(e)
-
-    return {
-      status,
-      message: text,
-      access_token: `Bearer ${accessToken}`,
-    }
+    return { accessToken: `Bearer ${signToken(user.id)}` }
   }
-  public updatePassword = async (e: H3Event<EventHandlerRequest>) => {
-    const user = await this.userModel.findById(e.context.user.id)
-    if (!user) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'User not found',
-      })
-    }
-    // validate body
-    const { currentPassword, newPassword } = await readValidatedBody(
+
+  public updatePassword = async (e: H3Event) => {
+    const user = await User.findById(e.context.user.id)
+    if (!user) throw apiError.USER_NOT_FOUND()
+    const { currentPassword, newPassword } = await this.validateBody(
       e,
-      pwUpdateInputSchema.parse
+      pwUpdateInputSchema,
     )
-    // check if current password matches
-    const isMatch = await bcrypt.compare(currentPassword!, user.password)
-    if (!isMatch) {
-      throw createError({
-        status: 403,
-        message: 'Validation error',
-        statusMessage: 'Invalid credential: please check your password again',
-      })
+    if (!(await bcrypt.compare(currentPassword, user.password))) {
+      throw apiError.VALIDATION_FAILED(undefined, [
+        {
+          field: 'currentPassword',
+          message: "Your current password isn't right.",
+        },
+      ])
     }
-    const hashedNewPassword = await this.hashPassword(newPassword)
-    const updatedUser = await this.userModel.findByIdAndUpdate(
-      user.id,
-      { password: hashedNewPassword },
-      { new: true, returnDocument: 'after' }
-    )
-    if (!updatedUser) {
-      throw createError({
-        status: 500,
-        message: 'Server error',
-        statusMessage: 'Unexpected error occurred, please try again.',
-      })
-    }
-    setResponseStatus(e, 200, 'Successfully updated user password')
-    const status = getResponseStatus(e)
-    const text = getResponseStatusText(e)
+    user.password = await hashPassword(newPassword)
+    await user.save()
+    return null
+  }
 
-    return {
-      status,
-      message: text,
-    }
-  }
-  public updateUserName = async (e: H3Event<EventHandlerRequest>) => {
-    const user = await this.userModel.findById(e.context.user.id)
-    if (!user) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'User not found',
-      })
-    }
-    // validate body
-    const body = await readValidatedBody(e, usernameSchema.parse)
-    const updatedUser = await this.userModel.findByIdAndUpdate(
+  public updateUserName = async (e: H3Event) => {
+    const user = await this.requireUser(e)
+    const { username } = await this.validateBody(e, usernameSchema)
+    return User.findByIdAndUpdate(
       user.id,
-      { name: body.username },
-      { new: true, returnDocument: 'after' }
+      { name: username },
+      { returnDocument: 'after', projection: { password: 0 } },
     )
-    if (!updatedUser) {
-      throw createError({
-        status: 500,
-        message: 'Server error',
-        statusMessage: 'Unexpected error occurred, please try again.',
-      })
-    }
-    return updatedUser
-  }
-  public hashPassword = async (password: string): Promise<string> => {
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password, salt)
-    return hashedPassword
-  }
-  public signToken = (payload: { id: string }) => {
-    return jwt.sign(payload, this.config.jwtSecret, { expiresIn: '7d' })
   }
 }

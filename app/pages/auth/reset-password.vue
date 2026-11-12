@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { passwordRules } from '#shared/dto/user/passwordRules'
 import { useAlertStore, useProfileStore } from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { MclFormGroup, MclInputText } from '@bobbykim/mcl-forms'
-import type { H3Error } from 'h3'
 import { storeToRefs } from 'pinia'
 
 const url = useRequestURL()
@@ -32,28 +32,37 @@ const alertStore = useAlertStore()
 const { darkMode } = storeToRefs(profileStore)
 const passwordInputRef = ref<string>('')
 
-const passwordPattern =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/
-const passwordInvalid = computed<boolean>(
-  () =>
-    passwordInputRef.value !== '' &&
-    !passwordPattern.test(passwordInputRef.value),
+// first password rule the current input breaks (same rules as the server)
+const passwordProblem = computed<string | undefined>(() =>
+  passwordInputRef.value === ''
+    ? undefined
+    : passwordRules.find((rule) => !rule.test.test(passwordInputRef.value))
+        ?.message,
 )
+// password message from the server's VALIDATION_FAILED response
+const serverPasswordError = ref<string>('')
+const passwordInvalid = computed<boolean>(
+  () => !!passwordProblem.value || !!serverPasswordError.value,
+)
+const api = useApi()
+const { extractErrorMessage } = useErrorCheck()
 const handleFormSubmit = async () => {
   const userId = route.query.user
   const token = route.query.token
   if (!userId) return
   if (!token) return
-  if (passwordInputRef.value === '') return
+  if (passwordInputRef.value === '' || passwordProblem.value) return
+  serverPasswordError.value = ''
   try {
-    await $fetch('/api/token/reset-password', {
+    await api('/api/token/reset-password', {
       method: 'POST',
       body: { userId, token, password: passwordInputRef.value },
     })
     alertStore.setAlert('Successfully updated password', 'success')
     router.push({ path: '/auth/login' })
   } catch (error) {
-    alertStore.setAlert((error as H3Error).statusMessage!)
+    serverPasswordError.value = fieldMap(error).password ?? ''
+    alertStore.setAlert(extractErrorMessage(error))
   }
 }
 const formTextColor = computed<ColorPalette>(() => {
@@ -85,9 +94,8 @@ const formTextColor = computed<ColorPalette>(() => {
               rounded
               required
               v-model="passwordInputRef"
-              pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$"
               :invalid="passwordInvalid"
-              invalid-feedback="Password must include one number, one uppercase and lowercase letter, one special character with at least 8 characters length."
+              :invalid-feedback="passwordProblem ?? serverPasswordError"
             ></MclInputText>
           </MclFormGroup>
           <button type="submit" class="btn btn-warning btn-full">Submit</button>

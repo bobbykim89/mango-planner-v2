@@ -11,6 +11,8 @@
 :root {
   --mcl-primary: #312e81;
   --mcl-info: #14532d;
+  /* slightly darker than the MCL default (#cc2f2f, 4.27:1) so red error text meets 4.5:1 on light cards */
+  --mcl-danger: #c02b2b;
 }
 
 .dark {

@@ -5,12 +5,12 @@ import type { PlanModel, ProfileModel, UserModel } from '../models'
 type ToDto<T> = T extends Types.ObjectId
   ? string
   : T extends Date
-  ? string
-  : T extends (infer U)[]
-  ? ToDto<U>[]
-  : T extends object
-  ? { [K in keyof T]: ToDto<T[K]> }
-  : T
+    ? string
+    : T extends (infer U)[]
+      ? ToDto<U>[]
+      : T extends object
+        ? { [K in keyof T]: ToDto<T[K]> }
+        : T
 
 // 2. Special case for "populated or not" fields
 type WithPopulate<T, DTO> = ToDto<T> | DTO

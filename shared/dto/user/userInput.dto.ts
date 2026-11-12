@@ -1,29 +1,37 @@
 import { z } from 'zod'
 
-const validator = {
-  email: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-  password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/,
-}
+import { passwordRules } from './passwordRules'
 
-export const passwordSchema = z
-  .string()
-  .min(8, { message: 'Password must be at least 8 characters long' })
-  .refine((pw) => /[A-Z]/.test(pw), {
-    message: 'Password must have at least 1 uppercase character',
-  })
-  .refine((pw) => /[a-z]/.test(pw), {
-    message: 'Password must have at least 1 lowercase character',
-  })
-  .refine((pw) => /[0-9]/.test(pw), {
-    message: 'Password must have at least 1 number',
-  })
-  .refine((pw) => /[!@#$%^&*]/.test(pw), {
-    message: 'Password must have at least 1 special character',
-  })
+export { PASSWORD_SPECIAL, passwordRules } from './passwordRules'
+
+export const passwordSchema = passwordRules.reduce(
+  (schema, rule) =>
+    schema.refine((pw) => rule.test.test(pw), { message: rule.message }),
+  z.string({ error: 'Please enter a password.' }),
+)
+
+/** Email as entered (trimmed); lookups handle capitalisation themselves. */
+export const emailInputSchema = z
+  .string({ error: 'Please enter your email address.' })
+  .trim()
+  .pipe(z.email('Please enter a valid email address.'))
+
+/** Email normalized for storage: trimmed and lowercased. */
+export const emailSchema = z
+  .string({ error: 'Please enter your email address.' })
+  .trim()
+  .toLowerCase()
+  .pipe(z.email('Please enter a valid email address.'))
+
+export const nameSchema = z
+  .string({ error: 'Please enter a username.' })
+  .trim()
+  .min(1, 'Please enter a username.')
+  .max(50, 'Usernames can be at most 50 characters.')
 
 export const userInputSchema = z.object({
-  email: z.string().email({ message: 'Invalid email address' }),
-  name: z.string(),
+  email: emailSchema,
+  name: nameSchema,
   password: passwordSchema,
 })
 

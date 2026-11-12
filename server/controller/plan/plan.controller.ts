@@ -1,216 +1,66 @@
 import { planInputCompleteSchema, planInputSchema } from '#shared/dto/plan'
-import {
-  Plan,
-  Profile,
-  User,
-  type PlanModel,
-  type ProfileModel,
-  type UserModel,
-} from '#shared/models'
-import type { EventHandlerRequest, H3Event } from 'h3'
-import {
-  createError,
-  getResponseStatus,
-  getResponseStatusText,
-  getRouterParam,
-  readValidatedBody,
-  setResponseStatus,
-} from 'h3'
-import { Model } from 'mongoose'
+import { Plan, Profile } from '#shared/models'
+import { getRouterParam, type H3Event } from 'h3'
+import { BaseController } from '../base.controller'
 
-export class PlanController {
-  private planModel: Model<PlanModel>
-  private profileModel: Model<ProfileModel>
-  private userModel: Model<UserModel>
-  constructor() {
-    this.planModel = Plan
-    this.profileModel = Profile
-    this.userModel = User
+export class PlanController extends BaseController {
+  public getAllPostByUser = async (e: H3Event) => {
+    return Plan.find({ author: e.context.user.id }).sort({ updatedAt: -1 })
   }
-  public getAllPostByUser = async (e: H3Event<EventHandlerRequest>) => {
-    const plans = await this.planModel
-      .find({ author: e.context.user.id })
-      .sort({
-        updatedAt: -1,
-      })
-    if (!plans) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'Plans not found',
-      })
-    }
-    return plans
-  }
-  public createNewPlan = async (e: H3Event<EventHandlerRequest>) => {
-    const user = e.context.user
-    const { title, content, type } = await readValidatedBody(
-      e,
-      planInputSchema.parse
-    )
-    const currentUser = await User.findById(user.id).select('-password')
-    if (!currentUser) {
-      throw createError({
-        status: 404,
-        message: 'Access denied',
-        statusMessage: 'Access denied: user not found',
-      })
-    }
-    const newPlan = new this.planModel({
+
+  public createNewPlan = async (e: H3Event) => {
+    const user = await this.requireUser(e)
+    const { title, content, type } = await this.validateBody(e, planInputSchema)
+    const plan = await new Plan({
       title,
       content,
       type,
-      author: currentUser.id,
-    })
-    const saveData = await newPlan.save()
-    if (!saveData) {
-      throw createError({
-        status: 500,
-        message: 'Server error',
-        statusMessage: 'Unexpected error occurred, please try again.',
-      })
-    }
-    const userProfile = await this.profileModel.findOne({
-      user: currentUser.id,
-    })
-    if (userProfile) {
-      const updatedBody = {
-        plansOrder: [saveData.id, ...userProfile.plansOrder],
-      }
-      await this.profileModel.findByIdAndUpdate(userProfile.id, updatedBody, {
-        new: true,
-        returnDocument: 'after',
-      })
-    }
-    return saveData
-  }
-  public updatePlan = async (e: H3Event<EventHandlerRequest>) => {
-    const user = e.context.user
-    const planId = getRouterParam(e, 'id')
-
-    // validator
-    const body = await readValidatedBody(e, planInputSchema.parse)
-
-    const plan = await this.planModel.findById(planId)
-
-    if (!plan) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'Plan not found',
-      })
-    }
-    if (plan.author?.toString() !== user.id) {
-      throw createError({
-        status: 401,
-        message: 'Access denied',
-        statusMessage:
-          'Access denied: Current user is not authorized to update this item',
-      })
-    }
-    const updatedPlan = await this.planModel.findByIdAndUpdate(
-      planId,
-      { ...body, updatedAt: new Date() },
-      {
-        new: true,
-        returnDocument: 'after',
-      }
+      author: user.id,
+    }).save()
+    // new plans go to the top of the user's custom order
+    await Profile.updateOne(
+      { user: user.id },
+      { $push: { plansOrder: { $each: [plan.id], $position: 0 } } },
     )
-    return updatedPlan
+    return plan
   }
-  public togglePlanCompleteById = async (e: H3Event<EventHandlerRequest>) => {
-    const user = e.context.user
-    const planId = getRouterParam(e, 'id')
-    // validator
-    const body = await readValidatedBody(e, planInputCompleteSchema.parse)
-    const plan = await this.planModel.findById(planId)
 
-    if (!plan) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'Plan not found',
-      })
-    }
-    if (plan.author?.toString() !== user.id) {
-      throw createError({
-        status: 401,
-        message: 'Access denied',
-        statusMessage:
-          'Access denied: Current user is not authorized to update this item',
-      })
-    }
-    const updatedPlan = await this.planModel.findByIdAndUpdate(
-      planId,
-      { ...body, updatedAt: new Date() },
-      {
-        new: true,
-        returnDocument: 'after',
-      }
+  public updatePlan = async (e: H3Event) => {
+    const plan = await this.findOwnedPlan(
+      getRouterParam(e, 'id'),
+      e.context.user.id,
     )
-    return updatedPlan
+    const body = await this.validateBody(e, planInputSchema)
+    return Plan.findByIdAndUpdate(
+      plan.id,
+      { ...body, updatedAt: new Date() },
+      { returnDocument: 'after' },
+    )
   }
-  public deletePlanById = async (e: H3Event<EventHandlerRequest>) => {
-    const user = e.context.user
-    const planId = getRouterParam(e, 'id')
-    const currentUser = await this.userModel
-      .findById(user.id)
-      .select('-password')
-    if (!currentUser) {
-      throw createError({
-        status: 404,
-        message: 'Access denied',
-        statusMessage: 'Access denied: user not found',
-      })
-    }
-    const plan = await this.planModel.findById(planId)
-    // check if item exists in db
-    if (!plan) {
-      throw createError({
-        status: 404,
-        message: 'Not found',
-        statusMessage: 'Not found: item with following ID not found',
-      })
-    }
-    // validate user
-    if (plan.author?.toString() !== currentUser.id) {
-      throw createError({
-        status: 401,
-        message: 'Unauthorized',
-        statusMessage:
-          'Unauthorized: current user is not authorized for this action.',
-      })
-    }
-    // delete item
-    try {
-      await this.planModel.findByIdAndDelete(planId)
-    } catch (error) {
-      throw createError({
-        status: 500,
-        message: 'Internal server error',
-        statusMessage:
-          'Internal server error: unexpected error happened, please try again.',
-      })
-    }
-    const userProfile = await this.profileModel.findOne({
-      user: currentUser.id,
-    })
-    if (userProfile) {
-      const updatedBody = {
-        plansOrder: userProfile.plansOrder.filter((item) => item !== plan.id),
-      }
-      await this.profileModel.findByIdAndUpdate(userProfile.id, updatedBody, {
-        new: true,
-        returnDocument: 'after',
-      })
-    }
-    // send completion message
-    setResponseStatus(e, 200, 'Successfuly deleted item.')
-    const status = getResponseStatus(e)
-    const statusText = getResponseStatusText(e)
-    return {
-      status,
-      text: statusText,
-    }
+
+  public togglePlanCompleteById = async (e: H3Event) => {
+    const plan = await this.findOwnedPlan(
+      getRouterParam(e, 'id'),
+      e.context.user.id,
+    )
+    const body = await this.validateBody(e, planInputCompleteSchema)
+    return Plan.findByIdAndUpdate(
+      plan.id,
+      { ...body, updatedAt: new Date() },
+      { returnDocument: 'after' },
+    )
+  }
+
+  public deletePlanById = async (e: H3Event) => {
+    const plan = await this.findOwnedPlan(
+      getRouterParam(e, 'id'),
+      e.context.user.id,
+    )
+    await plan.deleteOne()
+    await Profile.updateOne(
+      { user: e.context.user.id },
+      { $pull: { plansOrder: plan.id } },
+    )
+    return { id: plan.id as string }
   }
 }

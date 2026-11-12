@@ -1,5 +1,6 @@
 import { authController } from '../../controller'
 
-export default defineEventHandler({
-  handler: eventHandler(authController.loginUser),
+export default defineApiHandler({
+  rateLimit: 'login',
+  handler: authController.loginUser,
 })

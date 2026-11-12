@@ -1,5 +1,6 @@
 import { tokenController } from '../../controller'
 
-export default defineEventHandler({
-  handler: eventHandler(tokenController.sendToken),
+export default defineApiHandler({
+  rateLimit: ['sendTokenIp', 'sendTokenEmail'],
+  handler: tokenController.sendToken,
 })

@@ -2,6 +2,7 @@
 import { useInitPiniaStore, useProfileStore, useUserStore } from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { MclFormGroup, MclInputText } from '@bobbykim/mcl-forms'
+import { passwordRules } from '#shared/dto/user/passwordRules'
 import { storeToRefs } from 'pinia'
 
 const url = useRequestURL()
@@ -39,13 +40,19 @@ const signUpCred = reactive<{
   email: '',
   password: '',
 })
-const passwordPattern =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$/
+const { fieldErrors } = storeToRefs(userStore)
+// first password rule the current input breaks (same rules as the server)
+const passwordProblem = computed<string | undefined>(() =>
+  signUpCred.password === ''
+    ? undefined
+    : passwordRules.find((rule) => !rule.test.test(signUpCred.password))
+        ?.message,
+)
 const passwordInvalid = computed<boolean>(
-  () =>
-    signUpCred.password !== '' && !passwordPattern.test(signUpCred.password),
+  () => !!passwordProblem.value || !!fieldErrors.value.password,
 )
 const handleFormSubmit = async () => {
+  if (passwordProblem.value) return
   const { userName, email, password } = signUpCred
   await userStore.signupNewUser({ name: userName, email, password })
   await initPiniaStore.initStores()
@@ -81,6 +88,8 @@ const formTextColor = computed<ColorPalette>(() => {
               highlight-color="warning"
               rounded
               required
+              :invalid="!!fieldErrors.name"
+              :invalid-feedback="fieldErrors.name ?? ''"
               v-model="signUpCred.userName"
             ></MclInputText>
           </MclFormGroup>
@@ -99,6 +108,8 @@ const formTextColor = computed<ColorPalette>(() => {
               highlight-color="warning"
               rounded
               required
+              :invalid="!!fieldErrors.email"
+              :invalid-feedback="fieldErrors.email ?? ''"
               v-model="signUpCred.email"
             ></MclInputText>
           </MclFormGroup>
@@ -117,9 +128,8 @@ const formTextColor = computed<ColorPalette>(() => {
               highlight-color="warning"
               rounded
               required
-              pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_])[A-Za-z\d\W_]{8,}$"
               :invalid="passwordInvalid"
-              invalid-feedback="Password must include one number, one uppercase and lowercase letter, one special character with at least 8 characters length."
+              :invalid-feedback="passwordProblem ?? fieldErrors.password ?? ''"
               v-model="signUpCred.password"
             ></MclInputText>
           </MclFormGroup>

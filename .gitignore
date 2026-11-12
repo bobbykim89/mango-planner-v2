@@ -25,3 +25,6 @@ logs
 
 # Claude Code (personal overrides)
 .claude/settings.local.json
+
+# API test run artifacts
+test/.tmp/

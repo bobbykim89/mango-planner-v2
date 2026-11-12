@@ -1,6 +1,6 @@
 import { planController } from '../../../controller'
 
-export default defineEventHandler({
-  onRequest: [defineRequestMiddleware(checkAuth)],
-  handler: eventHandler(planController.updatePlan),
+export default defineApiHandler({
+  auth: true,
+  handler: planController.updatePlan,
 })
