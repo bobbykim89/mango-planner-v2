@@ -29,12 +29,7 @@ const UNKNOWN_MESSAGE = 'Something went wrong. Please try again.'
 /** Converts whatever $fetch threw into an ApiClientError. */
 export const toApiClientError = (err: unknown): ApiClientError => {
   if (err instanceof ApiClientError) return err
-  const e = (err ?? {}) as {
-    data?: any
-    statusCode?: number
-    status?: number
-    statusMessage?: string
-  }
+  const e = (err ?? {}) as { data?: any; statusCode?: number; status?: number }
   const status = e.statusCode ?? e.status ?? 0
   const data = e.data
   if (data && data.ok === false && data.error) {
@@ -46,13 +41,7 @@ export const toApiClientError = (err: unknown): ApiClientError => {
     )
   }
   if (!status) return new ApiClientError(0, 'NETWORK_ERROR', NETWORK_MESSAGE)
-  // pre-envelope error shape (routes not migrated yet)
-  const message = data?.statusMessage ?? e.statusMessage ?? UNKNOWN_MESSAGE
-  return new ApiClientError(
-    status,
-    status === 401 ? 'AUTH_TOKEN_INVALID' : 'UNKNOWN',
-    message,
-  )
+  return new ApiClientError(status, 'UNKNOWN', UNKNOWN_MESSAGE)
 }
 
 /** Field errors keyed by field name (empty unless it's a validation error). */

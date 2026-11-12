@@ -18,7 +18,7 @@ Current focus: hardening **security**, improving **performance**, and fixing int
 | `pnpm dev:prod` | Dev server using `.env` (production credentials, so use with care) |
 | `pnpm build` / `pnpm build:local` | Production build (`build:local` loads `.env.local`) |
 | `pnpm preview` | Serve the production build |
-| `pnpm typecheck` | `vue-tsc --noEmit` |
+| `pnpm typecheck` | `nuxt typecheck` (vue-tsc across the app/server/shared project references) |
 | `pnpm test` | Vitest API tests (builds the app, runs it against an in-memory MongoDB) |
 | `pnpm test:watch` | Vitest in watch mode |
 

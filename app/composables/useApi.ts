@@ -4,7 +4,8 @@ type ApiMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
 
 export interface ApiRequestOptions {
   method?: ApiMethod
-  body?: Record<string, unknown> | FormData | unknown[]
+  // any JSON-serialisable object (interfaces such as PlanInput aren't assignable to Record<string, unknown>) or FormData
+  body?: object
   query?: Record<string, string | number | boolean | undefined>
 }
 
@@ -34,7 +35,13 @@ export const useApi = () => {
     } catch (err) {
       throw toApiClientError(err)
     }
-    // routes not yet migrated still return their payload directly
-    return isSuccessEnvelope<T>(res) ? res.data : (res as T)
+    if (!isSuccessEnvelope<T>(res)) {
+      throw new ApiClientError(
+        200,
+        'UNKNOWN',
+        'Something went wrong. Please try again.',
+      )
+    }
+    return res.data
   }
 }
