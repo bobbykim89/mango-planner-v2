@@ -39,7 +39,11 @@ const passwordProblem = computed<string | undefined>(() =>
     : passwordRules.find((rule) => !rule.test.test(passwordInputRef.value))
         ?.message,
 )
-const passwordInvalid = computed<boolean>(() => !!passwordProblem.value)
+// password message from the server's VALIDATION_FAILED response
+const serverPasswordError = ref<string>('')
+const passwordInvalid = computed<boolean>(
+  () => !!passwordProblem.value || !!serverPasswordError.value,
+)
 const api = useApi()
 const { extractErrorMessage } = useErrorCheck()
 const handleFormSubmit = async () => {
@@ -48,6 +52,7 @@ const handleFormSubmit = async () => {
   if (!userId) return
   if (!token) return
   if (passwordInputRef.value === '' || passwordProblem.value) return
+  serverPasswordError.value = ''
   try {
     await api('/api/token/reset-password', {
       method: 'POST',
@@ -56,6 +61,7 @@ const handleFormSubmit = async () => {
     alertStore.setAlert('Successfully updated password', 'success')
     router.push({ path: '/auth/login' })
   } catch (error) {
+    serverPasswordError.value = fieldMap(error).password ?? ''
     alertStore.setAlert(extractErrorMessage(error))
   }
 }
@@ -89,7 +95,7 @@ const formTextColor = computed<ColorPalette>(() => {
               required
               v-model="passwordInputRef"
               :invalid="passwordInvalid"
-              :invalid-feedback="passwordProblem ?? ''"
+              :invalid-feedback="passwordProblem ?? serverPasswordError"
             ></MclInputText>
           </MclFormGroup>
           <button type="submit" class="btn btn-warning btn-full">Submit</button>

@@ -1,5 +1,5 @@
 import { tokenController } from '../../controller'
 
-export default defineEventHandler({
-  handler: eventHandler(tokenController.resetPasswordWithToken),
+export default defineApiHandler({
+  handler: tokenController.resetPasswordWithToken,
 })

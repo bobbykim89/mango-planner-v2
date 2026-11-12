@@ -1,13 +1,20 @@
-import nodemailer from 'nodemailer'
 import { useRuntimeConfig } from '#imports'
-import { createError } from 'h3'
+import nodemailer from 'nodemailer'
 
+/**
+ * Sends a plain-text email. In development, and when mailerTransport is 'log'
+ * (tests), it writes the message to the server log instead of sending it.
+ */
 export const sendEmail = async (
   email: string,
   subject: string,
   text: string,
 ) => {
   const config = useRuntimeConfig()
+  if (import.meta.dev || config.mailerTransport === 'log') {
+    console.info(`[mail] to=${email} text=${text.replace(/\n/g, '\\n')}`)
+    return
+  }
   try {
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
@@ -25,11 +32,10 @@ export const sendEmail = async (
       subject,
       text,
     })
-  } catch (error) {
-    throw createError({
-      status: 500,
-      message: 'Internal Server Error',
-      statusMessage: 'Failed to send email, please try again',
-    })
+  } catch (err) {
+    console.error('[mail] failed to send:', err)
+    throw apiError.UPSTREAM_ERROR(
+      "We couldn't send the email right now. Please try again later.",
+    )
   }
 }

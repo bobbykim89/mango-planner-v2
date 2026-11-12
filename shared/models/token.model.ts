@@ -17,6 +17,7 @@ const tokenSchema = new Schema<TokenModel>({
     required: true,
     ref: 'user',
   },
+  // SHA-256 hash of the reset token; the raw token only ever appears in the email link
   token: {
     type: String,
     required: true,
