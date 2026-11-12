@@ -226,6 +226,7 @@ const getPlans = computed(() => {
 
 <template>
   <section class="container py-md lg:py-lg min-h-[75vh]">
+    <h1 class="sr-only">My plans</h1>
     <div
       v-if="mounted"
       class="grid md:grid-cols-2 gap-xs md:gap-md grid-flow-row px-sm md:px-xs relative"
@@ -253,7 +254,7 @@ const getPlans = computed(() => {
         <div
           class="hidden md:block bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md"
         >
-          <h3 class="h3-md text-warning mb-xs">Create New Plan</h3>
+          <h2 class="h3-md text-warning mb-xs">Create New Plan</h2>
           <PlanInputForm
             prefix="desktop-new"
             @form-submit="handleNewFormSubmit"
@@ -284,6 +285,8 @@ const getPlans = computed(() => {
             @click="openModal"
           >
             <svg
+              aria-hidden="true"
+              focusable="false"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 448 512"
               fill="currentColor"
@@ -369,13 +372,15 @@ const getPlans = computed(() => {
         <div
           class="flex justify-between py-xs border-b-2 border-b-light-1 dark:border-b-dark-1"
         >
-          <h3 class="h3-md text-warning">
+          <h2 class="h3-md text-warning">
             <span v-if="modalForm === 'new'">Create New Plan</span>
             <span v-else-if="modalForm === 'update'">Update Plan</span>
             <span v-else>Saved Draft</span>
-          </h3>
+          </h2>
           <button @click="(onClear(), close())" aria-label="close modal">
             <svg
+              aria-hidden="true"
+              focusable="false"
               xmlns="http://www.w3.org/2000/svg"
               height="1em"
               viewBox="0 0 384 512"
@@ -446,6 +451,24 @@ const getPlans = computed(() => {
 /* spinner animation */
 .loader {
   animation: spinner 2s linear infinite;
+}
+/* reduced motion: no sliding, slower spinner */
+@media (prefers-reduced-motion: reduce) {
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.2s ease;
+  }
+  .fade-enter-from,
+  .fade-leave-to {
+    transform: none;
+  }
+  .mobile-utility-enter-active,
+  .mobile-utility-leave-active {
+    transition: none;
+  }
+  .loader {
+    animation-duration: 6s;
+  }
 }
 @keyframes spinner {
   0% {

@@ -176,6 +176,11 @@ onMounted(() => {
 
 <template>
   <div class="relative">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2xs focus:left-2xs focus:z-[60] focus:px-sm focus:py-2xs focus:rounded-md focus:bg-warning focus:text-dark-3 focus:font-bold"
+      >Skip to main content</a
+    >
     <HeaderHorizontal
       ref="headerRef"
       :bg-color="handleBgColors"
@@ -183,42 +188,33 @@ onMounted(() => {
       :scroll-distance="100"
     >
       <template #content
-        ><div class="flex shrink-0 items-center self-center md:py-3xs">
-          <div class="h-md md:h-lg mr-2xs md:mr-sm align-middle">
-            <NuxtLink
-              :to="menuItemData.logoLink"
-              custom
-              v-slot="{ navigate, href }"
-            >
-              <a
-                :href="href ?? undefined"
-                @click="navigate"
-                aria-label="mango planner logo"
+        ><NuxtLink
+          :to="menuItemData.logoLink"
+          custom
+          v-slot="{ navigate, href }"
+        >
+          <a
+            :href="href ?? undefined"
+            @click="navigate"
+            aria-label="Mango Planner home"
+            class="flex shrink-0 items-center self-center md:py-3xs"
+          >
+            <span class="h-md md:h-lg mr-2xs md:mr-sm align-middle">
+              <img
+                :src="menuItemData.logo"
+                alt=""
+                class="h-full inline-block"
+              />
+            </span>
+            <span class="flex flex-col justify-center ml-2">
+              <span
+                class="inline-block align-middle tracking-wider h2-md text-warning"
               >
-                <img
-                  :src="menuItemData.logo"
-                  :alt="menuItemData.logoAlt"
-                  class="h-full inline-block"
-                />
-              </a>
-            </NuxtLink>
-          </div>
-          <div class="flex flex-col justify-center ml-2">
-            <NuxtLink
-              :to="menuItemData.logoLink"
-              custom
-              v-slot="{ navigate, href }"
-            >
-              <a :href="href ?? undefined" @click="navigate">
-                <h2
-                  class="inline-block align-middle tracking-wider h2-md text-warning"
-                >
-                  {{ menuItemData.title }}
-                </h2>
-              </a>
-            </NuxtLink>
-          </div>
-        </div></template
+                {{ menuItemData.title }}
+              </span>
+            </span>
+          </a>
+        </NuxtLink></template
       >
       <template #content-right
         ><div>
@@ -296,6 +292,8 @@ onMounted(() => {
             @click="onLogout"
           >
             <svg
+              aria-hidden="true"
+              focusable="false"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 512 512"
               class="h-xs"
@@ -312,36 +310,42 @@ onMounted(() => {
       </template>
     </HeaderHorizontal>
     <div class="bg-light-4 dark:bg-dark-2">
-      <div class="container pt-xs px-sm md:px-xs" data-allow-mismatch>
-        <Alert
-          :show="alert !== null"
-          :color="alertColor"
-          dismissible
-          @close="onAlertClose"
-        >
-          <div class="flex justify-center" :class="alertTextClass">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 512 512"
-              fill="currentColor"
-              class="w-xs mr-2xs"
-            >
-              <!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
-              <path
-                d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-144c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z"
-              />
-            </svg>
-            <span>{{ alert }}</span>
-          </div>
-        </Alert>
-      </div>
-      <slot />
+      <main id="main" tabindex="-1" class="outline-none">
+        <div class="container pt-xs px-sm md:px-xs" data-allow-mismatch>
+          <Alert
+            :show="alert !== null"
+            :color="alertColor"
+            dismissible
+            @close="onAlertClose"
+          >
+            <div class="flex justify-center" :class="alertTextClass">
+              <svg
+                aria-hidden="true"
+                focusable="false"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 512 512"
+                fill="currentColor"
+                class="w-xs mr-2xs"
+              >
+                <!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+                <path
+                  d="M256 512c141.4 0 256-114.6 256-256S397.4 0 256 0S0 114.6 0 256S114.6 512 256 512zM216 336h24V272H216c-13.3 0-24-10.7-24-24s10.7-24 24-24h48c13.3 0 24 10.7 24 24v88h8c13.3 0 24 10.7 24 24s-10.7 24-24 24H216c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-144c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z"
+                />
+              </svg>
+              <span>{{ alert }}</span>
+            </div>
+          </Alert>
+        </div>
+        <slot />
+      </main>
       <div
         v-if="$pwa?.needRefresh"
         class="fixed bottom-0 left-0 ml-3xs mb-3xs md:ml-md md:mb-md bg-light-1 dark:bg-dark-4 p-md rounded-md drop-shadow-md text-dark-3 dark:text-light-3 max-w-[90vw]"
       >
         <div class="flex justify-center items-center gap-xs">
           <svg
+            aria-hidden="true"
+            focusable="false"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 512 512"
             fill="currentColor"
@@ -358,6 +362,8 @@ onMounted(() => {
             class="p-1.5 bg-warning rounded-md hover:bg-warning/75 transition-all duration-300 ease-linear"
           >
             <svg
+              aria-hidden="true"
+              focusable="false"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 512 512"
               fill="currentColor"
@@ -389,6 +395,8 @@ onMounted(() => {
               class="p-2xs text-dark-3 dark:text-light-3"
             >
               <svg
+                aria-hidden="true"
+                focusable="false"
                 xmlns="http://www.w3.org/2000/svg"
                 height="1em"
                 viewBox="0 0 384 512"
@@ -440,6 +448,8 @@ onMounted(() => {
               @click="onLogout"
             >
               <svg
+                aria-hidden="true"
+                focusable="false"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
                 class="h-xs"

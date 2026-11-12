@@ -21,3 +21,9 @@
 :root:not(.dark) .text-warning {
   color: var(--color-warning-text);
 }
+
+/* keep focused elements clear of the sticky header and the fixed mobile tools button (WCAG 2.4.11) */
+html {
+  scroll-padding-top: 6rem;
+  scroll-padding-bottom: 5rem;
+}

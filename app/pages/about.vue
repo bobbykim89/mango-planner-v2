@@ -50,7 +50,7 @@ const socialUrls = {
             />
           </div>
           <div class="text-dark-3 dark:text-light-3">
-            <h2 class="h2-md mb-xs">About Mango Planner</h2>
+            <h1 class="h2-md mb-xs">About Mango Planner</h1>
             <div class="font-bold text-lg mb-xs">
               <p>Simple planner app for daily use.</p>
               <p>Version: 0.2.1</p>
@@ -66,6 +66,8 @@ const socialUrls = {
                 class="hover:opacity-75 transition-opacity duration-300 ease-linear"
               >
                 <svg
+                  aria-hidden="true"
+                  focusable="false"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 448 512"
                   fill="currentColor"
@@ -86,6 +88,8 @@ const socialUrls = {
                 class="hover:opacity-75 transition-opacity duration-300 ease-linear"
               >
                 <svg
+                  aria-hidden="true"
+                  focusable="false"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 448 512"
                   fill="currentColor"
@@ -106,6 +110,8 @@ const socialUrls = {
                 class="hover:opacity-75 transition-opacity duration-300 ease-linear"
               >
                 <svg
+                  aria-hidden="true"
+                  focusable="false"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 512 512"
                   fill="currentColor"

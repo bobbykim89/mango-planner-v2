@@ -56,7 +56,7 @@ const formTextColor = computed<ColorPalette>(() => {
       <div
         class="bg-light-3 dark:bg-dark-3 p-md rounded-md drop-shadow-md w-full max-w-112 mx-xs"
       >
-        <h2 class="text-warning text-center mb-sm">Login</h2>
+        <h1 class="h2-md text-warning text-center mb-sm">Login</h1>
         <form @submit.prevent="handleFormSubmit">
           <MclFormGroup
             field-id="email"

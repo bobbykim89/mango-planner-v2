@@ -47,6 +47,8 @@ watch(
         title="Search"
       >
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 512 512"
           fill="currentColor"
@@ -76,6 +78,8 @@ watch(
         @click="onShowAllClick"
       >
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 512 512"
           fill="currentColor"
@@ -95,6 +99,8 @@ watch(
         @click="onShowIncompleteClick"
       >
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 640 512"
           fill="currentColor"
@@ -115,6 +121,8 @@ watch(
         @click="onShowCustomClick"
       >
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 576 512"
           fill="currentColor"
@@ -134,6 +142,8 @@ watch(
         @click="onNewPostClick"
       >
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 448 512"
           fill="currentColor"

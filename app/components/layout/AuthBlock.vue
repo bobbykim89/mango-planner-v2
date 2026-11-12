@@ -71,6 +71,8 @@ const handleUsernameClick = (e: Event) => {
         class="flex items-center gap-3 text-lg font-bold hover:opacity-60 transition-opacity duration-300 ease-linear"
       >
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 512 512"
           class="h-xs"
@@ -91,6 +93,8 @@ const handleUsernameClick = (e: Event) => {
         class="flex items-center gap-3 text-lg font-bold hover:opacity-60 transition-opacity duration-300 ease-linear"
       >
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 640 512"
           class="h-xs"

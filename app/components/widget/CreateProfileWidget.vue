@@ -15,6 +15,8 @@ const handleButtonClick = (e: Event) => {
   >
     <div class="mb-2xs font-bold flex gap-xs justify-center items-center">
       <svg
+        aria-hidden="true"
+        focusable="false"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 512 512"
         fill="currentColor"
