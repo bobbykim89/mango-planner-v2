@@ -108,14 +108,31 @@ const openModal = () => {
   mobileUtilityToggle.value = false
   modalRef.value!.open()
 }
+// set after saving an edit: the edited card may re-render collapsed, hiding the Edit
+// button the dialog would return focus to, so fall back to the plan's title button
+const focusPlanAfterClose = ref<string>('')
 const onModalClose = async () => {
   onClear()
-  if (returnFocusToToggle.value && import.meta.client) {
+  if (!import.meta.client) return
+  if (returnFocusToToggle.value) {
     returnFocusToToggle.value = false
     await nextTick()
     document
       .querySelector<HTMLElement>('[aria-controls="mobile-utility"]')
       ?.focus()
+    return
+  }
+  const planId = focusPlanAfterClose.value
+  if (planId) {
+    focusPlanAfterClose.value = ''
+    // let the dialog finish restoring focus first, then repair it only if it was lost
+    window.setTimeout(() => {
+      const active = document.activeElement as HTMLElement | null
+      if (active && active !== document.body && active.checkVisibility()) return
+      document
+        .querySelector<HTMLElement>(`[data-plan-toggle="${planId}"]`)
+        ?.focus()
+    }, 400)
   }
 }
 const onClear = () => {
@@ -167,6 +184,7 @@ const onEditSubmit = async (e: Event, data: PlanFormInput) => {
   ) {
     await planStore.updatePost({ id: selectedPost.value, body: data })
   }
+  focusPlanAfterClose.value = selectedPost.value
   onClear()
   modalRef.value?.close()
 }
