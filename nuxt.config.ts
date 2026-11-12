@@ -67,6 +67,12 @@ export default defineNuxtConfig({
     mailerEmailAddress: process.env.MAILER_EMAIL_ADDRESS,
     mailerAppPassword: process.env.MAILER_APP_PASSWORD,
     openWeatherApiKey: process.env.OPENWEATHER_API_KEY,
+    // full MongoDB connection string; when set it replaces the Atlas URL built above (used by tests)
+    mongoUri: process.env.MONGO_URI || '',
+    // base URL for links in emails (password reset); development uses the request origin
+    appUrl: process.env.APP_URL || 'https://mango-planner.bobbykim.dev',
+    // 'smtp' sends email; 'log' writes it to the server log instead (tests)
+    mailerTransport: process.env.MAILER_TRANSPORT || 'smtp',
   },
   modules: ['@pinia/nuxt', '@nuxtjs/color-mode', '@vite-pwa/nuxt'],
   typescript: {
