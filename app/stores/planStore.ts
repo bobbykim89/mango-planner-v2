@@ -250,5 +250,6 @@ export const usePlanStore = defineStore('plan', () => {
     clearPlanData,
     getDraft,
     deleteDraft,
+    loadAllDrafts,
   }
 })
