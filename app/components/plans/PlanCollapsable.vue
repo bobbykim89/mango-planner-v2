@@ -1,16 +1,25 @@
 <script setup lang="ts">
 import { PlanDto } from '#shared/types'
 import { Collapse } from '@bobbykim/manguito-theme'
+import { useCollapseTrigger } from '@bobbykim/manguito-theme/composable'
+import PlanMoveMenu from '@/components/plans/PlanMoveMenu.vue'
+import type { MoveTarget } from '~/utils/reorderPlans'
 
 const props = withDefaults(
   defineProps<{
     item: PlanDto
     visible?: boolean
     showHandle?: boolean
+    index?: number
+    total?: number
+    moveDisabled?: boolean
   }>(),
   {
     visible: false,
     showHandle: false,
+    index: 0,
+    total: 0,
+    moveDisabled: false,
   },
 )
 
@@ -18,17 +27,22 @@ const emit = defineEmits<{
   (e: 'toggle-complete', event: Event, id: string, complete: boolean): void
   (e: 'edit', event: Event, item: PlanDto): void
   (e: 'delete', event: Event, id: string): void
+  (e: 'move', id: string, target: MoveTarget): void
 }>()
 
 const collapseRef = ref<InstanceType<typeof Collapse>>()
-const collapseState = ref<boolean>(props.visible)
-
-const toggleCollapse = (visible: boolean) => {
-  collapseState.value = visible
-}
-const onCollapseTrigger = () => {
-  collapseRef.value?.toggle()
-}
+const {
+  attrs: toggleAttrs,
+  isOpen,
+  toggle,
+} = useCollapseTrigger(collapseRef, {
+  id: props.item._id.toString(),
+  visible: () => props.visible,
+})
+const completeLabel = computed<string>(
+  () =>
+    `Mark "${props.item.title}" ${props.item.complete ? 'incomplete' : 'complete'}`,
+)
 
 const getBorderColor = computed<string>(() => {
   const { complete } = props.item
@@ -42,10 +56,10 @@ const getCheckColor = computed(() => {
 const getBgColor = computed<string>(() => {
   const { type } = props.item
   if (type === 'work') {
-    return 'bg-info/60 dark:bg-info'
+    return 'bg-info/40 dark:bg-info'
   }
   if (type === 'chore') {
-    return 'bg-primary/60 dark:bg-primary'
+    return 'bg-primary/40 dark:bg-primary'
   }
   return 'bg-light-3 dark:bg-dark-3'
 })
@@ -74,13 +88,6 @@ const handleDeleteClick = (e: Event) => {
 }
 
 const renderedContent = computed(() => useMarkdown(props.item.content))
-
-watch(
-  () => props.visible,
-  (newValue) => {
-    collapseState.value = newValue
-  },
-)
 </script>
 
 <template>
@@ -88,49 +95,65 @@ watch(
     class="rounded-md overflow-hidden w-full border-l-4 drop-shadow-md"
     :class="getBorderColor"
   >
+    <!-- header: the title button is the keyboard/screen-reader toggle; the whole
+         header stays clickable for mouse users -->
     <div
       class="py-xs pl-sm pr-xs cursor-pointer select-none"
       :class="getBgColor"
-      aria-label="collapse panel header"
-      tabindex="0"
-      role="button"
-      @click="onCollapseTrigger"
+      @click="toggle"
     >
       <div class="flex justify-between items-center">
-        <div class="flex gap-4 items-center">
-          <svg
+        <div class="flex gap-4 items-center min-w-0">
+          <PlanMoveMenu
             v-if="showHandle"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 448 512"
-            fill="currentColor"
-            class="min-w-xs h-xs text-dark-3/80 dark:text-light-3/80 handle"
-          >
-            <!-- !Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
-            <path
-              d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"
-            />
-          </svg>
-          <h3 class="h3-md text-dark-3 dark:text-light-3">
-            {{ item.title }}
-          </h3>
+            :plan-id="item._id.toString()"
+            :title="item.title"
+            :index="index"
+            :total="total"
+            :disabled="moveDisabled"
+            @move="(target) => emit('move', item._id.toString(), target)"
+          />
+          <h2 class="h3-md text-dark-3 dark:text-light-3 min-w-0">
+            <button
+              type="button"
+              :data-plan-toggle="item._id.toString()"
+              v-bind="toggleAttrs"
+              :aria-describedby="`plan-type-${item._id.toString()}`"
+              class="text-left w-full break-words"
+              @click.stop="toggle"
+            >
+              {{ item.title }}
+            </button>
+          </h2>
         </div>
         <div @click.stop class="cursor-default">
-          <!-- toggle button -->
+          <!-- complete toggle -->
           <button
+            type="button"
+            :data-plan-complete="item._id.toString()"
             class="flex items-center p-3xs hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear"
             :class="getCheckColor"
-            :aria-label="item.complete ? 'completed' : 'incomplete'"
+            :aria-pressed="item.complete"
+            :aria-label="completeLabel"
             @click="handleToggleCompleteClick"
           >
             <svg
+              aria-hidden="true"
+              focusable="false"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 512 512"
               fill="currentColor"
               class="h-md"
             >
               <!-- !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
+              <!-- complete: filled check circle; incomplete: outlined clock (state isn't shown by colour alone) -->
               <path
+                v-if="item.complete"
                 d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
+              />
+              <path
+                v-else
+                d="M464 256A208 208 0 1 1 48 256a208 208 0 1 1 416 0zM0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM232 120V256c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2V120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"
               />
             </svg>
           </button>
@@ -140,8 +163,6 @@ watch(
     <Collapse
       ref="collapseRef"
       :id="item._id.toString()"
-      @open="toggleCollapse"
-      @close="toggleCollapse"
       :custom-class="getContentBgColor"
     >
       <div class="py-xs">
@@ -149,7 +170,11 @@ watch(
           <div
             class="w-full pl-xs pr-2xs whitespace-pre-line text-dark-3 dark:text-light-3 md-content"
           >
-            <div class="md-content" v-html="renderedContent"></div>
+            <div
+              class="md-content"
+              :class="{ 'md-content--tinted': item.type !== 'personal' }"
+              v-html="renderedContent"
+            ></div>
           </div>
           <div
             class="px-xs border-l-2 border-dark-1 dark:border-light-3 flex flex-col items-center gap-2xs text-dark-1 dark:text-light-3"
@@ -157,11 +182,13 @@ watch(
             <!-- edit button -->
             <button
               class="p-3xs hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear"
-              aria-label="edit"
-              tabindex="0"
+              type="button"
+              :aria-label="`Edit &quot;${item.title}&quot;`"
               @click="handleEditClick"
             >
               <svg
+                aria-hidden="true"
+                focusable="false"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
                 fill="currentColor"
@@ -179,11 +206,13 @@ watch(
             <!-- delete button -->
             <button
               class="p-3xs hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear"
-              aria-label="delete"
-              tabindex="0"
+              type="button"
+              :aria-label="`Delete &quot;${item.title}&quot;`"
               @click="handleDeleteClick"
             >
               <svg
+                aria-hidden="true"
+                focusable="false"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 448 512"
                 fill="currentColor"
@@ -202,16 +231,18 @@ watch(
     <div
       class="py-1.5 px-sm cursor-pointer transition-all duration-500 text-dark-3 dark:text-light-3 grid grid-cols-3 items-center"
       :class="[getBgColor]"
-      aria-label="collapse panel footer"
-      @click="onCollapseTrigger"
+      aria-hidden="true"
+      @click="toggle"
     >
       <svg
+        aria-hidden="true"
+        focusable="false"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 448 512"
         fill="currentColor"
         class="h-xs col-start-2 justify-self-center"
         :class="[
-          !collapseState ? 'rotate-0' : 'rotate-180',
+          !isOpen ? 'rotate-0' : 'rotate-180',
           'transition-transform duration-300 ease-in',
         ]"
       >
@@ -220,7 +251,13 @@ watch(
           d="M224 416c-8.188 0-16.38-3.125-22.62-9.375l-192-192c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L224 338.8l169.4-169.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-192 192C240.4 412.9 232.2 416 224 416z"
         />
       </svg>
-      <span class="text-xs opacity-60 justify-self-end">{{ item.type }}</span>
+      <!-- referenced by the title button's aria-describedby, so the type stays
+           available to screen readers although this bar is aria-hidden -->
+      <span
+        :id="`plan-type-${item._id.toString()}`"
+        class="text-xs text-dark-3 dark:text-light-3 justify-self-end"
+        >{{ item.type }}</span
+      >
     </div>
   </div>
 </template>

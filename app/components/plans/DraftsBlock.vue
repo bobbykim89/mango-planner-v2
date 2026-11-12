@@ -29,13 +29,21 @@ const handleButtonClick = (id: string, data: PlanFormInput) => {
           draft.id === 'new'
             ? 'btn-warning'
             : 'btn-dark-1 text-light-1 dark:text-dark-3 dark:btn-light-3',
-          'btn btn-no-ring flex gap-2 items-center justify-center',
+          'btn flex gap-2 items-center justify-center',
         ]"
         v-for="draft in drafts"
         :key="draft.id"
+        type="button"
+        :aria-label="
+          draft.id === 'new'
+            ? 'New draft'
+            : `Edit draft &quot;${draft.data.title}&quot;`
+        "
         @click="handleButtonClick(draft.id, draft.data)"
       >
         <svg
+          aria-hidden="true"
+          focusable="false"
           v-if="draft.id === 'new'"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 640 640"
@@ -48,6 +56,8 @@ const handleButtonClick = (id: string, data: PlanFormInput) => {
           />
         </svg>
         <svg
+          aria-hidden="true"
+          focusable="false"
           v-else
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 640 640"

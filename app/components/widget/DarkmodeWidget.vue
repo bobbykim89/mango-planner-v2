@@ -17,18 +17,22 @@ const handleColorModeButtonClick = (e: Event) => {
   <div
     class="py-3xs px-xs md:py-2xs md:bg-light-4 md:dark:bg-dark-4 rounded-md drop-shadow-md"
   >
-    <div
-      class="relative h-lg before:absolute before:h-xs before:w-full before:bg-warning/75 dark:before:bg-warning/50 before:rounded-lg before:top-1/2 before:-translate-y-1/2 cursor-pointer hover:opacity-80 transition-opacity duration-300 ease-linear"
-      role="button"
-      aria-label="toggle dark mode"
+    <button
+      type="button"
+      role="switch"
+      :aria-checked="dark"
+      aria-label="Dark mode"
+      class="block w-full relative h-lg before:absolute before:h-xs before:w-full before:bg-warning/75 dark:before:bg-warning/50 before:rounded-lg before:top-1/2 before:-translate-y-1/2 before:left-0 cursor-pointer hover:opacity-80 transition-opacity duration-300 ease-linear rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warning"
       @click="handleColorModeButtonClick"
     >
       <div
-        class="absolute p-2xs text-dark-1 dark:text-light-4 transition-all duration-300 ease-linear"
+        class="absolute top-0 p-2xs text-dark-1 dark:text-light-4 transition-all duration-300 ease-linear"
         :class="[dark ? 'left-full -translate-x-full' : 'left-0']"
       >
         <!-- moon icon -->
         <svg
+          aria-hidden="true"
+          focusable="false"
           v-if="dark"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 384 512"
@@ -42,6 +46,8 @@ const handleColorModeButtonClick = (e: Event) => {
         </svg>
         <!-- sun icon -->
         <svg
+          aria-hidden="true"
+          focusable="false"
           v-else
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 512 512"
@@ -54,7 +60,7 @@ const handleColorModeButtonClick = (e: Event) => {
           />
         </svg>
       </div>
-    </div>
+    </button>
   </div>
 </template>
 

@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { MclInputText } from '@bobbykim/mcl-forms'
 
+type PlanDisplayStyle = 'all' | 'incomplete' | 'custom' | 'search'
+
 const props = defineProps<{
   hasProfile: boolean
+  active: PlanDisplayStyle
 }>()
 
 const emit = defineEmits<{
@@ -43,11 +46,13 @@ watch(
     <div class="flex gap-2xs mb-2xs">
       <label
         for="search-bar"
-        class="mb-0 bg-warning p-2xs text-light-1 h-full rounded-l-md"
+        class="mb-0 bg-warning p-2xs text-dark-3 h-full rounded-l-md"
         title="Search"
-        tabindex="0"
       >
+        <span class="sr-only">Search plans</span>
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 512 512"
           fill="currentColor"
@@ -72,11 +77,15 @@ watch(
       <!-- sort list -->
       <button
         class="btn btn-light-4 dark:btn-light-3 btn-full text-dark-3"
-        aria-label="all"
-        title="all"
+        type="button"
+        aria-label="Show all plans"
+        title="Show all plans"
+        :aria-pressed="active === 'all'"
         @click="onShowAllClick"
       >
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 512 512"
           fill="currentColor"
@@ -91,11 +100,15 @@ watch(
       <!-- sort incomplete -->
       <button
         class="btn btn-light-4 dark:btn-light-3 btn-full text-dark-3"
-        aria-label="incomplete"
-        title="incomplete"
+        type="button"
+        aria-label="Show incomplete plans"
+        title="Show incomplete plans"
+        :aria-pressed="active === 'incomplete'"
         @click="onShowIncompleteClick"
       >
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 640 512"
           fill="currentColor"
@@ -110,12 +123,16 @@ watch(
       <!-- sort custom: display only when user has profile -->
       <button
         class="btn btn-light-4 dark:btn-light-3 btn-full text-dark-3"
-        aria-label="custom"
-        title="custom"
+        type="button"
+        aria-label="Custom order"
+        title="Custom order"
+        :aria-pressed="active === 'custom'"
         v-if="hasProfile"
         @click="onShowCustomClick"
       >
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 576 512"
           fill="currentColor"

@@ -64,25 +64,26 @@ const formTextColor = computed<ColorPalette>(() => {
       <div
         class="bg-light-3 dark:bg-dark-3 p-md rounded-md drop-shadow-md w-full max-w-112 mx-xs"
       >
-        <h2 class="text-warning text-center mb-sm">Signup</h2>
-        <MclFormGroup
-          field-id="user-name"
-          label="Username:"
-          :text-color="formTextColor"
-          :text-bold="true"
-          class="mb-xs"
-        >
-          <MclInputText
-            id="user-name"
-            type="text"
-            placeholder="Manguito"
-            highlight-color="warning"
-            rounded
-            required
-            v-model="signUpCred.userName"
-          ></MclInputText>
-        </MclFormGroup>
+        <h1 class="h2-md text-warning text-center mb-sm">Signup</h1>
         <form @submit.prevent="handleFormSubmit">
+          <MclFormGroup
+            field-id="user-name"
+            label="Username:"
+            :text-color="formTextColor"
+            :text-bold="true"
+            class="mb-xs"
+          >
+            <MclInputText
+              id="user-name"
+              type="text"
+              autocomplete="username"
+              placeholder="Manguito"
+              highlight-color="warning"
+              rounded
+              required
+              v-model="signUpCred.userName"
+            ></MclInputText>
+          </MclFormGroup>
           <MclFormGroup
             field-id="email"
             label="Email:"
@@ -93,6 +94,7 @@ const formTextColor = computed<ColorPalette>(() => {
             <MclInputText
               id="email"
               type="email"
+              autocomplete="email"
               placeholder="example@email.com"
               highlight-color="warning"
               rounded
@@ -103,6 +105,7 @@ const formTextColor = computed<ColorPalette>(() => {
           <MclFormGroup
             field-id="password"
             label="Password:"
+            help-text="Use at least 8 characters, with an uppercase and a lowercase letter, a number and a special character."
             :text-color="formTextColor"
             :text-bold="true"
             class="mb-sm"
@@ -110,6 +113,7 @@ const formTextColor = computed<ColorPalette>(() => {
             <MclInputText
               id="password"
               type="password"
+              autocomplete="new-password"
               highlight-color="warning"
               rounded
               required
@@ -119,9 +123,7 @@ const formTextColor = computed<ColorPalette>(() => {
               v-model="signUpCred.password"
             ></MclInputText>
           </MclFormGroup>
-          <button role="button" type="submit" class="btn btn-warning btn-full">
-            Submit
-          </button>
+          <button type="submit" class="btn btn-warning btn-full">Submit</button>
         </form>
       </div>
     </div>

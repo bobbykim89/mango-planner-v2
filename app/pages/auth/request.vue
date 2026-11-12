@@ -57,7 +57,7 @@ const formTextColor = computed<ColorPalette>(() => {
       <div
         class="bg-light-3 dark:bg-dark-3 p-md rounded-md drop-shadow-md w-full max-w-112 mx-xs"
       >
-        <h2 class="text-warning text-center mb-sm">Request Reset</h2>
+        <h1 class="h2-md text-warning text-center mb-sm">Request Reset</h1>
         <form @submit.prevent="handleFormSubmit">
           <MclFormGroup
             field-id="email"
@@ -69,6 +69,7 @@ const formTextColor = computed<ColorPalette>(() => {
             <MclInputText
               id="email"
               type="email"
+              autocomplete="email"
               placeholder="example@email.com"
               highlight-color="warning"
               rounded
@@ -76,9 +77,7 @@ const formTextColor = computed<ColorPalette>(() => {
               v-model="emailInputRef"
             ></MclInputText>
           </MclFormGroup>
-          <button role="button" type="submit" class="btn btn-warning btn-full">
-            Submit
-          </button>
+          <button type="submit" class="btn btn-warning btn-full">Submit</button>
         </form>
       </div>
     </div>

@@ -41,6 +41,8 @@ const handleUsernameClick = (e: Event) => {
       class="flex justify-center md:justify-normal items-center md:border-l-2 border-warning px-sm hover:opacity-60 transition-opacity duration-300 ease-linear"
     >
       <button
+        type="button"
+        aria-haspopup="dialog"
         @click="handleUsernameClick"
         class="flex items-center gap-xs md:gap-2xs"
       >
@@ -61,7 +63,7 @@ const handleUsernameClick = (e: Event) => {
     <!-- guest btns -->
     <div
       v-else
-      class="flex flex-col md:flex-row justify-center md:justify-normal items-center gap-2xs md:gap-sm md:border-l-2 border-warning px-sm text-dark-3 dark:text-light-3 md:text-warning md:dark:text-warning"
+      class="flex flex-col md:flex-row justify-center md:justify-normal items-center gap-2xs md:gap-sm md:border-l-2 border-warning px-sm text-dark-3 dark:text-light-3 md:text-warning-text"
     >
       <!-- login btn -->
       <a
@@ -71,6 +73,8 @@ const handleUsernameClick = (e: Event) => {
         class="flex items-center gap-3 text-lg font-bold hover:opacity-60 transition-opacity duration-300 ease-linear"
       >
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 512 512"
           class="h-xs"
@@ -91,6 +95,8 @@ const handleUsernameClick = (e: Event) => {
         class="flex items-center gap-3 text-lg font-bold hover:opacity-60 transition-opacity duration-300 ease-linear"
       >
         <svg
+          aria-hidden="true"
+          focusable="false"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 640 512"
           class="h-xs"

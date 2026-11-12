@@ -88,7 +88,7 @@
     padding: 0.15em 0.35em;
     border-radius: 4px;
     background-color: var(--color-light-2);
-    color: var(--color-warning);
+    color: var(--color-warning-text);
   }
 
   // ── Code block ────────────────────────────────────────
@@ -134,7 +134,7 @@
   a {
     text-decoration: underline;
     text-underline-offset: 2px;
-    color: var(--color-warning);
+    color: var(--color-warning-text);
     transition: opacity 300 linear;
     opacity: 1;
 
@@ -202,6 +202,17 @@
         margin-top: 0.25em;
         flex-shrink: 0;
       }
+    }
+  }
+
+  // ── Links on work/chore panels (light mode) ───────────
+  // No amber passes contrast on the tinted panels, so links use body text
+  // colour with a bright mango underline instead.
+  &.md-content--tinted a {
+    :root:not(.dark) & {
+      color: var(--color-dark-3);
+      text-decoration-color: var(--color-warning);
+      text-decoration-thickness: 2px;
     }
   }
 

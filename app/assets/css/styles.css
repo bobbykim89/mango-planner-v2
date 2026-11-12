@@ -3,7 +3,27 @@
 @source "../../../node_modules/@bobbykim";
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  /* amber used as text: darker in light mode for contrast, bright mango in dark mode */
+  --color-warning-text: #735107;
+}
+
 :root {
   --mcl-primary: #312e81;
   --mcl-info: #14532d;
+}
+
+.dark {
+  --color-warning-text: var(--color-warning);
+}
+
+/* amber text from the app and from MCL components (footer title, social icons) */
+:root:not(.dark) .text-warning {
+  color: var(--color-warning-text);
+}
+
+/* keep focused elements clear of the sticky header and the fixed mobile tools button (WCAG 2.4.11) */
+html {
+  scroll-padding-top: 6rem;
+  scroll-padding-bottom: 5rem;
 }

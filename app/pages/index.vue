@@ -19,6 +19,7 @@ import {
 } from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { AccordionGroup, Modal } from '@bobbykim/manguito-theme'
+import { useDebounceFn } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import draggable from 'vuedraggable'
 
@@ -71,6 +72,8 @@ const draftDataForm = reactive<PlanFormInput>({
 })
 const customOrderData = ref<PlanDto[]>([])
 const selectedPost = ref<string>('')
+const isSavingOrder = ref<boolean>(false)
+const { polite: announce } = useAnnouncer()
 
 const userProfileStatus = computed<boolean>(() => {
   if (isAuthenticated && userProfile.value !== null) {
@@ -96,13 +99,43 @@ const handleShowCustomClick = (e: Event) => {
   customOrderData.value = planStore.getPlansByOrder
   displayStyle.value = 'custom'
 }
+// set when the modal is opened from the mobile tools block, which hides itself first;
+// focus then returns to the (still visible) tools toggle instead of a hidden button
+const returnFocusToToggle = ref<boolean>(false)
 const openModal = () => {
   modalForm.value = 'new'
+  returnFocusToToggle.value = mobileUtilityToggle.value
   mobileUtilityToggle.value = false
   modalRef.value!.open()
 }
-const closeModal = () => {
-  modalRef.value?.close()
+// set after saving an edit: the edited card may re-render collapsed, hiding the Edit
+// button the dialog would return focus to, so fall back to the plan's title button
+const focusPlanAfterClose = ref<string>('')
+const onModalClose = async () => {
+  onClear()
+  if (!import.meta.client) return
+  if (returnFocusToToggle.value) {
+    returnFocusToToggle.value = false
+    await nextTick()
+    document
+      .querySelector<HTMLElement>('[aria-controls="mobile-utility"]')
+      ?.focus()
+    return
+  }
+  const planId = focusPlanAfterClose.value
+  if (planId) {
+    focusPlanAfterClose.value = ''
+    // let the dialog finish restoring focus first, then repair it only if it was lost
+    window.setTimeout(() => {
+      const active = document.activeElement as HTMLElement | null
+      // getClientRects: works for fixed elements and in Safari < 17.4 (no checkVisibility)
+      if (active && active !== document.body && active.getClientRects().length)
+        return
+      document
+        .querySelector<HTMLElement>(`[data-plan-toggle="${planId}"]`)
+        ?.focus()
+    }, 400)
+  }
 }
 const onClear = () => {
   selectedPost.value = ''
@@ -153,6 +186,7 @@ const onEditSubmit = async (e: Event, data: PlanFormInput) => {
   ) {
     await planStore.updatePost({ id: selectedPost.value, body: data })
   }
+  focusPlanAfterClose.value = selectedPost.value
   onClear()
   modalRef.value?.close()
 }
@@ -189,31 +223,93 @@ const onDraftSave = async (e: Event, data: PlanFormInput) => {
     modalRef.value?.close()
   }
 }
+// ids of the visible plans just before and after `id`, in on-screen order
+const neighbourIds = (id: string): { next?: string; prev?: string } => {
+  const ids = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-plan-toggle]'),
+  )
+    .filter((el) => el.offsetParent !== null)
+    .map((el) => el.dataset.planToggle ?? '')
+  const i = ids.indexOf(id)
+  return { next: ids[i + 1], prev: ids[i - 1] }
+}
 const handleCollapseDelete = async (e: Event, id: string) => {
   e.preventDefault()
   if (
     import.meta.client &&
     window.confirm('Permanently deleting this item. Please confirm to proceed.')
   ) {
+    const { next, prev } = neighbourIds(id)
     await planStore.deletePost(id)
+    customOrderData.value = planStore.getPlansByOrder
+    // keep keyboard focus on the list instead of losing it with the removed card
+    await nextTick()
+    const target =
+      [next, prev]
+        .map((pid) =>
+          pid
+            ? document.querySelector<HTMLElement>(`[data-plan-toggle="${pid}"]`)
+            : null,
+        )
+        .find((el) => el && el.offsetParent !== null) ??
+      document.querySelector<HTMLElement>('#plans-heading')
+    target?.focus()
+    return
   }
   customOrderData.value = planStore.getPlansByOrder
 }
 const onOrderUpdate = async () => {
-  const itemsOrder: string[] = customOrderData.value.map((item) => {
-    return item._id!.toString()
-  })
-  await profileStore.updateUserPlansOrder({ plansOrder: itemsOrder })
-  await profileStore.getCurrentUserProfile()
-  customOrderData.value = planStore.getPlansByOrder
+  isSavingOrder.value = true
+  try {
+    const itemsOrder: string[] = customOrderData.value.map((item) => {
+      return item._id!.toString()
+    })
+    await profileStore.updateUserPlansOrder({ plansOrder: itemsOrder })
+    await profileStore.getCurrentUserProfile()
+    customOrderData.value = planStore.getPlansByOrder
+  } finally {
+    isSavingOrder.value = false
+  }
+}
+// keyboard / tap reordering from the drag handle's Move menu
+const movePlan = async (id: string, target: MoveTarget) => {
+  if (isSavingOrder.value) return
+  const from = customOrderData.value.findIndex(
+    (item) => item._id!.toString() === id,
+  )
+  if (from === -1) return
+  const next = reorderPlans(customOrderData.value, from, target)
+  const newIndex = next.findIndex((item) => item._id!.toString() === id)
+  if (newIndex === from) return
+  const title = customOrderData.value[from]!.title
+  const focusHandle = async () => {
+    if (!import.meta.client) return
+    await nextTick()
+    document.querySelector<HTMLElement>(`[data-move-handle="${id}"]`)?.focus()
+  }
+  customOrderData.value = next
+  // moving the DOM node blurs it, so refocus the handle before and after saving
+  await focusHandle()
+  await onOrderUpdate()
+  // the store reports a failed save with an alert and the order reverts; only
+  // announce success when the plan really is in its new place
+  const savedIndex = customOrderData.value.findIndex(
+    (item) => item._id!.toString() === id,
+  )
+  if (savedIndex === newIndex) {
+    announce(`"${title}" moved to position ${newIndex + 1} of ${next.length}`)
+  }
+  await focusHandle()
 }
 const onMobileUtilityToggle = (open: boolean) => {
   mobileUtilityToggle.value = !open
 }
+const escapeRegExp = (text: string) =>
+  text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const getPlans = computed(() => {
   if (displayStyle.value === 'search') {
     return planStore.getAllPlans.filter((item) => {
-      const search = new RegExp(`${searchTerm.value}`, 'gi')
+      const search = new RegExp(escapeRegExp(searchTerm.value), 'gi')
       return item.title.match(search) || item.content?.match(search)
     })
   }
@@ -222,14 +318,25 @@ const getPlans = computed(() => {
   }
   return planStore.getAllPlans
 })
+// announce how many plans are shown after search/filter changes (debounced for typing)
+const announceCount = useDebounceFn(() => {
+  const n =
+    displayStyle.value === 'custom'
+      ? customOrderData.value.length
+      : getPlans.value.length
+  announce(`${n} ${n === 1 ? 'plan' : 'plans'} shown`)
+}, 500)
+watch([displayStyle, searchTerm], () => {
+  announceCount()
+})
 </script>
 
 <template>
   <section class="container py-md lg:py-lg min-h-[75vh]">
+    <h1 id="plans-heading" tabindex="-1" class="sr-only">My plans</h1>
     <div
       v-if="mounted"
       class="grid md:grid-cols-2 gap-xs md:gap-md grid-flow-row px-sm md:px-xs relative"
-      @keyup.esc="(closeModal(), onClear())"
     >
       <!-- mobile utility block -->
       <MobileUtilityToggleButton
@@ -240,6 +347,7 @@ const getPlans = computed(() => {
         <MobileUtilityBlock
           v-show="mobileUtilityToggle"
           :hasProfile="userProfileStatus"
+          :active="displayStyle"
           @new-post="openModal"
           @show-all="handleShowAllClick"
           @show-incomplete="handleShowIncompleteClick"
@@ -253,7 +361,7 @@ const getPlans = computed(() => {
         <div
           class="hidden md:block bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md"
         >
-          <h3 class="h3-md text-warning mb-xs">Create New Plan</h3>
+          <h2 class="h3-md text-warning mb-xs">Create New Plan</h2>
           <PlanInputForm
             prefix="desktop-new"
             @form-submit="handleNewFormSubmit"
@@ -262,6 +370,7 @@ const getPlans = computed(() => {
         <!-- utility block -->
         <UtilityBlock
           :hasProfile="userProfileStatus"
+          :active="displayStyle"
           @show-all="handleShowAllClick"
           @show-incomplete="handleShowIncompleteClick"
           @show-custom="handleShowCustomClick"
@@ -284,6 +393,8 @@ const getPlans = computed(() => {
             @click="openModal"
           >
             <svg
+              aria-hidden="true"
+              focusable="false"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 448 512"
               fill="currentColor"
@@ -311,12 +422,18 @@ const getPlans = computed(() => {
                 v-model="customOrderData"
                 item-key="_id"
                 handle=".handle"
+                :fallback-tolerance="5"
+                :disabled="isSavingOrder"
                 @change="onOrderUpdate"
               >
-                <template #item="{ element }">
+                <template #item="{ element, index }">
                   <PlanCollapsable
                     :item="element"
                     :show-handle="true"
+                    :index="index"
+                    :total="customOrderData.length"
+                    :move-disabled="isSavingOrder"
+                    @move="movePlan"
                     :key="element._id.toString()"
                     @toggle-complete="handleCollapseToggle"
                     @edit="handleCollapseEdit"
@@ -352,7 +469,8 @@ const getPlans = computed(() => {
         </AccordionGroup>
       </div>
     </div>
-    <div v-else class="min-h-[60vh] flex items-center">
+    <div v-else role="status" class="min-h-[60vh] flex items-center">
+      <span class="sr-only">Loading plans</span>
       <div
         class="loader border-light-3 dark:border-light-4 border-t-warning dark:border-t-warning border-20 rounded-full w-50 h-50 mx-auto"
       ></div>
@@ -363,19 +481,21 @@ const getPlans = computed(() => {
       :color="handleBgColors"
       custom-class="px-xs rounded-md border dark:border-dark-1"
       width="large"
-      @close="onClear"
+      @close="onModalClose"
     >
-      <template #header="{ close }">
+      <template #header="{ close, titleId }">
         <div
           class="flex justify-between py-xs border-b-2 border-b-light-1 dark:border-b-dark-1"
         >
-          <h3 class="h3-md text-warning">
+          <h2 :id="titleId" class="h3-md text-warning">
             <span v-if="modalForm === 'new'">Create New Plan</span>
             <span v-else-if="modalForm === 'update'">Update Plan</span>
             <span v-else>Saved Draft</span>
-          </h3>
+          </h2>
           <button @click="(onClear(), close())" aria-label="close modal">
             <svg
+              aria-hidden="true"
+              focusable="false"
               xmlns="http://www.w3.org/2000/svg"
               height="1em"
               viewBox="0 0 384 512"
@@ -446,6 +566,24 @@ const getPlans = computed(() => {
 /* spinner animation */
 .loader {
   animation: spinner 2s linear infinite;
+}
+/* reduced motion: no sliding, slower spinner */
+@media (prefers-reduced-motion: reduce) {
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.2s ease;
+  }
+  .fade-enter-from,
+  .fade-leave-to {
+    transform: none;
+  }
+  .mobile-utility-enter-active,
+  .mobile-utility-leave-active {
+    transition: none;
+  }
+  .loader {
+    animation-duration: 6s;
+  }
 }
 @keyframes spinner {
   0% {

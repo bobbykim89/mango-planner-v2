@@ -108,32 +108,35 @@ const formTextColor = computed<ColorPalette>(() => {
           v-model="formContent.content"
         ></MclTextArea>
       </MclFormGroup>
-      <div class="flex justify-center gap-md mb-sm">
-        <div
-          class="flex items-center gap-2xs"
-          v-for="(item, idx) in typeOptions"
-          :key="idx"
-        >
-          <MclInputRadio
-            :id="item.id"
-            :name="`${prefix}-type`"
-            :value="item.value"
-            v-model="formContent.type"
-            bg-color="warning"
-            checked-bg-color="warning"
-            border-color="warning"
-            :indicator-color="typeIndicatorColor[item.value]"
-          ></MclInputRadio>
-          <MclFormGroup :field-id="item.id">
-            <template #label>
-              <p class="text-dark-3 dark:text-light-3 font-bold">
-                {{ item.text }}
-              </p>
-            </template>
-          </MclFormGroup>
+      <fieldset>
+        <legend class="sr-only">Plan type</legend>
+        <div class="flex justify-center gap-md mb-sm">
+          <div
+            class="flex items-center gap-2xs"
+            v-for="(item, idx) in typeOptions"
+            :key="idx"
+          >
+            <MclInputRadio
+              :id="item.id"
+              :name="`${prefix}-type`"
+              :value="item.value"
+              v-model="formContent.type"
+              bg-color="warning"
+              checked-bg-color="warning"
+              border-color="warning"
+              :indicator-color="typeIndicatorColor[item.value]"
+            ></MclInputRadio>
+            <MclFormGroup :field-id="item.id">
+              <template #label>
+                <p class="text-dark-3 dark:text-light-3 font-bold">
+                  {{ item.text }}
+                </p>
+              </template>
+            </MclFormGroup>
+          </div>
         </div>
-      </div>
-      <button role="button" class="btn btn-warning btn-full">
+      </fieldset>
+      <button type="submit" class="btn btn-warning btn-full">
         {{ submitText }}
       </button>
     </form>

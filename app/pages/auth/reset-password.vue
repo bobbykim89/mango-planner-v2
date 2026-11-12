@@ -67,11 +67,12 @@ const formTextColor = computed<ColorPalette>(() => {
       <div
         class="bg-light-3 dark:bg-dark-3 p-md rounded-md drop-shadow-md w-full max-w-112 mx-xs"
       >
-        <h2 class="text-warning text-center mb-sm">Reset Password</h2>
+        <h1 class="h2-md text-warning text-center mb-sm">Reset Password</h1>
         <form @submit.prevent="handleFormSubmit">
           <MclFormGroup
             field-id="new-password"
             label="New Password:"
+            help-text="Use at least 8 characters, with an uppercase and a lowercase letter, a number and a special character."
             :text-color="formTextColor"
             :text-bold="true"
             class="mb-xs"
@@ -79,6 +80,7 @@ const formTextColor = computed<ColorPalette>(() => {
             <MclInputText
               id="new-password"
               type="password"
+              autocomplete="new-password"
               highlight-color="warning"
               rounded
               required
@@ -88,9 +90,7 @@ const formTextColor = computed<ColorPalette>(() => {
               invalid-feedback="Password must include one number, one uppercase and lowercase letter, one special character with at least 8 characters length."
             ></MclInputText>
           </MclFormGroup>
-          <button role="button" type="submit" class="btn btn-warning btn-full">
-            Submit
-          </button>
+          <button type="submit" class="btn btn-warning btn-full">Submit</button>
         </form>
       </div>
     </div>
