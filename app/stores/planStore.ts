@@ -29,6 +29,7 @@ const getDraftDb = (): DraftDb => {
 export const usePlanStore = defineStore('plan', () => {
   const errorCheck = useErrorCheck()
   const cookie = useAuthToken()
+  const api = useApi()
   const alertStore = useAlertStore()
   const profileStore = useProfileStore()
   const userStore = useUserStore()
@@ -78,9 +79,8 @@ export const usePlanStore = defineStore('plan', () => {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) return
 
-      const res = await $fetch<PlanDto[]>('/api/plan', {
+      const res = await api<PlanDto[]>('/api/plan', {
         method: 'GET',
-        headers: { Authorization: cookie.value },
       })
 
       plans.value = res
@@ -94,9 +94,8 @@ export const usePlanStore = defineStore('plan', () => {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) return
 
-      const res = await $fetch<PlanDto>('/api/plan', {
+      const res = await api<PlanDto>('/api/plan', {
         method: 'POST',
-        headers: { Authorization: cookie.value },
         body: payload,
       })
       plans.value = [res, ...plans.value]
@@ -111,9 +110,8 @@ export const usePlanStore = defineStore('plan', () => {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) return
 
-      await $fetch<PlanModel>(`/api/plan/${payload.id}`, {
+      await api<PlanModel>(`/api/plan/${payload.id}`, {
         method: 'PUT',
-        headers: { Authorization: cookie.value },
         body: payload.body,
       })
       await getAllPostByUser()
@@ -128,9 +126,8 @@ export const usePlanStore = defineStore('plan', () => {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) return
 
-      const res = await $fetch<PlanModel>(`/api/plan/${payload.id}/toggle`, {
+      const res = await api<PlanModel>(`/api/plan/${payload.id}/toggle`, {
         method: 'PUT',
-        headers: { Authorization: cookie.value },
         body: payload.body,
       })
       await getAllPostByUser()
@@ -149,9 +146,8 @@ export const usePlanStore = defineStore('plan', () => {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) return
 
-      await $fetch(`/api/plan/${payload}`, {
+      await api(`/api/plan/${payload}`, {
         method: 'DELETE',
-        headers: { Authorization: cookie.value },
       })
       await getAllPostByUser()
       alertStore.setAlert('Successfully deleted plan!', 'success')

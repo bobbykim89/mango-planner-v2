@@ -2,7 +2,6 @@
 import { useAlertStore, useProfileStore } from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { MclFormGroup, MclInputText } from '@bobbykim/mcl-forms'
-import type { H3Error } from 'h3'
 import { storeToRefs } from 'pinia'
 
 const url = useRequestURL()
@@ -39,6 +38,8 @@ const passwordInvalid = computed<boolean>(
     passwordInputRef.value !== '' &&
     !passwordPattern.test(passwordInputRef.value),
 )
+const api = useApi()
+const { extractErrorMessage } = useErrorCheck()
 const handleFormSubmit = async () => {
   const userId = route.query.user
   const token = route.query.token
@@ -46,14 +47,14 @@ const handleFormSubmit = async () => {
   if (!token) return
   if (passwordInputRef.value === '') return
   try {
-    await $fetch('/api/token/reset-password', {
+    await api('/api/token/reset-password', {
       method: 'POST',
       body: { userId, token, password: passwordInputRef.value },
     })
     alertStore.setAlert('Successfully updated password', 'success')
     router.push({ path: '/auth/login' })
   } catch (error) {
-    alertStore.setAlert((error as H3Error).statusMessage!)
+    alertStore.setAlert(extractErrorMessage(error))
   }
 }
 const formTextColor = computed<ColorPalette>(() => {

@@ -3,7 +3,6 @@ import { useRequestURL } from '#app'
 import { useAlertStore, useProfileStore } from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { MclFormGroup, MclInputText } from '@bobbykim/mcl-forms'
-import type { H3Error } from 'h3'
 import { storeToRefs } from 'pinia'
 
 const url = useRequestURL()
@@ -33,17 +32,19 @@ const alertStore = useAlertStore()
 const { darkMode } = storeToRefs(profileStore)
 const emailInputRef = ref<string>('')
 
+const api = useApi()
+const { extractErrorMessage } = useErrorCheck()
 const handleFormSubmit = async () => {
   if (emailInputRef.value === '') return
   try {
-    await $fetch('/api/token/send-token', {
+    await api('/api/token/send-token', {
       method: 'POST',
       body: { email: emailInputRef.value, url: url.origin },
     })
     alertStore.setAlert('Please check your email', 'success')
     router.push({ path: '/auth/login' })
   } catch (error) {
-    alertStore.setAlert((error as H3Error).statusMessage!)
+    alertStore.setAlert(extractErrorMessage(error))
   }
 }
 const formTextColor = computed<ColorPalette>(() => {

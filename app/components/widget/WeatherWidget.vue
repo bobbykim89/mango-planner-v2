@@ -22,6 +22,7 @@ const props = defineProps<{
   longitude: number
 }>()
 
+const api = useApi()
 const weatherData = reactive<{
   city: string
   weather: string
@@ -37,7 +38,7 @@ const weatherData = reactive<{
 const getWeatherData = async () => {
   const { latitude, longitude } = props
   if (latitude !== null && latitude !== Infinity) {
-    const res = await $fetch<ApiReturnType>('/api/weather', {
+    const res = await api<ApiReturnType>('/api/weather', {
       query: {
         lat: latitude,
         lon: longitude,

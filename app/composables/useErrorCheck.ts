@@ -1,5 +1,6 @@
 export const useErrorCheck = () => {
   const extractErrorMessage = (err: unknown) => {
+    if (err instanceof ApiClientError) return err.message
     if (err && typeof err === 'object' && 'statusMessage' in err) {
       return String(err.statusMessage)
     }
@@ -9,17 +10,19 @@ export const useErrorCheck = () => {
     return 'Unknown Error.'
   }
 
+  // only a missing or invalid session means "signed out"; a wrong password at login doesn't
   const isAuthError = (err: unknown) => {
-    // check for 401 status code
-    if (
-      err &&
+    if (err instanceof ApiClientError) {
+      return (
+        err.code === 'AUTH_TOKEN_MISSING' || err.code === 'AUTH_TOKEN_INVALID'
+      )
+    }
+    return (
+      !!err &&
       typeof err === 'object' &&
       'statusCode' in err &&
       err.statusCode === 401
-    ) {
-      return true
-    }
-    return false
+    )
   }
   return { extractErrorMessage, isAuthError }
 }

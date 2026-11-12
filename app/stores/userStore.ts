@@ -21,6 +21,7 @@ export const useUserStore = defineStore('user', () => {
   const planStore = usePlanStore()
   const profileStore = useProfileStore()
   const cookie = useAuthToken()
+  const api = useApi()
   // state
   const currentUser = ref<UserDto | null>(null)
   const isAuthenticated = ref<boolean>(false)
@@ -36,9 +37,8 @@ export const useUserStore = defineStore('user', () => {
     try {
       if (!cookie.value) return
 
-      const res = await $fetch<UserDto>('/api/auth', {
+      const res = await api<UserDto>('/api/auth', {
         method: 'GET',
-        headers: { Authorization: cookie.value },
       })
       currentUser.value = res
       isAuthenticated.value = true
@@ -50,9 +50,8 @@ export const useUserStore = defineStore('user', () => {
     try {
       if (!cookie.value) return
 
-      const res = await $fetch<UserDto>('/api/auth', {
+      const res = await api<UserDto>('/api/auth', {
         method: 'GET',
-        headers: { Authorization: cookie.value },
       })
       currentUser.value = res
       isAuthenticated.value = true
@@ -64,7 +63,7 @@ export const useUserStore = defineStore('user', () => {
   }
   const loginWithCredential = async (payload: AuthInput) => {
     try {
-      const res = await $fetch<AuthToken>('/api/auth', {
+      const res = await api<AuthToken>('/api/auth', {
         method: 'POST',
         body: payload,
       })
@@ -77,7 +76,7 @@ export const useUserStore = defineStore('user', () => {
   }
   const signupNewUser = async (payload: UserInput) => {
     try {
-      const res = await $fetch<AuthToken>('/api/user', {
+      const res = await api<AuthToken>('/api/user', {
         method: 'POST',
         body: payload,
       })
@@ -92,9 +91,8 @@ export const useUserStore = defineStore('user', () => {
     try {
       if (!cookie.value) return
 
-      await $fetch('/api/user/username', {
+      await api('/api/user/username', {
         method: 'PUT',
-        headers: { Authorization: cookie.value },
         body: payload,
       })
       await authUser()
@@ -107,9 +105,8 @@ export const useUserStore = defineStore('user', () => {
     try {
       if (!cookie.value) return
 
-      await $fetch('/api/user/password', {
+      await api('/api/user/password', {
         method: 'PUT',
-        headers: { Authorization: cookie.value },
         body: payload,
       })
       await authUser()

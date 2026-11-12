@@ -10,6 +10,7 @@ export const useProfileStore = defineStore('profile', () => {
   const alertStore = useAlertStore()
   const userStore = useUserStore()
   const cookie = useAuthToken()
+  const api = useApi()
   // state
   const userProfile = ref<ProfileDto | null>(null)
   const darkMode = ref<boolean>(false)
@@ -26,9 +27,8 @@ export const useProfileStore = defineStore('profile', () => {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) return
 
-      const res = await $fetch<ProfileDto | null>('/api/profile', {
+      const res = await api<ProfileDto | null>('/api/profile', {
         method: 'GET',
-        headers: { Authorization: cookie.value },
       })
       if (res) {
         userProfile.value = res
@@ -43,9 +43,8 @@ export const useProfileStore = defineStore('profile', () => {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) return
 
-      await $fetch<ProfileDto>('/api/profile', {
+      await api<ProfileDto>('/api/profile', {
         method: 'POST',
-        headers: { Authorization: cookie.value },
       })
       await getCurrentUserProfile()
       alertStore.setAlert('Successfully created user profile!', 'success')
@@ -58,11 +57,8 @@ export const useProfileStore = defineStore('profile', () => {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) return
 
-      await $fetch<ProfileDto>('/api/profile/profile-picture', {
+      await api<ProfileDto>('/api/profile/profile-picture', {
         method: 'PUT',
-        headers: {
-          Authorization: cookie.value,
-        },
         body: payload,
       })
       await getCurrentUserProfile()
@@ -76,9 +72,8 @@ export const useProfileStore = defineStore('profile', () => {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) return
 
-      const res = await $fetch<ProfileDto>('/api/profile/plans-order', {
+      const res = await api<ProfileDto>('/api/profile/plans-order', {
         method: 'PUT',
-        headers: { Authorization: cookie.value },
         body: payload,
       })
       userProfile.value = res
@@ -91,9 +86,8 @@ export const useProfileStore = defineStore('profile', () => {
       const { isAuthenticated } = userStore.getCurrentAuthInfo
       if (!cookie.value || !isAuthenticated) return
 
-      await $fetch<ProfileDto>('/api/profile/dark', {
+      await api<ProfileDto>('/api/profile/dark', {
         method: 'PUT',
-        headers: { Authorization: cookie.value },
         body: payload,
       })
       await getCurrentUserProfile()
