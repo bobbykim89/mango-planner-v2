@@ -1,5 +1,5 @@
 import { userController } from '../../controller'
 
-export default defineEventHandler({
-  handler: eventHandler(userController.signupUser),
+export default defineApiHandler({
+  handler: userController.signupUser,
 })

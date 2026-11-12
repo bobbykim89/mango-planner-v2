@@ -1,6 +1,6 @@
 import { userController } from '../../../controller'
 
-export default defineEventHandler({
-  onRequest: [defineRequestMiddleware(checkAuth)],
-  handler: eventHandler(userController.updateUserName),
+export default defineApiHandler({
+  auth: true,
+  handler: userController.updateUserName,
 })

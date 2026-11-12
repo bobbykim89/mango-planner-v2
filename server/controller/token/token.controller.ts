@@ -9,21 +9,18 @@ import {
 } from 'h3'
 import { Model } from 'mongoose'
 import { sendEmail } from '../../utils/sendEmail.util'
-import { UserController } from '../user/user.controller'
 
 export class TokenController {
   private tokenModel: Model<TokenModel>
   private userModel: Model<UserModel>
-  private userController: UserController
   constructor() {
     this.tokenModel = Token
     this.userModel = User
-    this.userController = new UserController()
   }
   public sendToken = async (e: H3Event<EventHandlerRequest>) => {
     const { email, url } = await readValidatedBody(
       e,
-      tokenEmailInputSchema.parse
+      tokenEmailInputSchema.parse,
     )
     const user = await this.userModel.findOne({ email })
     if (!user) {
@@ -37,7 +34,7 @@ export class TokenController {
     let token = await this.tokenModel.findOne({ userId: user.id })
     if (!token) {
       const tempPassword = Math.random().toString(36).slice(-8)
-      const hashedToken = await this.userController.hashPassword(tempPassword)
+      const hashedToken = await hashPassword(tempPassword)
       token = await new this.tokenModel({
         userId: user.id,
         token: hashedToken,
@@ -56,7 +53,7 @@ export class TokenController {
   public resetPasswordWithToken = async (e: H3Event<EventHandlerRequest>) => {
     const { password, token, userId } = await readValidatedBody(
       e,
-      resetPwInputSchema.parse
+      resetPwInputSchema.parse,
     )
     const user = await this.userModel.findById(userId)
     if (!user) {
@@ -74,7 +71,7 @@ export class TokenController {
         statusMessage: 'Not Found: Token not found.',
       })
     }
-    const hashedPassword = await this.userController.hashPassword(password)
+    const hashedPassword = await hashPassword(password)
     user.password = hashedPassword
     await user.save()
     await pwResetToken.deleteOne()

@@ -1,6 +1,6 @@
 import { authController } from '../../controller'
 
-export default defineEventHandler({
-  onRequest: [defineRequestMiddleware(checkAuth)],
-  handler: eventHandler(authController.getCurrentUser),
+export default defineApiHandler({
+  auth: true,
+  handler: authController.getCurrentUser,
 })

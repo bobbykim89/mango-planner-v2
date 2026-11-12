@@ -46,7 +46,7 @@ export class PlanController {
     const user = e.context.user
     const { title, content, type } = await readValidatedBody(
       e,
-      planInputSchema.parse
+      planInputSchema.parse,
     )
     const currentUser = await User.findById(user.id).select('-password')
     if (!currentUser) {
@@ -114,7 +114,7 @@ export class PlanController {
       {
         new: true,
         returnDocument: 'after',
-      }
+      },
     )
     return updatedPlan
   }
@@ -146,7 +146,7 @@ export class PlanController {
       {
         new: true,
         returnDocument: 'after',
-      }
+      },
     )
     return updatedPlan
   }

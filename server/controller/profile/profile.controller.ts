@@ -105,7 +105,7 @@ export class ProfileController {
         profilePicture: file.imageId,
         updatedAt: new Date(),
       },
-      { new: true, returnDocument: 'after' }
+      { new: true, returnDocument: 'after' },
     )
     if (!updatedProfile) {
       throw createError({
@@ -142,7 +142,7 @@ export class ProfileController {
       {
         new: true,
         returnDocument: 'after',
-      }
+      },
     )
     if (!updatedProfile) {
       throw createError({
@@ -179,7 +179,7 @@ export class ProfileController {
       {
         new: true,
         returnDocument: 'after',
-      }
+      },
     )
     if (!updatedProfile) {
       throw createError({

@@ -12,7 +12,7 @@ import { usePlanStore } from './planStore'
 import { useProfileStore } from './profileStore'
 
 interface AuthToken {
-  access_token: string
+  accessToken: string
 }
 
 export const useUserStore = defineStore('user', () => {
@@ -25,6 +25,8 @@ export const useUserStore = defineStore('user', () => {
   // state
   const currentUser = ref<UserDto | null>(null)
   const isAuthenticated = ref<boolean>(false)
+  // per-field messages from the last VALIDATION_FAILED response, keyed by field name
+  const fieldErrors = ref<Record<string, string>>({})
   // getters
   const getCurrentAuthInfo = computed(() => {
     return {
@@ -58,16 +60,18 @@ export const useUserStore = defineStore('user', () => {
       alertStore.setAlert('Successfully authenticated user', 'success')
     } catch (error) {
       handleAuthError(error)
-      cookie.value = null
+      // only drop the stored token when the server rejected it
+      if (errorCheck.isAuthError(error)) cookie.value = null
     }
   }
   const loginWithCredential = async (payload: AuthInput) => {
+    fieldErrors.value = {}
     try {
       const res = await api<AuthToken>('/api/auth', {
         method: 'POST',
         body: payload,
       })
-      cookie.value = res.access_token
+      cookie.value = res.accessToken
       await authUser()
       alertStore.setAlert('Login Successful!', 'success')
     } catch (error) {
@@ -75,12 +79,13 @@ export const useUserStore = defineStore('user', () => {
     }
   }
   const signupNewUser = async (payload: UserInput) => {
+    fieldErrors.value = {}
     try {
       const res = await api<AuthToken>('/api/user', {
         method: 'POST',
         body: payload,
       })
-      cookie.value = res.access_token
+      cookie.value = res.accessToken
       await authUser()
       alertStore.setAlert('Signup Successful!', 'success')
     } catch (error) {
@@ -88,6 +93,7 @@ export const useUserStore = defineStore('user', () => {
     }
   }
   const updateUsername = async (payload: NewUsernameInput) => {
+    fieldErrors.value = {}
     try {
       if (!cookie.value) return
 
@@ -102,6 +108,7 @@ export const useUserStore = defineStore('user', () => {
     }
   }
   const updatePassword = async (payload: PwUpdateInput) => {
+    fieldErrors.value = {}
     try {
       if (!cookie.value) return
 
@@ -134,6 +141,7 @@ export const useUserStore = defineStore('user', () => {
       currentUser.value = null
       isAuthenticated.value = false
     }
+    fieldErrors.value = fieldMap(err)
 
     console.error(errorMessage)
     alertStore.setAlert(errorMessage)
@@ -141,6 +149,7 @@ export const useUserStore = defineStore('user', () => {
   return {
     currentUser,
     isAuthenticated,
+    fieldErrors,
     getCurrentAuthInfo,
     getCurrentUser,
     loginWithCredential,

@@ -48,6 +48,25 @@ export abstract class BaseController {
     return profile
   }
 
+  /**
+   * Finds a user by email without breaking accounts stored before emails were
+   * normalized: exact match, then lowercase, then a case-insensitive match that
+   * counts only if it is unique. Includes the password hash.
+   */
+  protected findUserByEmail = async (
+    email: string,
+  ): Promise<UserDocument | null> => {
+    const typed = email.trim()
+    const exact = await User.findOne({ email: typed })
+    if (exact) return exact
+    const lower = await User.findOne({ email: typed.toLowerCase() })
+    if (lower) return lower
+    const matches = await User.find({ email: typed })
+      .collation({ locale: 'en', strength: 2 })
+      .limit(2)
+    return matches.length === 1 ? matches[0]! : null
+  }
+
   /** The plan if it exists and belongs to userId; otherwise INVALID_ID, PLAN_NOT_FOUND or FORBIDDEN. */
   protected findOwnedPlan = async (
     planId: unknown,
