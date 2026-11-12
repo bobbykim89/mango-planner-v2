@@ -19,6 +19,7 @@ import {
 } from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { AccordionGroup, Modal } from '@bobbykim/manguito-theme'
+import { useDebounceFn } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import draggable from 'vuedraggable'
 
@@ -202,13 +203,38 @@ const onDraftSave = async (e: Event, data: PlanFormInput) => {
     modalRef.value?.close()
   }
 }
+// ids of the visible plans just before and after `id`, in on-screen order
+const neighbourIds = (id: string): { next?: string; prev?: string } => {
+  const ids = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-plan-toggle]'),
+  )
+    .filter((el) => el.offsetParent !== null)
+    .map((el) => el.dataset.planToggle ?? '')
+  const i = ids.indexOf(id)
+  return { next: ids[i + 1], prev: ids[i - 1] }
+}
 const handleCollapseDelete = async (e: Event, id: string) => {
   e.preventDefault()
   if (
     import.meta.client &&
     window.confirm('Permanently deleting this item. Please confirm to proceed.')
   ) {
+    const { next, prev } = neighbourIds(id)
     await planStore.deletePost(id)
+    customOrderData.value = planStore.getPlansByOrder
+    // keep keyboard focus on the list instead of losing it with the removed card
+    await nextTick()
+    const target =
+      [next, prev]
+        .map((pid) =>
+          pid
+            ? document.querySelector<HTMLElement>(`[data-plan-toggle="${pid}"]`)
+            : null,
+        )
+        .find((el) => el && el.offsetParent !== null) ??
+      document.querySelector<HTMLElement>('#plans-heading')
+    target?.focus()
+    return
   }
   customOrderData.value = planStore.getPlansByOrder
 }
@@ -247,10 +273,12 @@ const movePlan = async (id: string, target: MoveTarget) => {
 const onMobileUtilityToggle = (open: boolean) => {
   mobileUtilityToggle.value = !open
 }
+const escapeRegExp = (text: string) =>
+  text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const getPlans = computed(() => {
   if (displayStyle.value === 'search') {
     return planStore.getAllPlans.filter((item) => {
-      const search = new RegExp(`${searchTerm.value}`, 'gi')
+      const search = new RegExp(escapeRegExp(searchTerm.value), 'gi')
       return item.title.match(search) || item.content?.match(search)
     })
   }
@@ -259,11 +287,22 @@ const getPlans = computed(() => {
   }
   return planStore.getAllPlans
 })
+// announce how many plans are shown after search/filter changes (debounced for typing)
+const announceCount = useDebounceFn(() => {
+  const n =
+    displayStyle.value === 'custom'
+      ? customOrderData.value.length
+      : getPlans.value.length
+  announce(`${n} ${n === 1 ? 'plan' : 'plans'} shown`)
+}, 500)
+watch([displayStyle, searchTerm], () => {
+  announceCount()
+})
 </script>
 
 <template>
   <section class="container py-md lg:py-lg min-h-[75vh]">
-    <h1 class="sr-only">My plans</h1>
+    <h1 id="plans-heading" tabindex="-1" class="sr-only">My plans</h1>
     <div
       v-if="mounted"
       class="grid md:grid-cols-2 gap-xs md:gap-md grid-flow-row px-sm md:px-xs relative"
@@ -277,6 +316,7 @@ const getPlans = computed(() => {
         <MobileUtilityBlock
           v-show="mobileUtilityToggle"
           :hasProfile="userProfileStatus"
+          :active="displayStyle"
           @new-post="openModal"
           @show-all="handleShowAllClick"
           @show-incomplete="handleShowIncompleteClick"
@@ -299,6 +339,7 @@ const getPlans = computed(() => {
         <!-- utility block -->
         <UtilityBlock
           :hasProfile="userProfileStatus"
+          :active="displayStyle"
           @show-all="handleShowAllClick"
           @show-incomplete="handleShowIncompleteClick"
           @show-custom="handleShowCustomClick"
@@ -396,7 +437,8 @@ const getPlans = computed(() => {
         </AccordionGroup>
       </div>
     </div>
-    <div v-else class="min-h-[60vh] flex items-center">
+    <div v-else role="status" class="min-h-[60vh] flex items-center">
+      <span class="sr-only">Loading plans</span>
       <div
         class="loader border-light-3 dark:border-light-4 border-t-warning dark:border-t-warning border-20 rounded-full w-50 h-50 mx-auto"
       ></div>
