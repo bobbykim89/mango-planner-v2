@@ -223,7 +223,7 @@ onBeforeUnmount(() => {
         role="menuitem"
         tabindex="-1"
         :aria-disabled="item.disabled ? 'true' : undefined"
-        class="flex gap-2.5 items-center w-full px-3 py-2.5 rounded text-left text-dark-3 dark:text-light-3 hover:bg-warning/25 focus:bg-warning/25 focus:outline-none aria-disabled:opacity-40 aria-disabled:cursor-not-allowed aria-disabled:hover:bg-transparent"
+        class="flex gap-2.5 items-center w-full px-3 py-2.5 rounded text-left text-dark-3 dark:text-light-3 hover:bg-warning/25 focus:bg-warning/25 focus:outline-2 focus:-outline-offset-2 focus:outline-warning aria-disabled:opacity-40 aria-disabled:cursor-not-allowed aria-disabled:hover:bg-transparent"
         @click="onItemClick(item)"
       >
         <svg

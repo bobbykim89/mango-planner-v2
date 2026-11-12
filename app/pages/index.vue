@@ -128,7 +128,9 @@ const onModalClose = async () => {
     // let the dialog finish restoring focus first, then repair it only if it was lost
     window.setTimeout(() => {
       const active = document.activeElement as HTMLElement | null
-      if (active && active !== document.body && active.checkVisibility()) return
+      // getClientRects: works for fixed elements and in Safari < 17.4 (no checkVisibility)
+      if (active && active !== document.body && active.getClientRects().length)
+        return
       document
         .querySelector<HTMLElement>(`[data-plan-toggle="${planId}"]`)
         ?.focus()
@@ -280,13 +282,24 @@ const movePlan = async (id: string, target: MoveTarget) => {
   const newIndex = next.findIndex((item) => item._id!.toString() === id)
   if (newIndex === from) return
   const title = customOrderData.value[from]!.title
-  customOrderData.value = next
-  await onOrderUpdate()
-  announce(`"${title}" moved to position ${newIndex + 1} of ${next.length}`)
-  if (import.meta.client) {
+  const focusHandle = async () => {
+    if (!import.meta.client) return
     await nextTick()
     document.querySelector<HTMLElement>(`[data-move-handle="${id}"]`)?.focus()
   }
+  customOrderData.value = next
+  // moving the DOM node blurs it, so refocus the handle before and after saving
+  await focusHandle()
+  await onOrderUpdate()
+  // the store reports a failed save with an alert and the order reverts; only
+  // announce success when the plan really is in its new place
+  const savedIndex = customOrderData.value.findIndex(
+    (item) => item._id!.toString() === id,
+  )
+  if (savedIndex === newIndex) {
+    announce(`"${title}" moved to position ${newIndex + 1} of ${next.length}`)
+  }
+  await focusHandle()
 }
 const onMobileUtilityToggle = (open: boolean) => {
   mobileUtilityToggle.value = !open
@@ -409,7 +422,8 @@ watch([displayStyle, searchTerm], () => {
                 v-model="customOrderData"
                 item-key="_id"
                 handle=".handle"
-                :touch-start-threshold="5"
+                :fallback-tolerance="5"
+                :disabled="isSavingOrder"
                 @change="onOrderUpdate"
               >
                 <template #item="{ element, index }">
