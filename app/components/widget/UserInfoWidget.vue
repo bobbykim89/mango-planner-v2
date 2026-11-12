@@ -72,7 +72,7 @@ const formTextColor = computed<ColorPalette>(() => {
     class="md:px-2xs md:py-xs md:bg-light-4 md:dark:bg-dark-4 text-dark-3 dark:text-light-3 md:rounded-md md:drop-shadow-md"
   >
     <div class="hidden md:block">
-      <h4 class="h4-md mb-xs">My Info</h4>
+      <h2 class="h4-md mb-xs">My Info</h2>
     </div>
     <!-- current user profile -->
     <div
