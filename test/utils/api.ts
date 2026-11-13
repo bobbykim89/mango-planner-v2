@@ -7,7 +7,9 @@ export interface ApiResult {
   headers: Headers
 }
 
-let ipCounter = 0
+// Each test file loads this module afresh while the database (and its rate-limit
+// counters) is shared, so start every file at a random point to avoid reusing IPs.
+let ipCounter = Math.floor(Math.random() * 0xffff) << 8
 const uniqueIp = () => {
   ipCounter += 1
   return `10.${(ipCounter >> 16) & 255}.${(ipCounter >> 8) & 255}.${ipCounter & 255}`
