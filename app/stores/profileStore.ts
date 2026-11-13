@@ -27,15 +27,19 @@ export const useProfileStore = defineStore('profile', () => {
         setProfile(await api<ProfileDto>('/api/profile', { method: 'POST' })),
       { success: 'Successfully created user profile!' },
     )
-  const updateProfilePicture = (form: FormData) =>
+  /** Shrinks the picture in the browser, then uploads it. */
+  const updateProfilePicture = (file: File) =>
     run(
-      async () =>
+      async () => {
+        const form = new FormData()
+        form.append('image', await prepareProfilePicture(file))
         setProfile(
           await api<ProfileDto>('/api/profile/profile-picture', {
             method: 'PUT',
             body: form,
           }),
-        ),
+        )
+      },
       { success: 'Successfully updated profile picture!' },
     )
   const updatePlansOrder = (plansOrder: string[]) =>

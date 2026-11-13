@@ -20,7 +20,6 @@ import {
 import type { MenuItemType, SocialUrl } from '@bobbykim/mcl-footer'
 import { MclFooterA } from '@bobbykim/mcl-footer'
 import { useGeolocation, useWindowScroll } from '@vueuse/core'
-import imageCompression from 'browser-image-compression'
 import { storeToRefs } from 'pinia'
 import { onMounted } from 'vue'
 
@@ -137,15 +136,8 @@ const onUsernameChange = async (e: Event, name: string) => {
 }
 const onFileUpload = async (e: Event, file: File) => {
   e.preventDefault()
-  const fileFormData = new FormData()
-  const compressedFile = await imageCompression(file, {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1000,
-    useWebWorker: true,
-  })
-  fileFormData.append('image', compressedFile)
   if (import.meta.client && window.confirm('Please confirm file upload.')) {
-    await profileStore.updateProfilePicture(fileFormData)
+    await profileStore.updateProfilePicture(file)
   }
   headerRef.value?.headerClose()
 }

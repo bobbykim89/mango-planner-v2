@@ -10,7 +10,8 @@ cloudinary.config({
   api_secret: config.cloudinaryApiSecret,
 })
 
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+// below Vercel's 4.5 MB request limit, so this error is the one users see (#33)
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024
 // room for the multipart boundaries and headers around the file
 const MULTIPART_OVERHEAD = 64 * 1024
 

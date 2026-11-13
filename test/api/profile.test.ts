@@ -97,9 +97,9 @@ describe('profile routes', () => {
     expect(profile.json.data.profilePicture).toBe('')
   })
 
-  it('rejects files over 5 MB (upload-too-large)', async () => {
+  it("rejects files over 4 MB, below Vercel's 4.5 MB request limit (upload-too-large)", async () => {
     const user = await createUser()
-    const bytes = new Uint8Array(5 * 1024 * 1024 + 1)
+    const bytes = new Uint8Array(4 * 1024 * 1024 + 1)
     bytes.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
     const form = new FormData()
     form.append('image', new Blob([bytes], { type: 'image/png' }), 'big.png')

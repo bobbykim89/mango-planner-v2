@@ -70,7 +70,7 @@ const catalog: Record<ApiErrorCode, { status: number; message: string }> = {
   },
   PAYLOAD_TOO_LARGE: {
     status: 413,
-    message: 'That file is too large. Please choose one under 5 MB.',
+    message: 'That file is too large. Please choose one under 4 MB.',
   },
   UNSUPPORTED_MEDIA_TYPE: {
     status: 415,
