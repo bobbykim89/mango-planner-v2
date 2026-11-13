@@ -12,9 +12,9 @@ import PlanCollapsable from '@/components/plans/PlanCollapsable.vue'
 import PlanInputForm from '@/components/plans/PlanInputForm.vue'
 import UtilityBlock from '@/components/plans/UtilityBlock.vue'
 import {
-  useInitPiniaStore,
   usePlanStore,
   useProfileStore,
+  useSessionStore,
   useUserStore,
 } from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
@@ -49,10 +49,10 @@ type ModalFormType = 'new' | 'update' | 'draft'
 const userStore = useUserStore()
 const profileStore = useProfileStore()
 const planStore = usePlanStore()
-const initPiniaStore = useInitPiniaStore()
+const sessionStore = useSessionStore()
 const { isAuthenticated } = storeToRefs(userStore)
 const { userProfile, darkMode } = storeToRefs(profileStore)
-const { mounted } = storeToRefs(initPiniaStore)
+const { mounted } = storeToRefs(sessionStore)
 const { drafts } = storeToRefs(planStore)
 const searchTerm = ref<string>('')
 const modalRef = ref<InstanceType<typeof Modal>>()

@@ -155,7 +155,7 @@ export const usePlanStore = defineStore('plan', () => {
       handleError(error)
     }
   }
-  const clearPlanData = () => {
+  const clear = () => {
     plans.value = []
     drafts.value = []
   }
@@ -168,9 +168,10 @@ export const usePlanStore = defineStore('plan', () => {
 
     if (shouldRedirectToLogin) {
       setTimeout(() => {
-        userStore.clearUserStore()
-        profileStore.clearProfileData()
-        clearPlanData()
+        useAuthToken().value = null
+        userStore.clear()
+        profileStore.clear()
+        clear()
         navigateTo('/auth/login')
       }, 1000)
     }
@@ -257,7 +258,7 @@ export const usePlanStore = defineStore('plan', () => {
     updatePost,
     toggleComplete,
     deletePost,
-    clearPlanData,
+    clear,
     getDraft,
     deleteDraft,
     loadAllDrafts,

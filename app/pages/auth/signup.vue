@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useInitPiniaStore, useProfileStore, useUserStore } from '@/stores'
+import { useProfileStore, useSessionStore, useUserStore } from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { MclFormGroup, MclInputText } from '@bobbykim/mcl-forms'
 import { passwordRules } from '#shared/dto/user/passwordRules'
@@ -28,7 +28,7 @@ useHead({
 const router = useRouter()
 const userStore = useUserStore()
 const profileStore = useProfileStore()
-const initPiniaStore = useInitPiniaStore()
+const sessionStore = useSessionStore()
 const { darkMode } = storeToRefs(profileStore)
 const { currentUser } = storeToRefs(userStore)
 const signUpCred = reactive<{
@@ -55,7 +55,7 @@ const handleFormSubmit = async () => {
   if (passwordProblem.value) return
   const { userName, email, password } = signUpCred
   await userStore.signupNewUser({ name: userName, email, password })
-  await initPiniaStore.initStores()
+  await sessionStore.init()
   if (currentUser.value !== null) {
     router.push({ path: '/' })
   }

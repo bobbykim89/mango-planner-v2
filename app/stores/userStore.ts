@@ -8,8 +8,6 @@ import type { UserDto } from '#shared/types'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useAlertStore } from './alertStore'
-import { usePlanStore } from './planStore'
-import { useProfileStore } from './profileStore'
 
 interface AuthToken {
   accessToken: string
@@ -18,8 +16,6 @@ interface AuthToken {
 export const useUserStore = defineStore('user', () => {
   const errorCheck = useErrorCheck()
   const alertStore = useAlertStore()
-  const planStore = usePlanStore()
-  const profileStore = useProfileStore()
   const cookie = useAuthToken()
   const api = useApi()
   // state
@@ -122,16 +118,10 @@ export const useUserStore = defineStore('user', () => {
       handleAuthError(error)
     }
   }
-  const clearUserStore = () => {
-    cookie.value = null
+  const clear = () => {
     currentUser.value = null
     isAuthenticated.value = false
-  }
-  const logoutUser = () => {
-    clearUserStore()
-    planStore.clearPlanData()
-    profileStore.clearProfileData()
-    alertStore.setAlert('Logout Successful!', 'success')
+    fieldErrors.value = {}
   }
   const handleAuthError = (err: unknown) => {
     const errorMessage: string = errorCheck.extractErrorMessage(err)
@@ -156,7 +146,6 @@ export const useUserStore = defineStore('user', () => {
     signupNewUser,
     updateUsername,
     updatePassword,
-    logoutUser,
-    clearUserStore,
+    clear,
   }
 })

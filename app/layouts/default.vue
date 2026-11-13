@@ -4,7 +4,12 @@ import CreateProfileWidget from '@/components/widget/CreateProfileWidget.vue'
 import DarkmodeWidget from '@/components/widget/DarkmodeWidget.vue'
 import UserInfoWidget from '@/components/widget/UserInfoWidget.vue'
 import WeatherWidget from '@/components/widget/WeatherWidget.vue'
-import { useAlertStore, useProfileStore, useUserStore } from '@/stores'
+import {
+  useAlertStore,
+  useProfileStore,
+  useSessionStore,
+  useUserStore,
+} from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import {
   Alert,
@@ -113,7 +118,7 @@ const onScrollToTop = () => {
   y.value = 0
 }
 const onLogout = () => {
-  userStore.logoutUser()
+  useSessionStore().logout()
   sidebarClose()
   headerRef.value?.headerClose()
   colorMode.preference = 'light'

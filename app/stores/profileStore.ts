@@ -99,7 +99,7 @@ export const useProfileStore = defineStore('profile', () => {
       handleProfileError(error)
     }
   }
-  const clearProfileData = () => {
+  const clear = () => {
     userProfile.value = null
     darkMode.value = false
   }
@@ -124,6 +124,6 @@ export const useProfileStore = defineStore('profile', () => {
     updateUserProfilePicture,
     updateUserPlansOrder,
     toggleUserDarkMode,
-    clearProfileData,
+    clear,
   }
 })
