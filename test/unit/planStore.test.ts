@@ -12,12 +12,23 @@ vi.mock('localforage', async () => {
 const { navigateToMock } = vi.hoisted(() => ({ navigateToMock: vi.fn() }))
 mockNuxtImport('navigateTo', () => navigateToMock)
 
-type MemoryForage = { stores: Map<string, Map<string, unknown>> }
-const draftStore = () => {
-  const { stores } = localforage as unknown as MemoryForage
-  if (!stores.has('drafts')) stores.set('drafts', new Map())
-  return stores.get('drafts')!
+type MemoryForage = {
+  stores: Map<string, Map<string, unknown>>
+  control: { failWrites: boolean }
 }
+const forage = localforage as unknown as MemoryForage
+const draftStore = () => {
+  if (!forage.stores.has('drafts')) forage.stores.set('drafts', new Map())
+  return forage.stores.get('drafts')!
+}
+/** The plan store with drafts loaded for a signed-in user (keys in storage are '<user>:<draft id>'). */
+const storeFor = async (user = 'u1') => {
+  const store = usePlanStore()
+  await store.loadDrafts(user)
+  return store
+}
+const serverError = (e: Parameters<typeof fail>[0]) =>
+  fail(e, 500, 'INTERNAL_ERROR', 'Something went wrong on our side. Please try again.')
 
 const plan = (id: string, over: Partial<PlanDto> = {}) =>
   ({ _id: id, title: id, content: '', type: 'personal', complete: false, ...over }) as unknown as PlanDto
@@ -41,6 +52,7 @@ describe('planStore', () => {
   })
   afterEach(() => {
     clearApiMocks()
+    forage.control.failWrites = false
     vi.restoreAllMocks()
   })
 
@@ -84,10 +96,10 @@ describe('planStore', () => {
       fail(e, 500, 'INTERNAL_ERROR', 'Something went wrong on our side. Please try again.'),
     )
     const input = { title: 'unsaved', content: 'x', type: 'work' }
-    const store = usePlanStore()
+    const store = await storeFor('u1')
     expect(await store.createPlan(input)).toBeNull()
-    expect(store.drafts).toEqual([{ id: 'new', data: input }])
-    const record = draftStore().get('new') as { data: unknown; timestamp: unknown }
+    expect(store.drafts).toEqual([{ id: expect.stringMatching(/^new-/), data: input }])
+    const record = draftStore().get(`u1:${store.drafts[0]!.id}`) as { data: unknown; timestamp: unknown }
     expect(record.data).toEqual(input)
     expect(typeof record.timestamp).toBe('number')
     expect(useAlertStore().alert).toBe(
@@ -100,7 +112,7 @@ describe('planStore', () => {
       fail(e, 500, 'INTERNAL_ERROR', 'Something went wrong on our side. Please try again.'),
     )
     const input = { title: 'unsaved', content: 'x', type: 'work' }
-    const store = usePlanStore()
+    const store = await storeFor('u1')
     const pending = store.createPlan(input)
     // PlanInputForm resets the object it emitted right after emitting, before the request fails
     input.title = ''
@@ -108,7 +120,7 @@ describe('planStore', () => {
     await pending
     const saved = { title: 'unsaved', content: 'x', type: 'work' }
     expect(store.drafts[0]?.data).toEqual(saved)
-    expect((draftStore().get('new') as { data: unknown }).data).toEqual(saved)
+    expect((draftStore().get(`u1:${store.drafts[0]!.id}`) as { data: unknown }).data).toEqual(saved)
   })
 
   it('a failed update keeps the draft values after the form clears its input', async () => {
@@ -116,7 +128,7 @@ describe('planStore', () => {
       fail(e, 500, 'INTERNAL_ERROR', 'Something went wrong on our side. Please try again.'),
     )
     const body = { title: 'edited', content: 'y', type: 'chore' }
-    const store = usePlanStore()
+    const store = await storeFor()
     store.plans = [plan('p1')]
     const pending = store.updatePlan({ id: 'p1', body })
     body.title = ''
@@ -125,15 +137,15 @@ describe('planStore', () => {
   })
 
   it('deletePlan also removes a draft saved for that plan', async () => {
-    const store = usePlanStore()
-    store.plans = [plan('p1')]
     const data = { title: 'stale', content: '', type: 'personal' }
-    draftStore().set('p1', { data, timestamp: 1 })
-    store.drafts = [{ id: 'p1', data }]
+    draftStore().set('u1:p1', { data, timestamp: 1 })
+    const store = await storeFor('u1')
+    store.plans = [plan('p1')]
+    expect(store.drafts).toEqual([{ id: 'p1', data }])
     mockApi('DELETE', '/api/plan/p1', () => ok({ id: 'p1' }))
     expect(await store.deletePlan('p1')).toBe(true)
     expect(store.drafts).toEqual([])
-    expect(draftStore().has('p1')).toBe(false)
+    expect(draftStore().has('u1:p1')).toBe(false)
   })
 
   it.each([
@@ -142,14 +154,14 @@ describe('planStore', () => {
   ])(
     'saving a draft for a plan that can never be updated (%s %s) drops the draft',
     async (status, code, message) => {
-      const store = usePlanStore()
       const data = { title: 'stale', content: '', type: 'personal' }
-      draftStore().set('gone', { data, timestamp: 1 })
-      store.drafts = [{ id: 'gone', data }]
+      draftStore().set('u1:gone', { data, timestamp: 1 })
+      const store = await storeFor('u1')
+      expect(store.drafts).toEqual([{ id: 'gone', data }])
       mockApi('PUT', '/api/plan/gone', (e) => fail(e, status, code, message))
       expect(await store.updatePlan({ id: 'gone', body: data })).toBe(false)
       expect(store.drafts).toEqual([])
-      expect(draftStore().has('gone')).toBe(false)
+      expect(draftStore().has('u1:gone')).toBe(false)
       expect(useAlertStore().alert).toBe(message)
     },
   )
@@ -158,11 +170,56 @@ describe('planStore', () => {
     mockApi('PUT', '/api/plan/p1', (e) =>
       fail(e, 500, 'INTERNAL_ERROR', 'Something went wrong on our side. Please try again.'),
     )
-    const store = usePlanStore()
+    const store = await storeFor()
     store.plans = [plan('p1')]
     expect(
       await store.updatePlan({ id: 'p1', body: { title: 'edited' } }),
     ).toBe(false)
     expect(store.drafts.map((d) => d.id)).toEqual(['p1'])
+  })
+
+  it('two failed new plans keep two drafts (#30)', async () => {
+    mockApi('POST', '/api/plan', serverError)
+    const store = await storeFor()
+    vi.spyOn(Date, 'now').mockReturnValueOnce(1).mockReturnValueOnce(2).mockReturnValue(3)
+    await store.createPlan({ title: 'first', content: '', type: 'work' })
+    await store.createPlan({ title: 'second', content: '', type: 'work' })
+    expect(store.drafts.map((d) => d.data.title).sort()).toEqual(['first', 'second'])
+    expect(draftStore().size).toBe(2)
+  })
+
+  it('a new-plan draft that fails again is updated, not duplicated (#30)', async () => {
+    mockApi('POST', '/api/plan', serverError)
+    draftStore().set('u1:new-1', { data: { title: 'v1', content: '', type: 'work' }, timestamp: 1 })
+    const store = await storeFor('u1')
+    // retrying a draft passes its key, so a second failure saves over the same draft
+    await store.createPlan({ title: 'v2', content: '', type: 'work' }, 'new-1')
+    expect(store.drafts).toEqual([{ id: 'new-1', data: { title: 'v2', content: '', type: 'work' } }])
+    expect([...draftStore().keys()]).toEqual(['u1:new-1'])
+  })
+
+  it('a draft the browser could not store is not listed (#30)', async () => {
+    mockApi('POST', '/api/plan', serverError)
+    const store = await storeFor()
+    forage.control.failWrites = true
+    expect(await store.createPlan({ title: 'lost', content: '', type: 'work' })).toBeNull()
+    expect(store.drafts).toEqual([])
+  })
+
+  it("loads only the signed-in user's drafts (#29)", async () => {
+    const data = { title: 'theirs', content: '', type: 'personal' }
+    draftStore().set('u2:new-1', { data, timestamp: 1 })
+    draftStore().set('u1:p1', { data: { ...data, title: 'mine' }, timestamp: 2 })
+    const store = await storeFor('u1')
+    expect(store.drafts).toEqual([{ id: 'p1', data: { ...data, title: 'mine' } }])
+  })
+
+  it('clear forgets whose drafts are loaded (#29)', async () => {
+    mockApi('PUT', '/api/plan/p1', serverError)
+    const store = await storeFor('u1')
+    store.clear()
+    // a failure after sign-out has no user to keep a draft for
+    await store.updatePlan({ id: 'p1', body: { title: 'x', content: '', type: 'work' } })
+    expect(draftStore().size).toBe(0)
   })
 })

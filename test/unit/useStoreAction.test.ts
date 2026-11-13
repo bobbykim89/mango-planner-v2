@@ -25,16 +25,38 @@ describe('useStoreAction', () => {
     vi.restoreAllMocks()
   })
 
-  it('skips the request without a session cookie', async () => {
+  it('without a session cookie, keeps the input and expires the session instead of calling the API (#30)', async () => {
+    // e.g. the user signed out in another tab, which clears the cookie here too
     let calls = 0
     mockApi('GET', '/api/x', () => {
       calls++
       return ok(1)
     })
     const { run, api } = useTestStore()
-    const result = await run(() => api('/api/x'))
+    let seen: unknown
+    const result = await run(() => api('/api/x'), {
+      onError: (err) => {
+        seen = err
+      },
+    })
     expect(result).toBe(false)
     expect(calls).toBe(0)
+    expect(seen).toBeInstanceOf(ApiClientError)
+    expect((seen as ApiClientError).code).toBe('AUTH_TOKEN_MISSING')
+    expect(navigateToMock).toHaveBeenCalledWith('/auth/login')
+    expect(useAlertStore().alert).toBe(
+      'Your session has expired. Please sign in again.',
+    )
+  })
+
+  it('without a session cookie and expireOnAuthError false, resolves false quietly (a guest opening the app)', async () => {
+    const { run, api } = useTestStore()
+    const onError = vi.fn()
+    expect(
+      await run(() => api('/api/x'), { expireOnAuthError: false, onError }),
+    ).toBe(false)
+    expect(onError).not.toHaveBeenCalled()
+    expect(navigateToMock).not.toHaveBeenCalled()
     expect(useAlertStore().alert).toBeNull()
   })
 

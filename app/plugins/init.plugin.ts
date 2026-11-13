@@ -8,7 +8,8 @@ export default defineNuxtPlugin({
     // The server already initialised the stores and Pinia hydrated that state, so
     // don't fetch it all again; only load what lives in the browser (IndexedDB drafts).
     if (import.meta.client && nuxtApp.isHydrating && session.mounted) {
-      if (useUserStore().isAuthenticated) await usePlanStore().loadDrafts()
+      const { isAuthenticated, currentUser } = useUserStore()
+      if (isAuthenticated && currentUser) await usePlanStore().loadDrafts(currentUser._id)
       return
     }
     await session.init()
