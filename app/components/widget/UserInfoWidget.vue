@@ -159,6 +159,7 @@ const formTextColor = computed<ColorPalette>(() => {
               >
                 <MclInputFile
                   id="profile-picture"
+                  accept="image/*"
                   button-text="Browse"
                   rounded
                   required
