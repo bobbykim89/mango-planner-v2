@@ -5,8 +5,8 @@ export default defineNuxtRouteMiddleware(async () => {
   const sessionStore = useSessionStore()
   const alertStore = useAlertStore()
   const { mounted } = storeToRefs(sessionStore)
-  const { isAuthenticated } = userStore.getCurrentAuthInfo
-  if (mounted.value && isAuthenticated) {
+  const { isAuthenticated } = storeToRefs(userStore)
+  if (mounted.value && isAuthenticated.value) {
     alertStore.setAlert('Guest only route: redirecting to main page')
     return navigateTo({ path: '/' })
   }

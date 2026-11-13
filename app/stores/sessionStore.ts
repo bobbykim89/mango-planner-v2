@@ -1,4 +1,4 @@
-import { defineStore, storeToRefs } from 'pinia'
+import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useAlertStore } from './alertStore'
 import { usePlanStore } from './planStore'
@@ -23,11 +23,12 @@ export const useSessionStore = defineStore('session', () => {
   const init = async () => {
     // runs on the server too: the access_token cookie comes with the request, so
     // server-side route middleware and rendering see the real auth state (#18)
-    await userStore.getCurrentUser()
-    const { isAuthenticated } = storeToRefs(userStore)
-    if (isAuthenticated.value === true) {
-      await profileStore.getCurrentUserProfile()
-      await planStore.getAllPostByUser()
+    await userStore.fetchCurrentUser()
+    if (userStore.isAuthenticated) {
+      await Promise.all([
+        profileStore.getCurrentUserProfile(),
+        planStore.getAllPostByUser(),
+      ])
     }
     loading.value = false
     mounted.value = true

@@ -24,8 +24,7 @@ export const useProfileStore = defineStore('profile', () => {
   // actions
   const getCurrentUserProfile = async () => {
     try {
-      const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated) return
+      if (!cookie.value || !userStore.isAuthenticated) return
 
       const res = await api<ProfileDto | null>('/api/profile', {
         method: 'GET',
@@ -40,8 +39,7 @@ export const useProfileStore = defineStore('profile', () => {
   }
   const postNewUserProfile = async () => {
     try {
-      const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated) return
+      if (!cookie.value || !userStore.isAuthenticated) return
 
       await api<ProfileDto>('/api/profile', {
         method: 'POST',
@@ -54,8 +52,7 @@ export const useProfileStore = defineStore('profile', () => {
   }
   const updateUserProfilePicture = async (payload: FormData) => {
     try {
-      const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated) return
+      if (!cookie.value || !userStore.isAuthenticated) return
 
       await api<ProfileDto>('/api/profile/profile-picture', {
         method: 'PUT',
@@ -69,8 +66,7 @@ export const useProfileStore = defineStore('profile', () => {
   }
   const updateUserPlansOrder = async (payload: { plansOrder: string[] }) => {
     try {
-      const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated) return
+      if (!cookie.value || !userStore.isAuthenticated) return
 
       const res = await api<ProfileDto>('/api/profile/plans-order', {
         method: 'PUT',
@@ -83,8 +79,7 @@ export const useProfileStore = defineStore('profile', () => {
   }
   const toggleUserDarkMode = async (payload: ProfileInputDark) => {
     try {
-      const { isAuthenticated } = userStore.getCurrentAuthInfo
-      if (!cookie.value || !isAuthenticated) return
+      if (!cookie.value || !userStore.isAuthenticated) return
 
       await api<ProfileDto>('/api/profile/dark', {
         method: 'PUT',

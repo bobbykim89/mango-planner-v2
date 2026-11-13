@@ -8,7 +8,7 @@ import {
   useUserStore,
 } from '@/stores'
 import type { PlanDto, ProfileDto, UserDto } from '#shared/types'
-import { clearApiMocks, resetState, signIn } from './helpers'
+import { clearApiMocks, mockApi, ok, resetState, signIn } from './helpers'
 
 const { navigateToMock } = vi.hoisted(() => ({ navigateToMock: vi.fn() }))
 mockNuxtImport('navigateTo', () => navigateToMock)
@@ -68,6 +68,23 @@ describe('sessionStore', () => {
     expect(useAlertStore().alert).toBe('Logout Successful!')
     expect(useAlertStore().alertColor).toBe('success')
     expect(navigateToMock).not.toHaveBeenCalled()
+  })
+
+  it('init fetches the user once and shows no success alert', async () => {
+    signIn()
+    let authCalls = 0
+    mockApi('GET', '/api/auth', () => {
+      authCalls++
+      return ok({ _id: 'u1', name: 'A', email: 'a@b.c' })
+    })
+    mockApi('GET', '/api/profile', () => ok(null))
+    mockApi('GET', '/api/plan', () => ok([]))
+    const session = useSessionStore()
+    await session.init()
+    expect(authCalls).toBe(1)
+    expect(useUserStore().isAuthenticated).toBe(true)
+    expect(useAlertStore().alert).toBeNull()
+    expect(session.mounted).toBe(true)
   })
 
   it('clearAll leaves nothing behind for the next user', () => {

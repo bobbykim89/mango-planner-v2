@@ -54,7 +54,7 @@ const passwordInvalid = computed<boolean>(
 const handleFormSubmit = async () => {
   if (passwordProblem.value) return
   const { userName, email, password } = signUpCred
-  await userStore.signupNewUser({ name: userName, email, password })
+  if (!(await userStore.signup({ name: userName, email, password }))) return
   await sessionStore.init()
   if (currentUser.value !== null) {
     router.push({ path: '/' })

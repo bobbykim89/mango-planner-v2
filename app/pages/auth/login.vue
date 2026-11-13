@@ -39,7 +39,7 @@ const loginCred = reactive<{
 })
 const handleFormSubmit = async () => {
   const { email, password } = loginCred
-  await userStore.loginWithCredential({ email, password })
+  if (!(await userStore.login({ email, password }))) return
   await sessionStore.init()
   if (currentUser.value !== null) {
     router.push({ path: '/' })
