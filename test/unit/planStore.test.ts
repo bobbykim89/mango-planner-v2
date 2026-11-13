@@ -95,6 +95,35 @@ describe('planStore', () => {
     )
   })
 
+  it('a listed draft keeps its values after the form clears its input', async () => {
+    mockApi('POST', '/api/plan', (e) =>
+      fail(e, 500, 'INTERNAL_ERROR', 'Something went wrong on our side. Please try again.'),
+    )
+    const input = { title: 'unsaved', content: 'x', type: 'work' }
+    const store = usePlanStore()
+    const pending = store.createPlan(input)
+    // PlanInputForm resets the object it emitted right after emitting, before the request fails
+    input.title = ''
+    input.content = ''
+    await pending
+    const saved = { title: 'unsaved', content: 'x', type: 'work' }
+    expect(store.drafts[0]?.data).toEqual(saved)
+    expect((draftStore().get('new') as { data: unknown }).data).toEqual(saved)
+  })
+
+  it('a failed update keeps the draft values after the form clears its input', async () => {
+    mockApi('PUT', '/api/plan/p1', (e) =>
+      fail(e, 500, 'INTERNAL_ERROR', 'Something went wrong on our side. Please try again.'),
+    )
+    const body = { title: 'edited', content: 'y', type: 'chore' }
+    const store = usePlanStore()
+    store.plans = [plan('p1')]
+    const pending = store.updatePlan({ id: 'p1', body })
+    body.title = ''
+    await pending
+    expect(store.drafts[0]?.data).toEqual({ title: 'edited', content: 'y', type: 'chore' })
+  })
+
   it('a failed update keeps the draft under the plan id', async () => {
     mockApi('PUT', '/api/plan/p1', (e) =>
       fail(e, 500, 'INTERNAL_ERROR', 'Something went wrong on our side. Please try again.'),

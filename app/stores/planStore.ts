@@ -37,7 +37,9 @@ export const usePlanStore = defineStore('plan', () => {
       plans.value = await api<PlanDto[]>('/api/plan')
     })
   /** Resolves to the created plan, or null when it failed (the input is kept as a draft). */
-  const createPlan = async (input: PlanInput): Promise<PlanDto | null> => {
+  const createPlan = async (formInput: PlanInput): Promise<PlanDto | null> => {
+    // copy first: PlanInputForm clears the object it emitted right after emitting
+    const input = { ...formInput }
     let created: PlanDto | null = null
     await run(
       async () => {
@@ -51,21 +53,22 @@ export const usePlanStore = defineStore('plan', () => {
     )
     return created
   }
-  const updatePlan = (payload: { id: string; body: PlanInput }) =>
-    run(
+  const updatePlan = (payload: { id: string; body: PlanInput }) => {
+    // copy first, as in createPlan
+    const { id } = payload
+    const body = { ...payload.body }
+    return run(
       async () => {
         putFirst(
-          await api<PlanDto>(`/api/plan/${payload.id}`, {
-            method: 'PUT',
-            body: payload.body,
-          }),
+          await api<PlanDto>(`/api/plan/${id}`, { method: 'PUT', body }),
         )
       },
       {
         success: 'Successfully updated plan!',
-        onError: () => saveDraft(payload.id, payload.body),
+        onError: () => saveDraft(id, body),
       },
     )
+  }
   const togglePlanComplete = (payload: { id: string; body: PlanInput }) =>
     run(
       async () => {
