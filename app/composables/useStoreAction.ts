@@ -34,13 +34,9 @@ export const useStoreAction = (): RunStoreAction => {
       if (opts.expireOnAuthError === false) return false
       // the session ended meanwhile, e.g. signed out in another tab: treat it like the
       // server rejecting the session, so onError keeps the input and the user is told (#30)
-      const err = new ApiClientError(
-        401,
-        'AUTH_TOKEN_MISSING',
-        'Your session has expired. Please sign in again.',
-      )
+      const err = new ApiClientError(401, 'AUTH_TOKEN_MISSING', SESSION_EXPIRED_MESSAGE)
       await opts.onError?.(err)
-      await nuxtApp.runWithContext(() => useSessionStore().expire(err.message))
+      await nuxtApp.runWithContext(() => useSessionStore().expire())
       return false
     }
     try {
@@ -55,12 +51,12 @@ export const useStoreAction = (): RunStoreAction => {
       return true
     } catch (err) {
       await opts.onError?.(err)
-      const message = errorCheck.extractErrorMessage(err)
       if (opts.expireOnAuthError !== false && errorCheck.isAuthError(err)) {
         // looked up here, not at setup: the session store imports the domain stores
-        await nuxtApp.runWithContext(() => useSessionStore().expire(message))
+        await nuxtApp.runWithContext(() => useSessionStore().expire())
         return false
       }
+      const message = errorCheck.extractErrorMessage(err)
       console.error(message)
       alertStore.setAlert(message)
       return false

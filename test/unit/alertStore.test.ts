@@ -23,4 +23,17 @@ describe('alertStore', () => {
     expect(alert.alert).toBeNull()
     expect(alert.alertColor).toBe('danger')
   })
+
+  it('dismissAlert clears the alert at once (the close button, #31)', () => {
+    const alert = useAlertStore()
+    alert.setAlert('saved', 'success')
+    alert.dismissAlert()
+    expect(alert.alert).toBeNull()
+    expect(alert.alertColor).toBe('danger')
+    // the dismissed alert's pending clear must not cut a newer alert short
+    vi.advanceTimersByTime(1000)
+    alert.setAlert('next')
+    vi.advanceTimersByTime(4500)
+    expect(alert.alert).toBe('next')
+  })
 })

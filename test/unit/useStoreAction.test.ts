@@ -2,7 +2,8 @@ import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { defineStore } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useStoreAction } from '@/composables/useStoreAction'
-import { useAlertStore } from '@/stores'
+import { useAlertStore, useUserStore } from '@/stores'
+import { SESSION_EXPIRED_REDIRECT } from '@/utils/session'
 import { clearApiMocks, fail, mockApi, ok, resetState, signIn } from './helpers'
 
 const { navigateToMock } = vi.hoisted(() => ({ navigateToMock: vi.fn() }))
@@ -26,7 +27,12 @@ describe('useStoreAction', () => {
   })
 
   it('without a session cookie, keeps the input and expires the session instead of calling the API (#30)', async () => {
-    // e.g. the user signed out in another tab, which clears the cookie here too
+    // e.g. the user signed out in another tab, which clears the cookie here too,
+    // while this tab is still signed in (set on the app's Pinia: the runner looks
+    // up the session store through the Nuxt app)
+    useNuxtApp().runWithContext(() => {
+      useUserStore().isAuthenticated = true
+    })
     let calls = 0
     mockApi('GET', '/api/x', () => {
       calls++
@@ -43,10 +49,7 @@ describe('useStoreAction', () => {
     expect(calls).toBe(0)
     expect(seen).toBeInstanceOf(ApiClientError)
     expect((seen as ApiClientError).code).toBe('AUTH_TOKEN_MISSING')
-    expect(navigateToMock).toHaveBeenCalledWith('/auth/login')
-    expect(useAlertStore().alert).toBe(
-      'Your session has expired. Please sign in again.',
-    )
+    expect(navigateToMock).toHaveBeenCalledWith(SESSION_EXPIRED_REDIRECT)
   })
 
   it('without a session cookie and expireOnAuthError false, resolves false quietly (a guest opening the app)', async () => {
@@ -110,9 +113,8 @@ describe('useStoreAction', () => {
     )
     const { run, api } = useTestStore()
     expect(await run(() => api('/api/x'))).toBe(false)
-    expect(navigateToMock).toHaveBeenCalledWith('/auth/login')
+    expect(navigateToMock).toHaveBeenCalledWith(SESSION_EXPIRED_REDIRECT)
     expect(useAuthToken().value).toBeNull()
-    expect(useAlertStore().alert).toBe('Please sign in to continue.')
   })
 
   it('does not expire when expireOnAuthError is false', async () => {

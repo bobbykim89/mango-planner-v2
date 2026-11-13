@@ -14,6 +14,12 @@ export const useAlertStore = defineStore('alert', () => {
       alertColor.value = 'danger'
     }, timeout)
   }
+  /** Clears the alert now, e.g. from its close button (#31). */
+  const dismissAlert = () => {
+    clearTimeout(clearTimer)
+    alert.value = null
+    alertColor.value = 'danger'
+  }
   const setAlert = (
     message: string,
     color: Partial<ColorPalette> = 'danger',
@@ -26,5 +32,5 @@ export const useAlertStore = defineStore('alert', () => {
     alertColor.value = color
     clearAlert()
   }
-  return { alert, alertColor, clearAlert, setAlert }
+  return { alert, alertColor, clearAlert, dismissAlert, setAlert }
 })

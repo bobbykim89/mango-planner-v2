@@ -7,6 +7,7 @@ import {
   useSessionStore,
   useUserStore,
 } from '@/stores'
+import { SESSION_EXPIRED_REDIRECT } from '@/utils/session'
 import type { PlanDto, ProfileDto, UserDto } from '#shared/types'
 import localforage from 'localforage'
 import { clearApiMocks, mockApi, ok, resetState, signIn } from './helpers'
@@ -60,15 +61,33 @@ describe('sessionStore', () => {
     clearApiMocks()
   })
 
-  it('expire clears every store but keeps the alert, then redirects once', async () => {
+  it('expire clears every store and redirects once, saying why in the URL', async () => {
     seedEverything()
     const session = useSessionStore()
-    await Promise.all([session.expire('A'), session.expire('B')])
+    await Promise.all([session.expire(), session.expire()])
     expectAllCleared()
     expect(useAuthToken().value).toBeNull()
     expect(navigateToMock).toHaveBeenCalledTimes(1)
-    expect(navigateToMock).toHaveBeenCalledWith('/auth/login')
-    expect(useAlertStore().alert).toBe('A')
+    // the reason travels with the redirect, so it survives a server-side redirect (#31)
+    expect(navigateToMock).toHaveBeenCalledWith(SESSION_EXPIRED_REDIRECT)
+  })
+
+  it('a request that fails after the session already ended does nothing (#31)', async () => {
+    seedEverything()
+    const session = useSessionStore()
+    await session.expire()
+    useAlertStore().setAlert('Login Successful!', 'success')
+    await session.expire() // a late 401 from a request sent before expiry
+    expect(navigateToMock).toHaveBeenCalledTimes(1)
+    expect(useAlertStore().alert).toBe('Login Successful!')
+  })
+
+  it('expires a tab that is still signed in after the cookie is gone (sign-out in another tab)', async () => {
+    seedEverything()
+    useAuthToken().value = null
+    await useSessionStore().expire()
+    expectAllCleared()
+    expect(navigateToMock).toHaveBeenCalledWith(SESSION_EXPIRED_REDIRECT)
   })
 
   it('logout clears everything and confirms', () => {
