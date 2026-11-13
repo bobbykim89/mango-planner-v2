@@ -25,10 +25,9 @@ export const useSessionStore = defineStore('session', () => {
     // server-side route middleware and rendering see the real auth state (#18)
     await userStore.fetchCurrentUser()
     if (userStore.isAuthenticated) {
-      await Promise.all([
-        profileStore.fetchProfile(),
-        planStore.getAllPostByUser(),
-      ])
+      await Promise.all([profileStore.fetchProfile(), planStore.fetchPlans()])
+      // drafts live in the browser's IndexedDB; this is a no-op on the server
+      await planStore.loadDrafts()
     }
     loading.value = false
     mounted.value = true
