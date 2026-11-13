@@ -111,7 +111,7 @@ const handleFooterMenuClick = (e: Event, item: MenuItemType) => {
   router.push({ path: item.url })
 }
 const onAlertClose = () => {
-  alertStore.clearAlert()
+  alertStore.dismissAlert()
 }
 const onScrollToTop = () => {
   y.value = 0

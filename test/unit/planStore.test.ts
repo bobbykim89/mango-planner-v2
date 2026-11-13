@@ -48,6 +48,7 @@ describe('planStore', () => {
     resetState()
     signIn()
     draftStore().clear()
+    navigateToMock.mockReset()
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })
   afterEach(() => {
@@ -89,6 +90,40 @@ describe('planStore', () => {
     expect(store.plans.map((p) => p._id)).toEqual(['a', 'c'])
     expect(useAlertStore().alert).toBe('Successfully deleted plan!')
     expect(fetches.calls).toBe(0)
+  })
+
+  it('a successful create returns the plan, puts it first and confirms (#32)', async () => {
+    const fetches = countPlanFetches()
+    mockApi('POST', '/api/plan', () => ok(plan('new')))
+    const store = await storeFor()
+    store.plans = [plan('old')]
+    const created = await store.createPlan({ title: 'new', content: '', type: 'personal' })
+    expect(created).toEqual(plan('new'))
+    expect(store.plans.map((p) => p._id)).toEqual(['new', 'old'])
+    expect(store.drafts).toEqual([])
+    expect(useAlertStore().alert).toBe('Successfully created new plan!')
+    expect(fetches.calls).toBe(0)
+  })
+
+  it.each([
+    ['create', (store: ReturnType<typeof usePlanStore>) => store.createPlan({ title: 'mine', content: '', type: 'personal' }), /^u1:new-/],
+    ['update', (store: ReturnType<typeof usePlanStore>) => store.updatePlan({ id: 'p1', body: { title: 'mine' } }), /^u1:p1$/],
+  ] as const)('a %s rejected because the session expired keeps the draft before signing out (#32)', async (_, act, key) => {
+    const expired = (e: Parameters<typeof fail>[0]) =>
+      fail(e, 401, 'AUTH_TOKEN_INVALID', 'Your session has expired. Please sign in again.')
+    mockApi('POST', '/api/plan', expired)
+    mockApi('PUT', '/api/plan/p1', expired)
+    let storedWhenRedirected: string[] = []
+    navigateToMock.mockImplementation(() => {
+      storedWhenRedirected = [...draftStore().keys()]
+    })
+    const store = await storeFor('u1')
+    store.plans = [plan('p1')]
+    await act(store)
+    expect(navigateToMock).toHaveBeenCalledTimes(1)
+    expect(storedWhenRedirected).toEqual([expect.stringMatching(key)])
+    // still there for the next sign-in
+    expect([...draftStore().keys()]).toEqual([expect.stringMatching(key)])
   })
 
   it('a failed create saves the draft and lists it at once', async () => {

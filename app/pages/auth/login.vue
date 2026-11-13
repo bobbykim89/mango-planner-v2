@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { useProfileStore, useSessionStore, useUserStore } from '@/stores'
+import {
+  useAlertStore,
+  useProfileStore,
+  useSessionStore,
+  useUserStore,
+} from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { MclFormGroup, MclInputText } from '@bobbykim/mcl-forms'
 import { storeToRefs } from 'pinia'
@@ -25,6 +30,7 @@ useHead({
 })
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
 const profileStore = useProfileStore()
 const sessionStore = useSessionStore()
@@ -45,6 +51,13 @@ const handleFormSubmit = async () => {
     router.push({ path: '/' })
   }
 }
+// sent here by an expired session (#31): explain, then drop the reason so a
+// reload doesn't repeat it. In onMounted: alerts are browser-only (they set timers).
+onMounted(() => {
+  if (route.query.reason !== 'expired') return
+  useAlertStore().setAlert(SESSION_EXPIRED_MESSAGE)
+  router.replace({ query: {} })
+})
 const formTextColor = computed<ColorPalette>(() => {
   return darkMode.value ? 'light-3' : 'dark-3'
 })

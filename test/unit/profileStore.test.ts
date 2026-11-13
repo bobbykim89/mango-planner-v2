@@ -38,6 +38,17 @@ describe('profileStore', () => {
     expect(store.getPlansOrder).toEqual([])
   })
 
+  it("fetchProfile with no profile drops the previous user's profile and dark mode (#32)", async () => {
+    const store = useProfileStore()
+    store.userProfile = profile({ dark: true, plansOrder: ['x'] })
+    store.darkMode = true
+    mockApi('GET', '/api/profile', () => ok(null))
+    expect(await store.fetchProfile()).toBe(true)
+    expect(store.userProfile).toBeNull()
+    expect(store.darkMode).toBe(false)
+    expect(store.getPlansOrder).toEqual([])
+  })
+
   it('toggleDarkMode uses the response and names the new state', async () => {
     const fetches = countProfileFetches()
     mockApi('PUT', '/api/profile/dark', () => ok(profile({ dark: true })))

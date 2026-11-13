@@ -43,14 +43,17 @@ export const useSessionStore = defineStore('session', () => {
     clearAll()
     alertStore.setAlert('Logout Successful!', 'success')
   }
-  /** The server rejected the session: clear everything, explain, go to login (once). */
-  const expire = async (message: string) => {
-    if (expiring) return
+  /**
+   * The session is gone (rejected by the server or signed out in another tab):
+   * clear everything and go to the login page, which explains why. Once there's
+   * nothing left to expire, a late failure from an older request does nothing (#31).
+   */
+  const expire = async () => {
+    if (expiring || (!cookie.value && !userStore.isAuthenticated)) return
     expiring = true
     try {
       clearAll()
-      alertStore.setAlert(message)
-      await navigateTo('/auth/login')
+      await navigateTo(SESSION_EXPIRED_REDIRECT)
     } finally {
       expiring = false
     }
