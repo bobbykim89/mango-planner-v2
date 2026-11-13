@@ -31,6 +31,9 @@ export const usePlanStore = defineStore('plan', () => {
     const draft = { id: key, data: data as DraftFormInput['data'] }
     drafts.value = [draft, ...drafts.value.filter((d) => d.id !== key)]
   }
+  const isUnrecoverable = (err: unknown) =>
+    err instanceof ApiClientError &&
+    (err.code === 'PLAN_NOT_FOUND' || err.code === 'FORBIDDEN')
   // actions
   const fetchPlans = () =>
     run(async () => {
@@ -65,7 +68,10 @@ export const usePlanStore = defineStore('plan', () => {
       },
       {
         success: 'Successfully updated plan!',
-        onError: () => saveDraft(id, body),
+        // keep the input as a draft, unless the plan is gone or not this user's:
+        // that save can never succeed, so a draft would be stuck in the list
+        onError: (err) =>
+          isUnrecoverable(err) ? deleteDraft(id) : saveDraft(id, body),
       },
     )
   }
@@ -91,6 +97,7 @@ export const usePlanStore = defineStore('plan', () => {
           method: 'DELETE',
         })
         plans.value = plans.value.filter((p) => p._id.toString() !== res.id)
+        await deleteDraft(res.id)
       },
       { success: 'Successfully deleted plan!' },
     )

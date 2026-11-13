@@ -124,6 +124,36 @@ describe('planStore', () => {
     expect(store.drafts[0]?.data).toEqual({ title: 'edited', content: 'y', type: 'chore' })
   })
 
+  it('deletePlan also removes a draft saved for that plan', async () => {
+    const store = usePlanStore()
+    store.plans = [plan('p1')]
+    const data = { title: 'stale', content: '', type: 'personal' }
+    draftStore().set('p1', { data, timestamp: 1 })
+    store.drafts = [{ id: 'p1', data }]
+    mockApi('DELETE', '/api/plan/p1', () => ok({ id: 'p1' }))
+    expect(await store.deletePlan('p1')).toBe(true)
+    expect(store.drafts).toEqual([])
+    expect(draftStore().has('p1')).toBe(false)
+  })
+
+  it.each([
+    [404, 'PLAN_NOT_FOUND', "That plan doesn't exist."],
+    [403, 'FORBIDDEN', "You don't have access to that."],
+  ])(
+    'saving a draft for a plan that can never be updated (%s %s) drops the draft',
+    async (status, code, message) => {
+      const store = usePlanStore()
+      const data = { title: 'stale', content: '', type: 'personal' }
+      draftStore().set('gone', { data, timestamp: 1 })
+      store.drafts = [{ id: 'gone', data }]
+      mockApi('PUT', '/api/plan/gone', (e) => fail(e, status, code, message))
+      expect(await store.updatePlan({ id: 'gone', body: data })).toBe(false)
+      expect(store.drafts).toEqual([])
+      expect(draftStore().has('gone')).toBe(false)
+      expect(useAlertStore().alert).toBe(message)
+    },
+  )
+
   it('a failed update keeps the draft under the plan id', async () => {
     mockApi('PUT', '/api/plan/p1', (e) =>
       fail(e, 500, 'INTERNAL_ERROR', 'Something went wrong on our side. Please try again.'),
