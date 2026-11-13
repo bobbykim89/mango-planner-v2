@@ -2,7 +2,7 @@ import { useAlertStore } from '@/stores/alertStore'
 import { useSessionStore } from '@/stores/sessionStore'
 
 export interface StoreActionOptions<T> {
-  /** Return false without calling the API when there's no session cookie. Default true. */
+  /** Needs the session cookie: without it, don't call the API and expire the session (unless expireOnAuthError is false). Default true. */
   requireAuth?: boolean
   /** Success alert; a function receives the action's result. */
   success?: string | ((result: T) => string)
@@ -29,7 +29,20 @@ export const useStoreAction = (): RunStoreAction => {
   const errorCheck = useErrorCheck()
 
   return async (fn, opts = {}) => {
-    if (opts.requireAuth !== false && !cookie.value) return false
+    if (opts.requireAuth !== false && !cookie.value) {
+      // a guest opening the app: nothing to do
+      if (opts.expireOnAuthError === false) return false
+      // the session ended meanwhile, e.g. signed out in another tab: treat it like the
+      // server rejecting the session, so onError keeps the input and the user is told (#30)
+      const err = new ApiClientError(
+        401,
+        'AUTH_TOKEN_MISSING',
+        'Your session has expired. Please sign in again.',
+      )
+      await opts.onError?.(err)
+      await nuxtApp.runWithContext(() => useSessionStore().expire(err.message))
+      return false
+    }
     try {
       const result = await fn()
       if (opts.success) {
