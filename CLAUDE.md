@@ -34,7 +34,7 @@ Current focus: hardening **security**, improving **performance**, and fixing int
 app/        Nuxt app (srcDir): pages, components/{layout,plans,widget}, stores (Pinia), composables, middleware, plugins
 server/     Nitro: api/ (file-based routes), controller/ (business logic), utils/ (auto-imported), plugins/connectDb.ts
 shared/     Code used by both sides (#shared alias): models/ (Mongoose), dto/ (Zod schemas), types/
-public/     PWA icons, screenshots, weather icons
+public/     PWA icons, screenshots, weather icons, offline.html
 ```
 
 ## Conventions
@@ -57,7 +57,7 @@ public/     PWA icons, screenshots, weather icons
   - Guard browser-only APIs (localforage, geolocation, window) with `import.meta.client` to avoid SSR/hydration errors.
 - **Markdown:** rendered with `marked` + `marked-katex-extension` and sanitized with DOMPurify (`useMarkdown`). Never render user content with `v-html` unsanitized.
 - **Config/secrets:** all secrets come from `runtimeConfig` in `nuxt.config.ts` (server-only keys). Never expose them via `runtimeConfig.public` or return them from API routes.
-- **PWA:** `@vite-pwa/nuxt` with `strategies: 'generateSW'`, `registerType: 'autoUpdate'`. `/api/*` is excluded from navigation fallback. Disabled in dev.
+- **PWA:** `@vite-pwa/nuxt` with `strategies: 'generateSW'`, `registerType: 'autoUpdate'`. Page loads are network-only and fall back to the precached, self-contained `public/offline.html` only when the request fails (no `navigateFallback`: pages are server-rendered, so there's no app shell to precache). Disabled in dev, so check service-worker changes with `pnpm build:local` + `pnpm preview --dotenv .env.local`. `pnpm test` rebuilds `.output` with test values, so rebuild and restart the preview after running it (otherwise its pages point at deleted chunks and nothing is interactive).
 - **Style:** Prettier (single quotes, no semicolons, 2-space indent). TypeScript strict. Match the surrounding code.
 
 ## Guardrails

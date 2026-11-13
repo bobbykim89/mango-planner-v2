@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>You're offline · Mango Planner</title>
+    <link rel="icon" href="/favicon.ico" />
+    <!--
+      Shown by the service worker when a page can't load from the network (#25).
+      Self-contained on purpose: no app code, no user data, only precached files.
+    -->
+    <script>
+      // match the app's saved light/dark choice (@nuxtjs/color-mode keeps it here)
+      try {
+        if (localStorage.getItem('nuxt-color-mode') === 'dark') {
+          document.documentElement.classList.add('dark')
+        }
+      } catch {}
+    </script>
+    <style>
+      :root {
+        --page: #d0d0d0; /* light-4 */
+        --card: #f1f1f1; /* light-2 */
+        --header: #e8e8e8; /* light-3 */
+        --text: #1f2937; /* dark-3 */
+        --accent-text: #735107; /* amber as text in light mode */
+        --button: #f1ac18; /* warning */
+        --button-text: #1f2937;
+        --focus: #1f2937;
+      }
+      .dark {
+        --page: #484848; /* dark-2 */
+        --card: #1f2937; /* dark-3 */
+        --header: #1f2937;
+        --text: #e8e8e8; /* light-3 */
+        --accent-text: #f1ac18;
+        --focus: #f1ac18;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background: var(--page);
+        color: var(--text);
+        font-family:
+          ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+          'Segoe UI Emoji';
+        line-height: 1.5;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 1.5rem;
+        background: var(--header);
+      }
+      header img {
+        width: 3rem;
+        height: 3rem;
+      }
+      header span {
+        font-size: 1.875rem;
+        font-weight: bold;
+        letter-spacing: 0.05em;
+        color: var(--accent-text);
+      }
+      main {
+        flex: 1;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 3rem 1rem;
+      }
+      .card {
+        width: 100%;
+        max-width: 32rem;
+        padding: 2rem;
+        border-radius: 0.375rem;
+        background: var(--card);
+        box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
+      }
+      h1 {
+        margin: 0 0 1rem;
+        font-size: 1.5rem;
+        color: var(--accent-text);
+      }
+      h1:focus {
+        outline: none;
+      }
+      p {
+        margin: 0 0 1rem;
+      }
+      .note {
+        padding: 0.75rem 1rem;
+        border-left: 4px solid var(--button);
+        background: rgb(241 172 24 / 0.12);
+        border-radius: 0.25rem;
+      }
+      button {
+        width: 100%;
+        margin-top: 0.5rem;
+        padding: 0.625rem 1rem;
+        border: 0;
+        border-radius: 0.375rem;
+        background: var(--button);
+        color: var(--button-text);
+        font: inherit;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      button:hover {
+        filter: brightness(0.95);
+      }
+      button:focus-visible {
+        outline: 3px solid var(--focus);
+        outline-offset: 2px;
+      }
+      .hint {
+        margin: 0.75rem 0 0;
+        font-size: 0.875rem;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="/mango_planner_logo-192x192.png" alt="" />
+      <span>Mango Planner</span>
+    </header>
+    <main>
+      <div class="card">
+        <h1 tabindex="-1">You're offline</h1>
+        <p>
+          Mango Planner can't reach the server right now. Check your connection
+          and try again.
+        </p>
+        <p class="note">
+          Plans you couldn't save are kept on this device as drafts. They'll
+          show up when you're back online and signed in.
+        </p>
+        <button type="button" id="retry">Try again</button>
+        <p class="hint" role="status">
+          This page reloads by itself when you're back online.
+        </p>
+      </div>
+    </main>
+    <script>
+      document.querySelector('h1').focus()
+      // reloading asks for the page that failed (this page is served at its address)
+      document.getElementById('retry').addEventListener('click', () => location.reload())
+      // wait a moment: a connection often reports "online" before it works, and
+      // if a page load is already under way this page is gone before the timer
+      // fires, so the reload can't cancel it
+      window.addEventListener('online', () => {
+        setTimeout(() => navigator.onLine && location.reload(), 1500)
+      })
+    </script>
+  </body>
+</html>

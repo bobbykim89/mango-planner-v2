@@ -1,5 +1,14 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import tailwindcss from '@tailwindcss/vite'
+
+// Shown by the service worker when a page can't load (#25). Precached under its
+// own URL, with a content hash so an edited page replaces the cached copy.
+const offlinePage = '/offline.html'
+const offlinePageRevision = createHash('md5')
+  .update(readFileSync(new URL('./public/offline.html', import.meta.url)))
+  .digest('hex')
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -160,9 +169,23 @@ export default defineNuxtConfig({
       ],
     },
     workbox: {
-      globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
-      navigateFallback: '/',
-      navigateFallbackDenylist: [/^\/api/],
+      globPatterns: ['**/*.{js,css,png,svg,ico}'],
+      // listed here, not globbed: the module renames globbed .html files to clean
+      // URLs ('offline'), which static hosting doesn't serve
+      additionalManifestEntries: [
+        { url: offlinePage, revision: offlinePageRevision },
+      ],
+      // Page loads always go to the server (it renders the page and checks the
+      // session); the offline page is shown only when that request fails.
+      // No navigateFallback: it would answer every page load, even online.
+      navigateFallback: null,
+      runtimeCaching: [
+        {
+          urlPattern: ({ request }) => request.mode === 'navigate',
+          handler: 'NetworkOnly',
+          options: { precacheFallback: { fallbackURL: offlinePage } },
+        },
+      ],
     },
     registerType: 'autoUpdate',
     devOptions: {
