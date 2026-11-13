@@ -149,8 +149,8 @@ const onClear = () => {
   draftDataForm.type = 'personal'
 }
 // the server puts a new plan first in the custom order; mirror that locally
-const createAndOrder = async (input: PlanFormInput) => {
-  const plan = await planStore.createPlan(input)
+const createAndOrder = async (input: PlanFormInput, draftKey?: string) => {
+  const plan = await planStore.createPlan(input, draftKey)
   if (plan) profileStore.addPlanToOrder(plan._id.toString())
   return plan
 }
@@ -216,8 +216,9 @@ const onDraftSave = async (e: Event, data: PlanFormInput) => {
     window.confirm('Please confirm to update this item.')
   ) {
     let saved: boolean
-    if (selectedDraft.value === 'new') {
-      saved = (await createAndOrder(data)) !== null
+    if (isNewDraft(selectedDraft.value)) {
+      // pass the draft's id: if this fails too, the same draft is updated (#30)
+      saved = (await createAndOrder(data, selectedDraft.value)) !== null
       customOrderData.value = plansByOrder.value
     } else {
       saved = await planStore.updatePlan({

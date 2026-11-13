@@ -8,7 +8,18 @@ import {
   useUserStore,
 } from '@/stores'
 import type { PlanDto, ProfileDto, UserDto } from '#shared/types'
+import localforage from 'localforage'
 import { clearApiMocks, mockApi, ok, resetState, signIn } from './helpers'
+
+vi.mock('localforage', async () => {
+  const { memoryLocalforage } = await import('./helpers')
+  return { default: memoryLocalforage() }
+})
+const draftStore = () => {
+  const { stores } = localforage as unknown as { stores: Map<string, Map<string, unknown>> }
+  if (!stores.has('drafts')) stores.set('drafts', new Map())
+  return stores.get('drafts')!
+}
 
 const { navigateToMock } = vi.hoisted(() => ({ navigateToMock: vi.fn() }))
 mockNuxtImport('navigateTo', () => navigateToMock)
@@ -85,6 +96,19 @@ describe('sessionStore', () => {
     expect(useUserStore().isAuthenticated).toBe(true)
     expect(useAlertStore().alert).toBeNull()
     expect(session.mounted).toBe(true)
+  })
+
+  it("init loads the signed-in user's drafts only (#29)", async () => {
+    draftStore().clear()
+    const data = { title: 'd', content: '', type: 'personal' }
+    draftStore().set('u1:p1', { data, timestamp: 1 })
+    draftStore().set('u2:p2', { data, timestamp: 2 })
+    signIn()
+    mockApi('GET', '/api/auth', () => ok({ _id: 'u1', name: 'A', email: 'a@b.c' }))
+    mockApi('GET', '/api/profile', () => ok(null))
+    mockApi('GET', '/api/plan', () => ok([{ _id: 'p1', title: 't' }]))
+    await useSessionStore().init()
+    expect(usePlanStore().drafts).toEqual([{ id: 'p1', data }])
   })
 
   it('clearAll leaves nothing behind for the next user', () => {

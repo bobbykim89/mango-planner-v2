@@ -9,6 +9,8 @@ export const usePlanStore = defineStore('plan', () => {
   // state
   const plans = ref<PlanDto[]>([])
   const drafts = ref<DraftFormInput[]>([])
+  // whose drafts are loaded; drafts are stored per user (#29). Set by loadDrafts.
+  let draftOwner: string | null = null
   // getters
   /** Incomplete plans first, then completed ones, each in list order. */
   const getAllPlans = computed<PlanDto[]>(() => [
@@ -24,10 +26,9 @@ export const usePlanStore = defineStore('plan', () => {
     const id = plan._id.toString()
     plans.value = [plan, ...plans.value.filter((p) => p._id.toString() !== id)]
   }
-  /** Keeps unsaved input in the browser and shows it in the drafts list at once. */
+  /** Keeps unsaved input in the browser and lists it, only if the browser stored it (#30). */
   const saveDraft = async (key: string, data: PlanInput) => {
-    await draftStorage.save(key, data)
-    if (!import.meta.client) return
+    if (!draftOwner || !(await draftStorage.save(draftOwner, key, data))) return
     const draft = { id: key, data: data as DraftFormInput['data'] }
     drafts.value = [draft, ...drafts.value.filter((d) => d.id !== key)]
   }
@@ -39,8 +40,14 @@ export const usePlanStore = defineStore('plan', () => {
     run(async () => {
       plans.value = await api<PlanDto[]>('/api/plan')
     })
-  /** Resolves to the created plan, or null when it failed (the input is kept as a draft). */
-  const createPlan = async (formInput: PlanInput): Promise<PlanDto | null> => {
+  /**
+   * Resolves to the created plan, or null when it failed (the input is kept as a
+   * draft). Retrying a draft passes its id, so a second failure updates that draft.
+   */
+  const createPlan = async (
+    formInput: PlanInput,
+    draftKey?: string,
+  ): Promise<PlanDto | null> => {
     // copy first: PlanInputForm clears the object it emitted right after emitting
     const input = { ...formInput }
     let created: PlanDto | null = null
@@ -51,7 +58,7 @@ export const usePlanStore = defineStore('plan', () => {
       },
       {
         success: 'Successfully created new plan!',
-        onError: () => saveDraft('new', input),
+        onError: () => saveDraft(draftKey ?? newDraftKey(), input),
       },
     )
     return created
@@ -101,16 +108,23 @@ export const usePlanStore = defineStore('plan', () => {
       },
       { success: 'Successfully deleted plan!' },
     )
-  const loadDrafts = async () => {
-    drafts.value = await draftStorage.list()
+  /** Loads the user's drafts (after the plans, which decide which old drafts are theirs). */
+  const loadDrafts = async (userId: string) => {
+    draftOwner = userId
+    await draftStorage.claimLegacy(
+      userId,
+      plans.value.map((plan) => plan._id.toString()),
+    )
+    drafts.value = await draftStorage.list(userId)
   }
   const deleteDraft = async (key: string) => {
-    await draftStorage.remove(key)
+    if (draftOwner) await draftStorage.remove(draftOwner, key)
     drafts.value = drafts.value.filter((draft) => draft.id !== key)
   }
   const clear = () => {
     plans.value = []
     drafts.value = []
+    draftOwner = null
   }
   return {
     plans,
