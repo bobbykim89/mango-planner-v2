@@ -1,16 +1,16 @@
-import { useInitPiniaStore, usePlanStore, useUserStore } from '@/stores'
+import { usePlanStore, useSessionStore, useUserStore } from '@/stores'
 
 export default defineNuxtPlugin({
   name: 'stores-init',
   dependsOn: ['pinia'],
   async setup(nuxtApp) {
-    const initStore = useInitPiniaStore()
+    const session = useSessionStore()
     // The server already initialised the stores and Pinia hydrated that state, so
     // don't fetch it all again; only load what lives in the browser (IndexedDB drafts).
-    if (import.meta.client && nuxtApp.isHydrating && initStore.mounted) {
-      if (useUserStore().isAuthenticated) await usePlanStore().loadAllDrafts()
+    if (import.meta.client && nuxtApp.isHydrating && session.mounted) {
+      if (useUserStore().isAuthenticated) await usePlanStore().loadDrafts()
       return
     }
-    await initStore.initStores()
+    await session.init()
   },
 })

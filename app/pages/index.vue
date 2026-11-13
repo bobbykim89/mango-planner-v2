@@ -12,9 +12,9 @@ import PlanCollapsable from '@/components/plans/PlanCollapsable.vue'
 import PlanInputForm from '@/components/plans/PlanInputForm.vue'
 import UtilityBlock from '@/components/plans/UtilityBlock.vue'
 import {
-  useInitPiniaStore,
   usePlanStore,
   useProfileStore,
+  useSessionStore,
   useUserStore,
 } from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
@@ -49,11 +49,12 @@ type ModalFormType = 'new' | 'update' | 'draft'
 const userStore = useUserStore()
 const profileStore = useProfileStore()
 const planStore = usePlanStore()
-const initPiniaStore = useInitPiniaStore()
+const sessionStore = useSessionStore()
 const { isAuthenticated } = storeToRefs(userStore)
 const { userProfile, darkMode } = storeToRefs(profileStore)
-const { mounted } = storeToRefs(initPiniaStore)
+const { mounted } = storeToRefs(sessionStore)
 const { drafts } = storeToRefs(planStore)
+const plansByOrder = usePlansByOrder()
 const searchTerm = ref<string>('')
 const modalRef = ref<InstanceType<typeof Modal>>()
 const modalForm = ref<ModalFormType>('new')
@@ -96,7 +97,7 @@ const handleShowIncompleteClick = (e: Event) => {
 }
 const handleShowCustomClick = (e: Event) => {
   e.preventDefault()
-  customOrderData.value = planStore.getPlansByOrder
+  customOrderData.value = plansByOrder.value
   displayStyle.value = 'custom'
 }
 // set when the modal is opened from the mobile tools block, which hides itself first;
@@ -147,6 +148,12 @@ const onClear = () => {
   draftDataForm.content = ''
   draftDataForm.type = 'personal'
 }
+// the server puts a new plan first in the custom order; mirror that locally
+const createAndOrder = async (input: PlanFormInput) => {
+  const plan = await planStore.createPlan(input)
+  if (plan) profileStore.addPlanToOrder(plan._id.toString())
+  return plan
+}
 const updateSearchTerm = (text: string) => {
   displayStyle.value = 'search'
   searchTerm.value = text
@@ -154,8 +161,8 @@ const updateSearchTerm = (text: string) => {
 
 const handleNewFormSubmit = async (e: Event, item: PlanFormInput) => {
   e.preventDefault()
-  await planStore.createNewPost(item)
-  customOrderData.value = planStore.getPlansByOrder
+  await createAndOrder(item)
+  customOrderData.value = plansByOrder.value
   modalRef.value?.close()
 }
 const handleCollapseToggle = async (
@@ -163,8 +170,8 @@ const handleCollapseToggle = async (
   id: string,
   complete: boolean,
 ) => {
-  await planStore.toggleComplete({ id, body: { complete: !complete } })
-  customOrderData.value = planStore.getPlansByOrder
+  await planStore.togglePlanComplete({ id, body: { complete: !complete } })
+  customOrderData.value = plansByOrder.value
   onClear()
 }
 const handleCollapseEdit = (e: Event, item: PlanDto) => {
@@ -184,7 +191,7 @@ const onEditSubmit = async (e: Event, data: PlanFormInput) => {
     import.meta.client &&
     window.confirm('Please confirm to update this item.')
   ) {
-    await planStore.updatePost({ id: selectedPost.value, body: data })
+    await planStore.updatePlan({ id: selectedPost.value, body: data })
   }
   focusPlanAfterClose.value = selectedPost.value
   onClear()
@@ -208,16 +215,18 @@ const onDraftSave = async (e: Event, data: PlanFormInput) => {
     import.meta.client &&
     window.confirm('Please confirm to update this item.')
   ) {
+    let saved: boolean
     if (selectedDraft.value === 'new') {
-      await planStore.createNewPost(data)
-      customOrderData.value = planStore.getPlansByOrder
+      saved = (await createAndOrder(data)) !== null
+      customOrderData.value = plansByOrder.value
     } else {
-      await planStore.updatePost({
+      saved = await planStore.updatePlan({
         id: selectedDraft.value,
         body: data,
       })
     }
-    await planStore.deleteDraft(selectedDraft.value)
+    // a failed save keeps the draft (the store re-saved it), so only drop it on success
+    if (saved) await planStore.deleteDraft(selectedDraft.value)
     onClear()
 
     modalRef.value?.close()
@@ -240,8 +249,8 @@ const handleCollapseDelete = async (e: Event, id: string) => {
     window.confirm('Permanently deleting this item. Please confirm to proceed.')
   ) {
     const { next, prev } = neighbourIds(id)
-    await planStore.deletePost(id)
-    customOrderData.value = planStore.getPlansByOrder
+    if (await planStore.deletePlan(id)) profileStore.removePlanFromOrder(id)
+    customOrderData.value = plansByOrder.value
     // keep keyboard focus on the list instead of losing it with the removed card
     await nextTick()
     const target =
@@ -256,7 +265,7 @@ const handleCollapseDelete = async (e: Event, id: string) => {
     target?.focus()
     return
   }
-  customOrderData.value = planStore.getPlansByOrder
+  customOrderData.value = plansByOrder.value
 }
 const onOrderUpdate = async () => {
   isSavingOrder.value = true
@@ -264,9 +273,8 @@ const onOrderUpdate = async () => {
     const itemsOrder: string[] = customOrderData.value.map((item) => {
       return item._id!.toString()
     })
-    await profileStore.updateUserPlansOrder({ plansOrder: itemsOrder })
-    await profileStore.getCurrentUserProfile()
-    customOrderData.value = planStore.getPlansByOrder
+    await profileStore.updatePlansOrder(itemsOrder)
+    customOrderData.value = plansByOrder.value
   } finally {
     isSavingOrder.value = false
   }

@@ -4,7 +4,12 @@ import CreateProfileWidget from '@/components/widget/CreateProfileWidget.vue'
 import DarkmodeWidget from '@/components/widget/DarkmodeWidget.vue'
 import UserInfoWidget from '@/components/widget/UserInfoWidget.vue'
 import WeatherWidget from '@/components/widget/WeatherWidget.vue'
-import { useAlertStore, useProfileStore, useUserStore } from '@/stores'
+import {
+  useAlertStore,
+  useProfileStore,
+  useSessionStore,
+  useUserStore,
+} from '@/stores'
 import type { ColorPalette } from '@bobbykim/manguito-theme'
 import {
   Alert,
@@ -113,7 +118,7 @@ const onScrollToTop = () => {
   y.value = 0
 }
 const onLogout = () => {
-  userStore.logoutUser()
+  useSessionStore().logout()
   sidebarClose()
   headerRef.value?.headerClose()
   colorMode.preference = 'light'
@@ -121,7 +126,7 @@ const onLogout = () => {
 }
 const onDarkModeClick = async (e: Event, dark: boolean) => {
   e.preventDefault()
-  await profileStore.toggleUserDarkMode({ dark: !dark })
+  await profileStore.toggleDarkMode({ dark: !dark })
 }
 const onUsernameChange = async (e: Event, name: string) => {
   e.preventDefault()
@@ -140,7 +145,7 @@ const onFileUpload = async (e: Event, file: File) => {
   })
   fileFormData.append('image', compressedFile)
   if (import.meta.client && window.confirm('Please confirm file upload.')) {
-    await profileStore.updateUserProfilePicture(fileFormData)
+    await profileStore.updateProfilePicture(fileFormData)
   }
   headerRef.value?.headerClose()
 }
@@ -156,7 +161,7 @@ const onPwUpdate = async (e: Event, currPw: string, newPw: string) => {
 }
 const onProfileCreate = async (e: Event) => {
   e.preventDefault()
-  await profileStore.postNewUserProfile()
+  await profileStore.createProfile()
   headerRef.value?.headerClose()
 }
 

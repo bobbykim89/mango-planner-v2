@@ -33,6 +33,14 @@ describe('server-rendered pages', () => {
     expect(res.headers.get('location')).toBe('/auth/login')
   })
 
+  it('a stale cookie keeps public pages public', async () => {
+    const about = await page('/about', 'Bearer invalid')
+    expect(about.status).toBe(200)
+    const home = await page('/', 'Bearer invalid')
+    expect(home.status).toBe(302)
+    expect(home.headers.get('location')).toBe('/auth/login')
+  })
+
   it('renders / for a signed-in user with sanitized Markdown', async () => {
     const user = await createUser()
     const created = await api('POST', '/api/plan', {

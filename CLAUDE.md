@@ -19,10 +19,14 @@ Current focus: hardening **security**, improving **performance**, and fixing int
 | `pnpm build` / `pnpm build:local` | Production build (`build:local` loads `.env.local`) |
 | `pnpm preview` | Serve the production build |
 | `pnpm typecheck` | `nuxt typecheck` (vue-tsc across the app/server/shared project references) |
-| `pnpm test` | Vitest API tests (builds the app, runs it against an in-memory MongoDB) |
+| `pnpm test` | All Vitest tests: the `api` project (builds the app, runs it against an in-memory MongoDB) and the `unit` project |
+| `pnpm vitest run --project unit` | Only the fast client unit tests (no build) |
 | `pnpm test:watch` | Vitest in watch mode |
 
-**Tests:** API tests live in `test/api/` (Vitest). The global setup (`test/setup/global.ts`) builds the app with the fake values in `test/test.env` (never the real `.env`), starts it against `mongodb-memory-server`, and the tests call the real `/api` routes. Set `SKIP_BUILD=1` to reuse an existing `.output` when only tests changed. CI (`.github/workflows/ci.yml`) runs `pnpm typecheck` and `pnpm test` on every PR. There is no linter yet; also exercise UI changes in `pnpm dev`.
+**Tests:** Vitest runs two projects (`vitest.config.ts`):
+
+- `api`: `test/api/` and `test/pages/`. The global setup (`test/setup/global.ts`) builds the app with the fake values in `test/test.env` (never the real `.env`), starts it against `mongodb-memory-server` with require-of-ESM disabled (like Vercel), and the tests call the real `/api` routes and render real pages. Set `SKIP_BUILD=1` to reuse an existing `.output` when only tests changed.
+- `unit`: `test/unit/`, client stores and composables in the Nuxt environment (happy-dom). Mock API routes with `mockApi`/`ok`/`fail` from `test/unit/helpers.ts` (wraps `registerEndpoint`), call `resetState()` in `beforeEach` and `clearApiMocks()` in `afterEach`, mock `navigateTo` per file with `mockNuxtImport`, and mock localforage with `memoryLocalforage()` (no IndexedDB in happy-dom). CI (`.github/workflows/ci.yml`) runs `pnpm typecheck` and `pnpm test` on every PR. There is no linter yet; also exercise UI changes in `pnpm dev`.
 
 ## Layout
 
@@ -46,7 +50,11 @@ public/     PWA icons, screenshots, weather icons
 - **Validation:** request bodies go through Zod schemas in `shared/dto/<domain>/` via `readValidatedBody(e, schema.parse)`.
 - **Errors:** throw `createError({ status, message, statusMessage })`. The client surfaces `statusMessage` to users (`useErrorCheck().extractErrorMessage`) and treats `statusCode === 401` as "log out and redirect to /auth/login".
 - **Auth:** `POST /api/auth` returns `access_token: "Bearer <jwt>"`. The client stores it in the `access_token` cookie (`useAuthToken`, 7 days) and sends it verbatim as the `Authorization` header. `server/utils/checkAuth.util.ts` verifies it and sets `event.context.user`. Ownership checks (`plan.author.toString() !== user.id`) live in each controller method.
-- **Client state:** Pinia setup stores in `app/stores/`, initialized once by `app/plugins/init.plugin.ts` → `initPiniaStore.initStores()`. Store actions call `$fetch` directly and route failures through a local `handleError`. Guard browser-only APIs (localforage, geolocation, window) with `import.meta.client` to avoid SSR/hydration errors.
+- **Client state:** Pinia setup stores in `app/stores/`, initialized once by `app/plugins/init.plugin.ts` → `useSessionStore().init()` (on the server from the request cookie; the client reuses the hydrated state).
+  - Store actions wrap their body in the runner from `useStoreAction()` (session-cookie guard, success/error alerts, expired session → `sessionStore.expire()`), call the API through `useApi()`, and update state from the API response instead of refetching. Actions never throw; they resolve `true`/`false`.
+  - `userStore`, `profileStore` and `planStore` don't import each other; only `sessionStore` (startup, logout, expiry) combines them. Logic that needs two stores goes in a composable (e.g. `usePlansByOrder`) or the page.
+  - Offline drafts persist through `useDrafts()` (IndexedDB via localforage); `planStore.drafts` is the reactive list.
+  - Guard browser-only APIs (localforage, geolocation, window) with `import.meta.client` to avoid SSR/hydration errors.
 - **Markdown:** rendered with `marked` + `marked-katex-extension` and sanitized with DOMPurify (`useMarkdown`). Never render user content with `v-html` unsanitized.
 - **Config/secrets:** all secrets come from `runtimeConfig` in `nuxt.config.ts` (server-only keys). Never expose them via `runtimeConfig.public` or return them from API routes.
 - **PWA:** `@vite-pwa/nuxt` with `strategies: 'generateSW'`, `registerType: 'autoUpdate'`. `/api/*` is excluded from navigation fallback. Disabled in dev.
