@@ -19,10 +19,13 @@ Current focus: hardening **security**, improving **performance**, and fixing int
 | `pnpm build` / `pnpm build:local` | Production build (`build:local` loads `.env.local`) |
 | `pnpm preview` | Serve the production build |
 | `pnpm typecheck` | `nuxt typecheck` (vue-tsc across the app/server/shared project references) |
-| `pnpm test` | Vitest API tests (builds the app, runs it against an in-memory MongoDB) |
+| `pnpm test` | All Vitest tests: the `api` project (builds the app, runs it against an in-memory MongoDB) and the `unit` project |
+| `pnpm vitest run --project unit` | Only the fast client unit tests (no build) |
 | `pnpm test:watch` | Vitest in watch mode |
 
-**Tests:** API tests live in `test/api/` (Vitest). The global setup (`test/setup/global.ts`) builds the app with the fake values in `test/test.env` (never the real `.env`), starts it against `mongodb-memory-server`, and the tests call the real `/api` routes. Set `SKIP_BUILD=1` to reuse an existing `.output` when only tests changed. CI (`.github/workflows/ci.yml`) runs `pnpm typecheck` and `pnpm test` on every PR. There is no linter yet; also exercise UI changes in `pnpm dev`.
+**Tests:** Vitest runs two projects (`vitest.config.ts`):
+- `api`: `test/api/` and `test/pages/`. The global setup (`test/setup/global.ts`) builds the app with the fake values in `test/test.env` (never the real `.env`), starts it against `mongodb-memory-server` with require-of-ESM disabled (like Vercel), and the tests call the real `/api` routes and render real pages. Set `SKIP_BUILD=1` to reuse an existing `.output` when only tests changed.
+- `unit`: `test/unit/`, client stores and composables in the Nuxt environment (happy-dom). Mock API routes with `mockApi`/`ok`/`fail` from `test/unit/helpers.ts` (wraps `registerEndpoint`), call `resetState()` in `beforeEach` and `clearApiMocks()` in `afterEach`, mock `navigateTo` per file with `mockNuxtImport`, and mock localforage with `memoryLocalforage()` (no IndexedDB in happy-dom). CI (`.github/workflows/ci.yml`) runs `pnpm typecheck` and `pnpm test` on every PR. There is no linter yet; also exercise UI changes in `pnpm dev`.
 
 ## Layout
 
