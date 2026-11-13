@@ -28,3 +28,5 @@ logs
 
 # API test run artifacts
 test/.tmp/
+.vercel
+.env*

@@ -7,3 +7,9 @@ minimumReleaseAgeExclude:
   - '@bobbykim/manguito-theme@1.5.0'
   - '@bobbykim/mcl-footer@0.10.8'
   - '@bobbykim/mcl-forms@0.12.4'
+# jsdom 28+ (via isomorphic-dompurify) require()s ESM-only packages, which
+# Vercel's Node runtime rejects (ERR_REQUIRE_ESM, every server-rendered page 500s).
+# isomorphic-dompurify documents this pin as the workaround:
+# https://github.com/kkomelin/isomorphic-dompurify/issues/394
+overrides:
+  jsdom: 25.0.1

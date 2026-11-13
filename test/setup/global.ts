@@ -53,7 +53,11 @@ export default async function setup(project: TestProject) {
 
   const port = await getRandomPort()
   const logStream = createWriteStream(serverLog, { flags: 'w' })
-  const server: ChildProcess = spawn('node', ['.output/server/index.mjs'], {
+  // Vercel's Node runtime can't require() ES modules, though local Node 24 can.
+  // Turn that off here too so a dependency that relies on it fails the tests
+  // instead of only failing in production.
+  const nodeArgs = ['--no-experimental-require-module', '.output/server/index.mjs']
+  const server: ChildProcess = spawn('node', nodeArgs, {
     cwd: root,
     env: {
       ...process.env,
