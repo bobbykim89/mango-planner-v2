@@ -126,7 +126,7 @@ const onLogout = () => {
 }
 const onDarkModeClick = async (e: Event, dark: boolean) => {
   e.preventDefault()
-  await profileStore.toggleUserDarkMode({ dark: !dark })
+  await profileStore.toggleDarkMode({ dark: !dark })
 }
 const onUsernameChange = async (e: Event, name: string) => {
   e.preventDefault()
@@ -145,7 +145,7 @@ const onFileUpload = async (e: Event, file: File) => {
   })
   fileFormData.append('image', compressedFile)
   if (import.meta.client && window.confirm('Please confirm file upload.')) {
-    await profileStore.updateUserProfilePicture(fileFormData)
+    await profileStore.updateProfilePicture(fileFormData)
   }
   headerRef.value?.headerClose()
 }
@@ -161,7 +161,7 @@ const onPwUpdate = async (e: Event, currPw: string, newPw: string) => {
 }
 const onProfileCreate = async (e: Event) => {
   e.preventDefault()
-  await profileStore.postNewUserProfile()
+  await profileStore.createProfile()
   headerRef.value?.headerClose()
 }
 

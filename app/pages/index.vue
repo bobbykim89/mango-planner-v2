@@ -264,8 +264,7 @@ const onOrderUpdate = async () => {
     const itemsOrder: string[] = customOrderData.value.map((item) => {
       return item._id!.toString()
     })
-    await profileStore.updateUserPlansOrder({ plansOrder: itemsOrder })
-    await profileStore.getCurrentUserProfile()
+    await profileStore.updatePlansOrder(itemsOrder)
     customOrderData.value = planStore.getPlansByOrder
   } finally {
     isSavingOrder.value = false

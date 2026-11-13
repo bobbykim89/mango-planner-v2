@@ -26,7 +26,7 @@ export const useSessionStore = defineStore('session', () => {
     await userStore.fetchCurrentUser()
     if (userStore.isAuthenticated) {
       await Promise.all([
-        profileStore.getCurrentUserProfile(),
+        profileStore.fetchProfile(),
         planStore.getAllPostByUser(),
       ])
     }
