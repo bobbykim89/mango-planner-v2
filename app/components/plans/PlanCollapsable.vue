@@ -119,7 +119,7 @@ const renderedContent = computed(() => useMarkdown(props.item.content))
               :data-plan-toggle="item._id.toString()"
               v-bind="toggleAttrs"
               :aria-describedby="`plan-type-${item._id.toString()}`"
-              class="text-left w-full break-words"
+              class="text-left w-full wrap-anywhere"
               @click.stop="toggle"
             >
               {{ item.title }}
@@ -168,7 +168,7 @@ const renderedContent = computed(() => useMarkdown(props.item.content))
       <div class="py-xs">
         <div class="flex gap-2xs">
           <div
-            class="w-full pl-xs pr-2xs whitespace-pre-line text-dark-3 dark:text-light-3 md-content"
+            class="w-full min-w-0 pl-xs pr-2xs whitespace-pre-line text-dark-3 dark:text-light-3 md-content"
           >
             <div
               class="md-content"

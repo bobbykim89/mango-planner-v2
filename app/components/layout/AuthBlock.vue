@@ -53,8 +53,10 @@ const handleUsernameClick = (e: Event) => {
             class="h-md rounded-full aspect-square"
           />
         </div>
-        <div class="text-lg font-bold text-warning">
-          <span>
+        <!-- a long name is cut short so the header stays on one line; the
+             button's accessible name and tooltip keep the full name -->
+        <div class="text-lg font-bold text-warning min-w-0">
+          <span class="block max-w-64 truncate" :title="username">
             {{ username }}
           </span>
         </div>

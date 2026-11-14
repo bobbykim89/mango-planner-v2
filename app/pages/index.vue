@@ -355,9 +355,11 @@ watch([displayStyle, searchTerm], () => {
 <template>
   <section class="container py-md lg:py-lg min-h-[75vh]">
     <h1 id="plans-heading" tabindex="-1" class="sr-only">My plans</h1>
+    <!-- grid-cols-1: without an explicit column, long unbroken text (a URL) widens
+         the column past the screen on mobile -->
     <div
       v-if="mounted"
-      class="grid md:grid-cols-2 gap-xs md:gap-md grid-flow-row px-sm md:px-xs relative"
+      class="grid grid-cols-1 md:grid-cols-2 gap-xs md:gap-md grid-flow-row px-sm md:px-xs relative"
     >
       <!-- mobile utility block -->
       <MobileUtilityToggleButton

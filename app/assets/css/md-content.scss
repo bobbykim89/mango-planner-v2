@@ -1,6 +1,10 @@
 @import 'katex/dist/katex.min.css';
 
 .md-content {
+  // long unbroken text (URLs, long words) wraps instead of widening the card;
+  // code blocks and display math keep their own horizontal scroll
+  overflow-wrap: anywhere;
+
   // ── Headings ──────────────────────────────────────────
   // Content headings start at h3 (# → h3, see useMarkdown), so # matches the
   // plan title's size and the rest step down from there (#42).
@@ -159,6 +163,18 @@
     border-collapse: collapse;
     margin: 0.75rem 0;
     font-size: 0.9rem;
+  }
+
+  // in a table, breaking anywhere would let the table squeeze short columns
+  // down to a letter or two; only links and code (the long unbroken parts) do
+  th,
+  td {
+    overflow-wrap: break-word;
+
+    a,
+    code {
+      overflow-wrap: anywhere;
+    }
   }
 
   th,
