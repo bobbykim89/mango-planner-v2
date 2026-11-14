@@ -90,7 +90,7 @@ const formTextColor = computed<ColorPalette>(() => {
         alt="placeholder profile picture"
         class="object-center object-cover aspect-square rounded-full h-md md:h-2xl"
       />
-      <p class="font-bold">{{ username }}</p>
+      <p class="font-bold min-w-0 text-center wrap-anywhere">{{ username }}</p>
     </div>
     <AccordionGroup>
       <!-- username update -->
