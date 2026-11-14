@@ -127,10 +127,20 @@ const onMenuKeydown = (e: KeyboardEvent) => {
       focusItem(list.length - 1)
       break
     case 'Escape':
-    case 'Tab':
       e.preventDefault()
       closeMenu()
       break
+    case 'Tab': {
+      // close and move on from the handle, as Tab would from the menu button
+      // (the menu itself is teleported to the end of <main>, so the browser's
+      // own Tab would land far away) (#41)
+      e.preventDefault()
+      const handle = handleRef.value
+      const target = handle ? nextTabbable(handle, e.shiftKey ? -1 : 1) : null
+      closeMenu(!target)
+      target?.focus()
+      break
+    }
   }
 }
 

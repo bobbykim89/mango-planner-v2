@@ -74,7 +74,7 @@ const draftDataForm = reactive<PlanFormInput>({
 const customOrderData = ref<PlanDto[]>([])
 const selectedPost = ref<string>('')
 const isSavingOrder = ref<boolean>(false)
-const { polite: announce } = useAnnouncer()
+const announce = useRepeatableAnnouncer()
 
 const userProfileStatus = computed<boolean>(() => {
   if (isAuthenticated && userProfile.value !== null) {
@@ -170,9 +170,13 @@ const handleCollapseToggle = async (
   id: string,
   complete: boolean,
 ) => {
+  const before = visiblePlanIds()
   await planStore.togglePlanComplete({ id, body: { complete: !complete } })
   customOrderData.value = plansByOrder.value
   onClear()
+  // under "Show incomplete" the plan leaves the list, and in "all" it moves to the
+  // completed ones; either way its button loses focus (#39)
+  await focusPlanAfterChange(id, before, 'data-plan-complete')
 }
 const handleCollapseEdit = (e: Event, item: PlanDto) => {
   e.preventDefault()
@@ -233,15 +237,34 @@ const onDraftSave = async (e: Event, data: PlanFormInput) => {
     modalRef.value?.close()
   }
 }
-// ids of the visible plans just before and after `id`, in on-screen order
-const neighbourIds = (id: string): { next?: string; prev?: string } => {
-  const ids = Array.from(
-    document.querySelectorAll<HTMLElement>('[data-plan-toggle]'),
-  )
-    .filter((el) => el.offsetParent !== null)
-    .map((el) => el.dataset.planToggle ?? '')
-  const i = ids.indexOf(id)
-  return { next: ids[i + 1], prev: ids[i - 1] }
+const isShown = (el: HTMLElement) => el.offsetParent !== null
+// ids of the plans on screen, in on-screen order (the mobile and desktop
+// layouts both render the list; only one is shown)
+const visiblePlanIds = (): string[] =>
+  import.meta.client
+    ? Array.from(document.querySelectorAll<HTMLElement>('[data-plan-toggle]'))
+        .filter(isShown)
+        .map((el) => el.dataset.planToggle ?? '')
+    : []
+/**
+ * After the list changed, keep keyboard focus on it instead of losing it with a
+ * removed or moved card: the plan's own control if it's still shown, else a
+ * neighbour's, else the list heading.
+ */
+const focusPlanAfterChange = async (
+  id: string,
+  before: string[],
+  control: 'data-plan-toggle' | 'data-plan-complete',
+) => {
+  if (!import.meta.client) return
+  await nextTick()
+  const targetId = pickFocusId(id, before, visiblePlanIds())
+  const target = targetId
+    ? Array.from(
+        document.querySelectorAll<HTMLElement>(`[${control}="${targetId}"]`),
+      ).find(isShown)
+    : undefined
+  ;(target ?? document.querySelector<HTMLElement>('#plans-heading'))?.focus()
 }
 const handleCollapseDelete = async (e: Event, id: string) => {
   e.preventDefault()
@@ -249,21 +272,10 @@ const handleCollapseDelete = async (e: Event, id: string) => {
     import.meta.client &&
     window.confirm('Permanently deleting this item. Please confirm to proceed.')
   ) {
-    const { next, prev } = neighbourIds(id)
+    const before = visiblePlanIds()
     if (await planStore.deletePlan(id)) profileStore.removePlanFromOrder(id)
     customOrderData.value = plansByOrder.value
-    // keep keyboard focus on the list instead of losing it with the removed card
-    await nextTick()
-    const target =
-      [next, prev]
-        .map((pid) =>
-          pid
-            ? document.querySelector<HTMLElement>(`[data-plan-toggle="${pid}"]`)
-            : null,
-        )
-        .find((el) => el && el.offsetParent !== null) ??
-      document.querySelector<HTMLElement>('#plans-heading')
-    target?.focus()
+    await focusPlanAfterChange(id, before, 'data-plan-toggle')
     return
   }
   customOrderData.value = plansByOrder.value
