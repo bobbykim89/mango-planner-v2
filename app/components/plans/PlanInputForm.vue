@@ -65,25 +65,21 @@ const onFormSubmit = (e: Event) => {
   emit('form-submit', e, formContent)
   clearInput()
 }
-
-const formTextColor = computed<ColorPalette>(() => {
-  if (useColorMode().preference === 'dark') {
-    return 'light-3'
-  }
-  return 'dark-3'
-})
 </script>
 
 <template>
   <div>
     <form @submit.prevent="onFormSubmit">
+      <!-- label colours come from dark: classes, not from useColorMode() in script:
+           the server can't know the colour mode, so a colour picked in script
+           renders for light mode and stays that way after hydration (#52) -->
       <MclFormGroup
         :field-id="`${prefix}-title`"
-        label="Title:"
-        :text-color="formTextColor"
-        :text-bold="true"
         class="mb-xs"
       >
+        <template #label>
+          <span class="mb-2xs block text-md font-bold text-dark-3 dark:text-light-3">Title:</span>
+        </template>
         <MclInputText
           :id="`${prefix}-title`"
           highlight-color="warning"
@@ -95,11 +91,11 @@ const formTextColor = computed<ColorPalette>(() => {
       </MclFormGroup>
       <MclFormGroup
         :field-id="`${prefix}-content`"
-        label="Content:"
-        :text-color="formTextColor"
-        :text-bold="true"
         class="mb-xs"
       >
+        <template #label>
+          <span class="mb-2xs block text-md font-bold text-dark-3 dark:text-light-3">Content:</span>
+        </template>
         <MclTextArea
           :id="`${prefix}-content`"
           highlight-color="warning"

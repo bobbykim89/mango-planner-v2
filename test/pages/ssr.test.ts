@@ -64,4 +64,20 @@ describe('server-rendered pages', () => {
     expect(markup).toContain('<strong>bold text</strong> <img src="x">')
     expect(markup).not.toContain('onerror')
   })
+
+  // The server can't know the colour mode (the browser keeps it), so a label
+  // colour picked in script renders for light mode and stays dark on the dark
+  // panel after hydration. The colour has to come from a dark: class instead.
+  it('renders the plan form labels with a dark-mode colour (#52)', async () => {
+    const user = await createUser()
+    const res = await page('/', user.token)
+    expect(res.status).toBe(200)
+
+    for (const id of ['desktop-new-title', 'desktop-new-content']) {
+      const label = res.html.match(new RegExp(`<label for="${id}"[^>]*>[\\s\\S]*?</label>`))?.[0]
+      expect(label, id).toBeDefined()
+      expect(label).toContain('text-dark-3')
+      expect(label).toContain('dark:text-light-3')
+    }
+  })
 })
