@@ -19,6 +19,8 @@ Current focus: hardening **security**, improving **performance**, and fixing int
 | `pnpm build` / `pnpm build:local` | Production build (`build:local` loads `.env.local`) |
 | `pnpm preview` | Serve the production build |
 | `pnpm typecheck` | `nuxt typecheck` (vue-tsc across the app/server/shared project references) |
+| `pnpm lint` | ESLint (`eslint.config.mjs`: recommended JS/TS rules + Vue essentials, same base as MCL) |
+| `pnpm format` / `pnpm format:check` | Prettier write / check (`.prettierrc`, sorts Tailwind classes) |
 | `pnpm test` | All Vitest tests: the `api` project (builds the app, runs it against an in-memory MongoDB) and the `unit` project |
 | `pnpm vitest run --project unit` | Only the fast client unit tests (no build) |
 | `pnpm test:watch` | Vitest in watch mode |
@@ -26,7 +28,7 @@ Current focus: hardening **security**, improving **performance**, and fixing int
 **Tests:** Vitest runs two projects (`vitest.config.ts`):
 
 - `api`: `test/api/` and `test/pages/`. The global setup (`test/setup/global.ts`) builds the app with the fake values in `test/test.env` (never the real `.env`), starts it against `mongodb-memory-server` with require-of-ESM disabled (like Vercel), and the tests call the real `/api` routes and render real pages. Set `SKIP_BUILD=1` to reuse an existing `.output` when only tests changed.
-- `unit`: `test/unit/`, client stores and composables in the Nuxt environment (happy-dom). Mock API routes with `mockApi`/`ok`/`fail` from `test/unit/helpers.ts` (wraps `registerEndpoint`), call `resetState()` in `beforeEach` and `clearApiMocks()` in `afterEach`, mock `navigateTo` per file with `mockNuxtImport`, and mock localforage with `memoryLocalforage()` (no IndexedDB in happy-dom). CI (`.github/workflows/ci.yml`) runs `pnpm typecheck` and `pnpm test` on every PR. There is no linter yet; also exercise UI changes in `pnpm dev`.
+- `unit`: `test/unit/`, client stores and composables in the Nuxt environment (happy-dom). Mock API routes with `mockApi`/`ok`/`fail` from `test/unit/helpers.ts` (wraps `registerEndpoint`), call `resetState()` in `beforeEach` and `clearApiMocks()` in `afterEach`, mock `navigateTo` per file with `mockNuxtImport`, and mock localforage with `memoryLocalforage()` (no IndexedDB in happy-dom). CI (`.github/workflows/ci.yml`) runs two jobs on every PR: `lint` (`pnpm lint`, `pnpm format:check`) and `test` (`pnpm typecheck`, `pnpm test`). Run `pnpm lint` and `pnpm format` before committing; also exercise UI changes in `pnpm dev`.
 
 ## Layout
 
@@ -61,7 +63,7 @@ public/     PWA icons, screenshots, weather icons, offline.html
 - **Markdown:** rendered with `useMarkdown`'s own `Marked` instance (`marked-katex-extension`, headings shifted two levels so `#` is an h3 under the plan title's h2, `breaks: true` so a single line break stays a `<br>`; the card must not use `whitespace-pre-line`, which shows the newlines between blocks as blank lines) and sanitized with DOMPurify. Never render user content with `v-html` unsanitized.
 - **Config/secrets:** all secrets come from `runtimeConfig` in `nuxt.config.ts` (server-only keys). Never expose them via `runtimeConfig.public` or return them from API routes.
 - **PWA:** `@vite-pwa/nuxt` with `strategies: 'generateSW'`, `registerType: 'autoUpdate'`. Page loads are network-only and fall back to the precached, self-contained `public/offline.html` only when the request fails (no `navigateFallback`: pages are server-rendered, so there's no app shell to precache). Disabled in dev, so check service-worker changes with `pnpm build:local` + `pnpm preview --dotenv .env.local`. `pnpm test` rebuilds `.output` with test values, so rebuild and restart the preview after running it (otherwise its pages point at deleted chunks and nothing is interactive).
-- **Style:** Prettier (single quotes, no semicolons, 2-space indent). TypeScript strict. Match the surrounding code.
+- **Style:** Prettier (single quotes, no semicolons, 2-space indent, Tailwind classes sorted by `prettier-plugin-tailwindcss`), checked in CI. TypeScript strict. A deliberately unused binding starts with `_`. Match the surrounding code.
 
 ## Guardrails
 

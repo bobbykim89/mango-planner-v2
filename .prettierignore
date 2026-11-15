@@ -1,0 +1,6 @@
+# Prettier also skips everything in .gitignore (.nuxt, .output, .env*, ...)
+pnpm-lock.yaml
+public/
+dev-dist/
+coverage/
+.superpowers/
