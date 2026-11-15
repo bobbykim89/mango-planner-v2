@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { DraftFormInput, PlanFormInput } from '#shared/types'
 
-const props = defineProps<{
+defineProps<{
   visible: boolean
   drafts: DraftFormInput[]
 }>()

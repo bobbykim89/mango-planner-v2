@@ -4,7 +4,7 @@ import { AccordionGroup, Collapse } from '@bobbykim/manguito-theme'
 import { useCollapseTrigger } from '@bobbykim/manguito-theme/composable'
 import { MclFormGroup, MclInputFile, MclInputText } from '@bobbykim/mcl-forms'
 
-const props = defineProps<{
+defineProps<{
   username?: string
   profilePicture?: string
 }>()

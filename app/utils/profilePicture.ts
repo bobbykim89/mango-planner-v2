@@ -22,6 +22,7 @@ export const prepareProfilePicture = async (file: File): Promise<File> => {
     console.error('Failed to prepare picture:', err)
     throw new Error(
       "We couldn't read that image. Please choose a JPEG or PNG photo.",
+      { cause: err },
     )
   }
   if (picture.size > MAX_PICTURE_BYTES) {

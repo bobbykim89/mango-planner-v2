@@ -46,6 +46,11 @@ export default tseslint.config(
     },
   },
   {
+    // test helpers hand tests the parsed JSON of any response, which they read freely
+    files: ['test/**'],
+    rules: { '@typescript-eslint/no-explicit-any': 'off' },
+  },
+  {
     // generated output, served assets and git-ignored scratch dirs
     ignores: [
       '**/node_modules/**',

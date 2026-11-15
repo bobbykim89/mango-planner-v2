@@ -3,7 +3,7 @@ import { MclInputText } from '@bobbykim/mcl-forms'
 
 type PlanDisplayStyle = 'all' | 'incomplete' | 'custom' | 'search'
 
-const props = defineProps<{
+defineProps<{
   hasProfile: boolean
   active: PlanDisplayStyle
 }>()

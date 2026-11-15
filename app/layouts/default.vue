@@ -89,7 +89,7 @@ const handleMobileMenuBgColor = computed<ColorPalette>(() => {
   return darkMode.value ? 'dark-2' : 'light-4'
 })
 
-const handleTitleClick = (e: Event, url: string, target: CtaTarget) => {
+const handleTitleClick = (e: Event, url: string, _target: CtaTarget) => {
   e.preventDefault()
   router.push({ path: url })
 }
