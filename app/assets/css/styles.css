@@ -17,6 +17,9 @@
 
 .dark {
   --color-warning-text: var(--color-warning);
+  /* MCL's keyboard focus ring defaults to a dark-3 outline, the same colour as
+     the dark panels; mango shows on them (as the MCL README suggests per theme) */
+  --mcl-focus-color: var(--color-warning);
 }
 
 /* amber text from the app and from MCL components (footer title, social icons) */

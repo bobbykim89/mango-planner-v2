@@ -170,14 +170,14 @@ importers:
   .:
     dependencies:
       '@bobbykim/manguito-theme':
-        specifier: ^1.5.0
-        version: 1.5.0(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)
+        specifier: ^1.6.0
+        version: 1.6.0(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)
       '@bobbykim/mcl-footer':
-        specifier: ^0.10.8
-        version: 0.10.8(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)
+        specifier: ^0.10.9
+        version: 0.10.9(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)
       '@bobbykim/mcl-forms':
-        specifier: ^0.12.4
-        version: 0.12.4(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)
+        specifier: ^0.13.0
+        version: 0.13.0(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)
       '@pinia/nuxt':
         specifier: ^0.11.3
         version: 0.11.3(@nuxt/schema@4.6.4)(confbox@0.3.2)(dotenv@17.4.2)(giget@3.3.1)(jiti@2.7.0)(magic-string@1.4.5)(mlly@1.8.2)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.45(typescript@5.9.3)))(rolldown@1.2.18)(unplugin@3.7.0(esbuild@0.28.2)(rolldown@1.2.18)(rollup@4.68.2)(vite@8.3.7(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(sass@1.108.1)(terser@5.51.2)(yaml@2.9.1)))
@@ -838,14 +838,14 @@ packages:
     resolution: {integrity: sha512-8V8aSTDx012YPmDQF30vrokyxVFdRAU2YBS2VzrnfLAGkP8floVnjckwgFcD0Jrvf6GWMSRdCrYVsk3tyMwZRg==}
     engines: {node: ^22.18.0 || >=24.11.0}
 
-  '@bobbykim/manguito-theme@1.5.0':
-    resolution: {integrity: sha512-7uwryQkHYS154WHuoLSqNCdULjejOXz069S3mckmQmIiuM/7FO3/+UAcPhE8W3Yn3aGhoT2BJneESex7R2MaDA==}
+  '@bobbykim/manguito-theme@1.6.0':
+    resolution: {integrity: sha512-A8cqVP2fJWkk6fCORbH2sq3+w8EVbkg2FpqSbA0fLGIvrfFcumbrxQR+MA7M1DvsTUmWfqnu0SY1VnSlUAz0mQ==}
 
-  '@bobbykim/mcl-footer@0.10.8':
-    resolution: {integrity: sha512-kfE7gpDcxZLpluhkqAyhe0BbkUQ5fsZiq1/G8L/Uwm1L4H3Y7TuwQHAPLsP3e+kiK6xpWYjARsKE6DSPbX5HVg==}
+  '@bobbykim/mcl-footer@0.10.9':
+    resolution: {integrity: sha512-rKnIk46v3+Dc1ApnQ7ZJgoNGFv+22nIgDlQaiyEmPFA9+nZlHoWaHyfLXZYjnXqopS8rK+1nq8sOd1cCbe3XWg==}
 
-  '@bobbykim/mcl-forms@0.12.4':
-    resolution: {integrity: sha512-DFjv8+4UAF4phtklZkpd3RyEJv27N4uNj/rNkC7WvkhrSxrLoE41X2j3Z5dHrC3S77LPpnYChqgL97fZuUZ9Sw==}
+  '@bobbykim/mcl-forms@0.13.0':
+    resolution: {integrity: sha512-KVCJW62VPjVtGY0WHolj7B1CW0Kb7OneHtpIRp61VFKY9Gn6yPEDIuC5gvR/tsNoIunNcgrjqQX5hzLr2SWomA==}
 
   '@clack/core@1.5.1':
     resolution: {integrity: sha512-iHTrHA8MtVuLl2TfZySmcKv1qO2PoyC9Z7pfSDozEuV5vtY3/wcOPKJXlqJ5Oq2Cx5DDGQGAMVx6HZfRRoVEbQ==}
@@ -6062,7 +6062,7 @@ snapshots:
       '@babel/helper-string-parser': 8.0.8
       '@babel/helper-validator-identifier': 8.0.6
 
-  '@bobbykim/manguito-theme@1.5.0(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)':
+  '@bobbykim/manguito-theme@1.6.0(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)':
     dependencies:
       '@vueuse/core': 12.8.2(typescript@5.9.3)
       '@vueuse/integrations': 14.4.0(focus-trap@8.2.4)(fuse.js@7.5.0)(sortablejs@1.14.0)(vue@3.5.45(typescript@5.9.3))
@@ -6088,9 +6088,9 @@ snapshots:
       - universal-cookie
       - utf-8-validate
 
-  '@bobbykim/mcl-footer@0.10.8(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)':
+  '@bobbykim/mcl-footer@0.10.9(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)':
     dependencies:
-      '@bobbykim/manguito-theme': 1.5.0(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)
+      '@bobbykim/manguito-theme': 1.6.0(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)
       vue: 3.5.45(typescript@5.9.3)
     transitivePeerDependencies:
       - async-validator
@@ -6110,9 +6110,9 @@ snapshots:
       - universal-cookie
       - utf-8-validate
 
-  '@bobbykim/mcl-forms@0.12.4(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)':
+  '@bobbykim/mcl-forms@0.13.0(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)':
     dependencies:
-      '@bobbykim/manguito-theme': 1.5.0(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)
+      '@bobbykim/manguito-theme': 1.6.0(fuse.js@7.5.0)(sortablejs@1.14.0)(supports-color@10.2.2)(typescript@5.9.3)
       '@floating-ui/vue': 1.1.11(vue@3.5.45(typescript@5.9.3))
       '@vueuse/core': 12.8.2(typescript@5.9.3)
       vue: 3.5.45(typescript@5.9.3)
