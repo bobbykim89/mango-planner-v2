@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import DefaultProfile from '@/assets/images/defaultProfile.webp'
-import type { ColorPalette } from '@bobbykim/manguito-theme'
 import { AccordionGroup, Collapse } from '@bobbykim/manguito-theme'
 import { useCollapseTrigger } from '@bobbykim/manguito-theme/composable'
 import { MclFormGroup, MclInputFile, MclInputText } from '@bobbykim/mcl-forms'
@@ -58,13 +57,6 @@ const onPasswordSubmit = (e: Event) => {
   currentPasswordRef.value = ''
   newPasswordRef.value = ''
 }
-
-const formTextColor = computed<ColorPalette>(() => {
-  if (useColorMode().preference === 'light') {
-    return 'dark-3'
-  }
-  return 'light-3'
-})
 </script>
 
 <template>
@@ -112,10 +104,11 @@ const formTextColor = computed<ColorPalette>(() => {
             <form @submit="onUserNameUpdateSubmit">
               <MclFormGroup
                 field-id="user-name"
-                label="Username:"
-                :text-color="formTextColor"
                 class="mb-xs"
               >
+                <template #label>
+                  <span class="mb-2xs block text-md text-dark-3 dark:text-light-3">Username:</span>
+                </template>
                 <MclInputText
                   id="user-name"
                   autocomplete="username"
@@ -153,10 +146,11 @@ const formTextColor = computed<ColorPalette>(() => {
             <form @submit="onFileSubmit">
               <MclFormGroup
                 field-id="profile-picture"
-                label="Profile picture:"
-                :text-color="formTextColor"
                 class="mb-xs"
               >
+                <template #label>
+                  <span class="mb-2xs block text-md text-dark-3 dark:text-light-3">Profile picture:</span>
+                </template>
                 <MclInputFile
                   id="profile-picture"
                   accept="image/*"
@@ -197,10 +191,11 @@ const formTextColor = computed<ColorPalette>(() => {
             <form @submit="onPasswordSubmit">
               <MclFormGroup
                 field-id="current-pw"
-                label="Current password:"
-                :text-color="formTextColor"
                 class="mb-2xs"
               >
+                <template #label>
+                  <span class="mb-2xs block text-md text-dark-3 dark:text-light-3">Current password:</span>
+                </template>
                 <MclInputText
                   id="current-pw"
                   type="password"
@@ -213,10 +208,11 @@ const formTextColor = computed<ColorPalette>(() => {
               </MclFormGroup>
               <MclFormGroup
                 field-id="new-pw"
-                label="New password:"
-                :text-color="formTextColor"
                 class="mb-xs"
               >
+                <template #label>
+                  <span class="mb-2xs block text-md text-dark-3 dark:text-light-3">New password:</span>
+                </template>
                 <MclInputText
                   id="new-pw"
                   type="password"
