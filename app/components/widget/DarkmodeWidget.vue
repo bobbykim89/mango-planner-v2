@@ -15,18 +15,18 @@ const handleColorModeButtonClick = (e: Event) => {
 
 <template>
   <div
-    class="py-3xs px-xs md:py-2xs md:bg-light-4 md:dark:bg-dark-4 rounded-md drop-shadow-md"
+    class="rounded-md px-xs py-3xs drop-shadow-md md:bg-light-4 md:py-2xs md:dark:bg-dark-4"
   >
     <button
       type="button"
       role="switch"
       :aria-checked="dark"
       aria-label="Dark mode"
-      class="block w-full relative h-lg before:absolute before:h-xs before:w-full before:bg-warning/75 dark:before:bg-warning/50 before:rounded-lg before:top-1/2 before:-translate-y-1/2 before:left-0 cursor-pointer hover:opacity-80 transition-opacity duration-300 ease-linear rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warning"
+      class="relative block h-lg w-full cursor-pointer rounded-lg transition-opacity duration-300 ease-linear before:absolute before:top-1/2 before:left-0 before:h-xs before:w-full before:-translate-y-1/2 before:rounded-lg before:bg-warning/75 hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-warning dark:before:bg-warning/50"
       @click="handleColorModeButtonClick"
     >
       <div
-        class="absolute top-0 p-2xs text-dark-1 dark:text-light-4 transition-all duration-300 ease-linear"
+        class="absolute top-0 p-2xs text-dark-1 transition-all duration-300 ease-linear dark:text-light-4"
         :class="[dark ? 'left-full -translate-x-full' : 'left-0']"
       >
         <!-- moon icon -->

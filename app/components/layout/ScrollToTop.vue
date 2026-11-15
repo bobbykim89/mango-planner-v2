@@ -10,10 +10,10 @@ const handleScrollToTopClick = (e: Event) => {
 
 <template>
   <div
-    class="fixed bottom-0 right-0 mr-xs mb-xs bg-light-4 dark:bg-dark-4 rounded-md drop-shadow-md border border-light-1 dark:border-dark-1"
+    class="fixed right-0 bottom-0 mr-xs mb-xs rounded-md border border-light-1 bg-light-4 drop-shadow-md dark:border-dark-1 dark:bg-dark-4"
   >
     <button
-      class="p-2xs text-dark-3 dark:text-light-3 hover:opacity-65 transition-opacity duration-200 ease-linear"
+      class="p-2xs text-dark-3 transition-opacity duration-200 ease-linear hover:opacity-65 dark:text-light-3"
       aria-label="scroll to top"
       @click="handleScrollToTopClick"
     >

@@ -40,13 +40,13 @@ watch(
 <template>
   <!-- utility block -->
   <div
-    class="hidden md:block bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md md:mt-md"
+    class="hidden rounded-md bg-light-2 p-md drop-shadow-md md:mt-md md:block dark:bg-dark-3"
   >
     <!-- search bar -->
-    <div class="flex gap-2xs mb-2xs">
+    <div class="mb-2xs flex gap-2xs">
       <label
         for="search-bar"
-        class="mb-0 bg-warning p-2xs text-dark-3 h-full rounded-l-md"
+        class="mb-0 h-full rounded-l-md bg-warning p-2xs text-dark-3"
         title="Search"
       >
         <span class="sr-only">Search plans</span>
@@ -76,7 +76,7 @@ watch(
     <div class="btn-group w-full">
       <!-- sort list -->
       <button
-        class="btn btn-light-4 dark:btn-light-3 btn-full text-dark-3"
+        class="btn btn-full text-dark-3 btn-light-4 dark:btn-light-3"
         type="button"
         aria-label="Show all plans"
         title="Show all plans"
@@ -89,7 +89,7 @@ watch(
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 512 512"
           fill="currentColor"
-          class="h-sm mx-auto"
+          class="mx-auto h-sm"
         >
           <!-- !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
           <path
@@ -99,7 +99,7 @@ watch(
       </button>
       <!-- sort incomplete -->
       <button
-        class="btn btn-light-4 dark:btn-light-3 btn-full text-dark-3"
+        class="btn btn-full text-dark-3 btn-light-4 dark:btn-light-3"
         type="button"
         aria-label="Show incomplete plans"
         title="Show incomplete plans"
@@ -112,7 +112,7 @@ watch(
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 640 512"
           fill="currentColor"
-          class="h-sm mx-auto"
+          class="mx-auto h-sm"
         >
           <!-- !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
           <path
@@ -122,7 +122,7 @@ watch(
       </button>
       <!-- sort custom: display only when user has profile -->
       <button
-        class="btn btn-light-4 dark:btn-light-3 btn-full text-dark-3"
+        class="btn btn-full text-dark-3 btn-light-4 dark:btn-light-3"
         type="button"
         aria-label="Custom order"
         title="Custom order"
@@ -136,7 +136,7 @@ watch(
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 576 512"
           fill="currentColor"
-          class="h-sm mx-auto"
+          class="mx-auto h-sm"
         >
           <!-- !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
           <path

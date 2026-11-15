@@ -2,7 +2,10 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import LoginPage from '@/pages/auth/login.vue'
 import { useAlertStore } from '@/stores'
-import { SESSION_EXPIRED_MESSAGE, SESSION_EXPIRED_REDIRECT } from '@/utils/session'
+import {
+  SESSION_EXPIRED_MESSAGE,
+  SESSION_EXPIRED_REDIRECT,
+} from '@/utils/session'
 import { resetState } from './helpers'
 
 describe('login page', () => {

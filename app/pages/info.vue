@@ -23,8 +23,8 @@ const { isAuthenticated } = storeToRefs(userStore)
 </script>
 
 <template>
-  <div class="container py-md lg:py-lg min-h-[75vh] px-sm md:px-xs">
-    <div class="rounded-md px-sm md:px-md py-lg bg-light-3 dark:bg-dark-3">
+  <div class="container min-h-[75vh] px-sm py-md md:px-xs lg:py-lg">
+    <div class="rounded-md bg-light-3 px-sm py-lg md:px-md dark:bg-dark-3">
       <h1 class="h2-md mb-md text-dark-3 dark:text-light-3">Info Page</h1>
       <div class="mb-md">
         <p class="text-dark-3 dark:text-light-3">
@@ -34,9 +34,9 @@ const { isAuthenticated } = storeToRefs(userStore)
       <ul class="mb-md">
         <li>
           <!-- new button -->
-          <div class="flex items-center gap-sm md:gap-md mb-sm">
+          <div class="mb-sm flex items-center gap-sm md:gap-md">
             <span
-              class="btn btn-warning text-dark-3 px-xs min-w-15"
+              class="btn min-w-15 px-xs text-dark-3 btn-warning"
               aria-hidden="true"
             >
               <svg
@@ -45,7 +45,7 @@ const { isAuthenticated } = storeToRefs(userStore)
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 448 512"
                 fill="currentColor"
-                class="h-sm mx-auto"
+                class="mx-auto h-sm"
               >
                 <!-- Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com
               License - https://fontawesome.com/license/free Copyright 2024
@@ -62,9 +62,9 @@ const { isAuthenticated } = storeToRefs(userStore)
         </li>
         <li>
           <!-- show all -->
-          <div class="flex items-center gap-sm md:gap-md mb-sm">
+          <div class="mb-sm flex items-center gap-sm md:gap-md">
             <span
-              class="btn btn-light-4 dark:btn-light-3 text-dark-3 px-xs min-w-15"
+              class="btn min-w-15 px-xs text-dark-3 btn-light-4 dark:btn-light-3"
               aria-hidden="true"
             >
               <svg
@@ -73,7 +73,7 @@ const { isAuthenticated } = storeToRefs(userStore)
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
                 fill="currentColor"
-                class="h-sm mx-auto"
+                class="mx-auto h-sm"
               >
                 <!-- !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
                 <path
@@ -89,9 +89,9 @@ const { isAuthenticated } = storeToRefs(userStore)
         </li>
         <li>
           <!-- show incomplete -->
-          <div class="flex items-center gap-sm md:gap-md mb-sm">
+          <div class="mb-sm flex items-center gap-sm md:gap-md">
             <span
-              class="btn btn-light-4 dark:btn-light-3 text-dark-3 min-w-15"
+              class="btn min-w-15 text-dark-3 btn-light-4 dark:btn-light-3"
               aria-hidden="true"
             >
               <svg
@@ -100,7 +100,7 @@ const { isAuthenticated } = storeToRefs(userStore)
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 640 512"
                 fill="currentColor"
-                class="h-sm mx-auto"
+                class="mx-auto h-sm"
               >
                 <!-- !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
                 <path
@@ -115,9 +115,9 @@ const { isAuthenticated } = storeToRefs(userStore)
         </li>
         <li>
           <!-- show draggable -->
-          <div class="flex items-center gap-sm md:gap-md mb-sm">
+          <div class="mb-sm flex items-center gap-sm md:gap-md">
             <span
-              class="btn btn-light-4 dark:btn-light-3 text-dark-3 min-w-15"
+              class="btn min-w-15 text-dark-3 btn-light-4 dark:btn-light-3"
               aria-hidden="true"
             >
               <svg
@@ -126,7 +126,7 @@ const { isAuthenticated } = storeToRefs(userStore)
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 576 512"
                 fill="currentColor"
-                class="h-sm mx-auto"
+                class="mx-auto h-sm"
               >
                 <!-- !Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
                 <path
@@ -141,7 +141,7 @@ const { isAuthenticated } = storeToRefs(userStore)
           </div>
         </li>
         <li>
-          <p class="text-dark-3 dark:text-light-3 mb-sm">
+          <p class="mb-sm text-dark-3 dark:text-light-3">
             Please click on your username to open sidebar containing weather
             widget, toggle darkmode and update user info.
           </p>

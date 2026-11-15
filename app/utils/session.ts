@@ -1,4 +1,5 @@
-export const SESSION_EXPIRED_MESSAGE = 'Your session has expired. Please sign in again.'
+export const SESSION_EXPIRED_MESSAGE =
+  'Your session has expired. Please sign in again.'
 
 /**
  * Where an expired session goes. The reason travels in the URL, not in store

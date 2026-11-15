@@ -2,11 +2,7 @@ import { RateLimit } from '#shared/models'
 import { getRequestIP, readBody, type H3Event } from 'h3'
 
 export type RateLimitName =
-  | 'login'
-  | 'signup'
-  | 'sendTokenIp'
-  | 'sendTokenEmail'
-  | 'resetPassword'
+  'login' | 'signup' | 'sendTokenIp' | 'sendTokenEmail' | 'resetPassword'
 
 /** Requests allowed per window. Stored in MongoDB because serverless instances share no memory. */
 export const RATE_LIMITS: Record<

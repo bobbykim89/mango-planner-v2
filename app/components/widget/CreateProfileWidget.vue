@@ -11,9 +11,9 @@ const handleButtonClick = (e: Event) => {
 
 <template>
   <div
-    class="px-xs py-2xs md:px-sm md:py-xs md:bg-light-4 md:dark:bg-dark-4 text-dark-3 dark:text-light-3 md:rounded-md md:drop-shadow-md"
+    class="px-xs py-2xs text-dark-3 md:rounded-md md:bg-light-4 md:px-sm md:py-xs md:drop-shadow-md dark:text-light-3 md:dark:bg-dark-4"
   >
-    <div class="mb-2xs font-bold flex gap-xs justify-center items-center">
+    <div class="mb-2xs flex items-center justify-center gap-xs font-bold">
       <svg
         aria-hidden="true"
         focusable="false"
@@ -32,7 +32,7 @@ const handleButtonClick = (e: Event) => {
     <div class="text-end">
       <button
         type="button"
-        class="btn btn-warning text-dark-3"
+        class="btn text-dark-3 btn-warning"
         @click="handleButtonClick"
       >
         Create

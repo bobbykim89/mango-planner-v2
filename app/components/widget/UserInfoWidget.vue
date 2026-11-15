@@ -61,37 +61,37 @@ const onPasswordSubmit = (e: Event) => {
 
 <template>
   <div
-    class="md:px-2xs md:py-xs md:bg-light-4 md:dark:bg-dark-4 text-dark-3 dark:text-light-3 md:rounded-md md:drop-shadow-md"
+    class="text-dark-3 md:rounded-md md:bg-light-4 md:px-2xs md:py-xs md:drop-shadow-md dark:text-light-3 md:dark:bg-dark-4"
   >
     <div class="hidden md:block">
       <h2 class="h4-md mb-xs">My Info</h2>
     </div>
     <!-- current user profile -->
     <div
-      class="rounded-t-md md:rounded-md drop-shadow-md overflow-hidden md:mb-xs px-2xs py-2xs md:px-xs md:py-sm bg-light-3 dark:bg-dark-3 flex md:flex-col justify-center items-center gap-xs md:gap-sm"
+      class="flex items-center justify-center gap-xs overflow-hidden rounded-t-md bg-light-3 px-2xs py-2xs drop-shadow-md md:mb-xs md:flex-col md:gap-sm md:rounded-md md:px-xs md:py-sm dark:bg-dark-3"
     >
       <img
         v-if="profilePicture !== ''"
         :src="cloudinaryBaseUrl + profilePicture"
         alt="profile picture"
-        class="object-center object-cover aspect-square rounded-full h-md md:h-2xl"
+        class="aspect-square h-md rounded-full object-cover object-center md:h-2xl"
       />
       <img
         v-else
         :src="DefaultProfile"
         alt="placeholder profile picture"
-        class="object-center object-cover aspect-square rounded-full h-md md:h-2xl"
+        class="aspect-square h-md rounded-full object-cover object-center md:h-2xl"
       />
-      <p class="font-bold min-w-0 text-center wrap-anywhere">{{ username }}</p>
+      <p class="min-w-0 text-center font-bold wrap-anywhere">{{ username }}</p>
     </div>
     <AccordionGroup>
       <!-- username update -->
-      <div class="md:rounded-md drop-shadow-md overflow-hidden md:mb-xs">
+      <div class="overflow-hidden drop-shadow-md md:mb-xs md:rounded-md">
         <button
           type="button"
           v-bind="usernameAttrs"
           @click="toggleUsername"
-          class="block w-full py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-light-3/60 dark:hover:bg-dark-3/60 transition-all duration-300 ease-linear text-left"
+          class="block w-full bg-light-3 px-xs py-3xs text-left transition-all duration-300 ease-linear hover:bg-light-3/60 dark:bg-dark-3 dark:hover:bg-dark-3/60"
         >
           Update Username
         </button>
@@ -102,12 +102,12 @@ const onPasswordSubmit = (e: Event) => {
         >
           <div class="px-xs py-xs">
             <form @submit="onUserNameUpdateSubmit">
-              <MclFormGroup
-                field-id="user-name"
-                class="mb-xs"
-              >
+              <MclFormGroup field-id="user-name" class="mb-xs">
                 <template #label>
-                  <span class="mb-2xs block text-md text-dark-3 dark:text-light-3">Username:</span>
+                  <span
+                    class="mb-2xs block text-md text-dark-3 dark:text-light-3"
+                    >Username:</span
+                  >
                 </template>
                 <MclInputText
                   id="user-name"
@@ -119,7 +119,7 @@ const onPasswordSubmit = (e: Event) => {
                 ></MclInputText>
               </MclFormGroup>
               <div class="flex justify-end">
-                <button type="submit" class="btn btn-warning text-dark-3">
+                <button type="submit" class="btn text-dark-3 btn-warning">
                   Save
                 </button>
               </div>
@@ -128,12 +128,12 @@ const onPasswordSubmit = (e: Event) => {
         </Collapse>
       </div>
       <!-- profile picture update -->
-      <div class="md:rounded-md drop-shadow-md overflow-hidden md:mb-xs">
+      <div class="overflow-hidden drop-shadow-md md:mb-xs md:rounded-md">
         <button
           type="button"
           v-bind="pictureAttrs"
           @click="togglePicture"
-          class="block w-full py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-light-3/60 dark:hover:bg-dark-3/60 transition-all duration-300 ease-linear text-left"
+          class="block w-full bg-light-3 px-xs py-3xs text-left transition-all duration-300 ease-linear hover:bg-light-3/60 dark:bg-dark-3 dark:hover:bg-dark-3/60"
         >
           Update Profile Picture
         </button>
@@ -144,12 +144,12 @@ const onPasswordSubmit = (e: Event) => {
         >
           <div class="px-xs py-xs">
             <form @submit="onFileSubmit">
-              <MclFormGroup
-                field-id="profile-picture"
-                class="mb-xs"
-              >
+              <MclFormGroup field-id="profile-picture" class="mb-xs">
                 <template #label>
-                  <span class="mb-2xs block text-md text-dark-3 dark:text-light-3">Profile picture:</span>
+                  <span
+                    class="mb-2xs block text-md text-dark-3 dark:text-light-3"
+                    >Profile picture:</span
+                  >
                 </template>
                 <MclInputFile
                   id="profile-picture"
@@ -162,7 +162,7 @@ const onPasswordSubmit = (e: Event) => {
                 ></MclInputFile>
               </MclFormGroup>
               <div class="flex justify-end">
-                <button type="submit" class="btn btn-warning text-dark-3">
+                <button type="submit" class="btn text-dark-3 btn-warning">
                   Upload
                 </button>
               </div>
@@ -172,13 +172,13 @@ const onPasswordSubmit = (e: Event) => {
       </div>
       <!-- password update -->
       <div
-        class="rounded-b-md md:rounded-md drop-shadow-md overflow-hidden md:mb-xs"
+        class="overflow-hidden rounded-b-md drop-shadow-md md:mb-xs md:rounded-md"
       >
         <button
           type="button"
           v-bind="passwordAttrs"
           @click="togglePassword"
-          class="block w-full pt-3xs pb-2xs md:py-3xs px-xs bg-light-3 dark:bg-dark-3 hover:bg-light-3/60 dark:hover:bg-dark-3/60 transition-all duration-300 ease-linear text-left"
+          class="block w-full bg-light-3 px-xs pt-3xs pb-2xs text-left transition-all duration-300 ease-linear hover:bg-light-3/60 md:py-3xs dark:bg-dark-3 dark:hover:bg-dark-3/60"
         >
           Update Password
         </button>
@@ -189,12 +189,12 @@ const onPasswordSubmit = (e: Event) => {
         >
           <div class="px-xs py-xs">
             <form @submit="onPasswordSubmit">
-              <MclFormGroup
-                field-id="current-pw"
-                class="mb-2xs"
-              >
+              <MclFormGroup field-id="current-pw" class="mb-2xs">
                 <template #label>
-                  <span class="mb-2xs block text-md text-dark-3 dark:text-light-3">Current password:</span>
+                  <span
+                    class="mb-2xs block text-md text-dark-3 dark:text-light-3"
+                    >Current password:</span
+                  >
                 </template>
                 <MclInputText
                   id="current-pw"
@@ -206,12 +206,12 @@ const onPasswordSubmit = (e: Event) => {
                   v-model="currentPasswordRef"
                 ></MclInputText>
               </MclFormGroup>
-              <MclFormGroup
-                field-id="new-pw"
-                class="mb-xs"
-              >
+              <MclFormGroup field-id="new-pw" class="mb-xs">
                 <template #label>
-                  <span class="mb-2xs block text-md text-dark-3 dark:text-light-3">New password:</span>
+                  <span
+                    class="mb-2xs block text-md text-dark-3 dark:text-light-3"
+                    >New password:</span
+                  >
                 </template>
                 <MclInputText
                   id="new-pw"
@@ -224,7 +224,7 @@ const onPasswordSubmit = (e: Event) => {
                 ></MclInputText>
               </MclFormGroup>
               <div class="flex justify-end">
-                <button type="submit" class="btn btn-warning text-dark-3">
+                <button type="submit" class="btn text-dark-3 btn-warning">
                   Save
                 </button>
               </div>

@@ -28,10 +28,22 @@ const storeFor = async (user = 'u1') => {
   return store
 }
 const serverError = (e: Parameters<typeof fail>[0]) =>
-  fail(e, 500, 'INTERNAL_ERROR', 'Something went wrong on our side. Please try again.')
+  fail(
+    e,
+    500,
+    'INTERNAL_ERROR',
+    'Something went wrong on our side. Please try again.',
+  )
 
 const plan = (id: string, over: Partial<PlanDto> = {}) =>
-  ({ _id: id, title: id, content: '', type: 'personal', complete: false, ...over }) as unknown as PlanDto
+  ({
+    _id: id,
+    title: id,
+    content: '',
+    type: 'personal',
+    complete: false,
+    ...over,
+  }) as unknown as PlanDto
 
 /** Counts GET /api/plan calls (a refetch the store should no longer make). */
 const countPlanFetches = () => {
@@ -62,9 +74,9 @@ describe('planStore', () => {
     const store = usePlanStore()
     store.plans = [plan('A'), plan('B'), plan('C')]
     mockApi('PUT', '/api/plan/C', () => ok(plan('C', { title: 'C2' })))
-    expect(
-      await store.updatePlan({ id: 'C', body: { title: 'C2' } }),
-    ).toBe(true)
+    expect(await store.updatePlan({ id: 'C', body: { title: 'C2' } })).toBe(
+      true,
+    )
     expect(store.plans.map((p) => p.title)).toEqual(['C2', 'A', 'B'])
     expect(useAlertStore().alert).toBe('Successfully updated plan!')
     expect(fetches.calls).toBe(0)
@@ -73,7 +85,9 @@ describe('planStore', () => {
   it('togglePlanComplete applies the response and names the state', async () => {
     const store = usePlanStore()
     store.plans = [plan('A'), plan('B')]
-    mockApi('PUT', '/api/plan/A/toggle', () => ok(plan('A', { complete: true })))
+    mockApi('PUT', '/api/plan/A/toggle', () =>
+      ok(plan('A', { complete: true })),
+    )
     expect(
       await store.togglePlanComplete({ id: 'A', body: { complete: true } }),
     ).toBe(true)
@@ -97,7 +111,11 @@ describe('planStore', () => {
     mockApi('POST', '/api/plan', () => ok(plan('new')))
     const store = await storeFor()
     store.plans = [plan('old')]
-    const created = await store.createPlan({ title: 'new', content: '', type: 'personal' })
+    const created = await store.createPlan({
+      title: 'new',
+      content: '',
+      type: 'personal',
+    })
     expect(created).toEqual(plan('new'))
     expect(store.plans.map((p) => p._id)).toEqual(['new', 'old'])
     expect(store.drafts).toEqual([])
@@ -106,35 +124,63 @@ describe('planStore', () => {
   })
 
   it.each([
-    ['create', (store: ReturnType<typeof usePlanStore>) => store.createPlan({ title: 'mine', content: '', type: 'personal' }), /^u1:new-/],
-    ['update', (store: ReturnType<typeof usePlanStore>) => store.updatePlan({ id: 'p1', body: { title: 'mine' } }), /^u1:p1$/],
-  ] as const)('a %s rejected because the session expired keeps the draft before signing out (#32)', async (_, act, key) => {
-    const expired = (e: Parameters<typeof fail>[0]) =>
-      fail(e, 401, 'AUTH_TOKEN_INVALID', 'Your session has expired. Please sign in again.')
-    mockApi('POST', '/api/plan', expired)
-    mockApi('PUT', '/api/plan/p1', expired)
-    let storedWhenRedirected: string[] = []
-    navigateToMock.mockImplementation(() => {
-      storedWhenRedirected = [...draftStore().keys()]
-    })
-    const store = await storeFor('u1')
-    store.plans = [plan('p1')]
-    await act(store)
-    expect(navigateToMock).toHaveBeenCalledTimes(1)
-    expect(storedWhenRedirected).toEqual([expect.stringMatching(key)])
-    // still there for the next sign-in
-    expect([...draftStore().keys()]).toEqual([expect.stringMatching(key)])
-  })
+    [
+      'create',
+      (store: ReturnType<typeof usePlanStore>) =>
+        store.createPlan({ title: 'mine', content: '', type: 'personal' }),
+      /^u1:new-/,
+    ],
+    [
+      'update',
+      (store: ReturnType<typeof usePlanStore>) =>
+        store.updatePlan({ id: 'p1', body: { title: 'mine' } }),
+      /^u1:p1$/,
+    ],
+  ] as const)(
+    'a %s rejected because the session expired keeps the draft before signing out (#32)',
+    async (_, act, key) => {
+      const expired = (e: Parameters<typeof fail>[0]) =>
+        fail(
+          e,
+          401,
+          'AUTH_TOKEN_INVALID',
+          'Your session has expired. Please sign in again.',
+        )
+      mockApi('POST', '/api/plan', expired)
+      mockApi('PUT', '/api/plan/p1', expired)
+      let storedWhenRedirected: string[] = []
+      navigateToMock.mockImplementation(() => {
+        storedWhenRedirected = [...draftStore().keys()]
+      })
+      const store = await storeFor('u1')
+      store.plans = [plan('p1')]
+      await act(store)
+      expect(navigateToMock).toHaveBeenCalledTimes(1)
+      expect(storedWhenRedirected).toEqual([expect.stringMatching(key)])
+      // still there for the next sign-in
+      expect([...draftStore().keys()]).toEqual([expect.stringMatching(key)])
+    },
+  )
 
   it('a failed create saves the draft and lists it at once', async () => {
     mockApi('POST', '/api/plan', (e) =>
-      fail(e, 500, 'INTERNAL_ERROR', 'Something went wrong on our side. Please try again.'),
+      fail(
+        e,
+        500,
+        'INTERNAL_ERROR',
+        'Something went wrong on our side. Please try again.',
+      ),
     )
     const input = { title: 'unsaved', content: 'x', type: 'work' }
     const store = await storeFor('u1')
     expect(await store.createPlan(input)).toBeNull()
-    expect(store.drafts).toEqual([{ id: expect.stringMatching(/^new-/), data: input }])
-    const record = draftStore().get(`u1:${store.drafts[0]!.id}`) as { data: unknown; timestamp: unknown }
+    expect(store.drafts).toEqual([
+      { id: expect.stringMatching(/^new-/), data: input },
+    ])
+    const record = draftStore().get(`u1:${store.drafts[0]!.id}`) as {
+      data: unknown
+      timestamp: unknown
+    }
     expect(record.data).toEqual(input)
     expect(typeof record.timestamp).toBe('number')
     expect(useAlertStore().alert).toBe(
@@ -144,7 +190,12 @@ describe('planStore', () => {
 
   it('a listed draft keeps its values after the form clears its input', async () => {
     mockApi('POST', '/api/plan', (e) =>
-      fail(e, 500, 'INTERNAL_ERROR', 'Something went wrong on our side. Please try again.'),
+      fail(
+        e,
+        500,
+        'INTERNAL_ERROR',
+        'Something went wrong on our side. Please try again.',
+      ),
     )
     const input = { title: 'unsaved', content: 'x', type: 'work' }
     const store = await storeFor('u1')
@@ -155,12 +206,19 @@ describe('planStore', () => {
     await pending
     const saved = { title: 'unsaved', content: 'x', type: 'work' }
     expect(store.drafts[0]?.data).toEqual(saved)
-    expect((draftStore().get(`u1:${store.drafts[0]!.id}`) as { data: unknown }).data).toEqual(saved)
+    expect(
+      (draftStore().get(`u1:${store.drafts[0]!.id}`) as { data: unknown }).data,
+    ).toEqual(saved)
   })
 
   it('a failed update keeps the draft values after the form clears its input', async () => {
     mockApi('PUT', '/api/plan/p1', (e) =>
-      fail(e, 500, 'INTERNAL_ERROR', 'Something went wrong on our side. Please try again.'),
+      fail(
+        e,
+        500,
+        'INTERNAL_ERROR',
+        'Something went wrong on our side. Please try again.',
+      ),
     )
     const body = { title: 'edited', content: 'y', type: 'chore' }
     const store = await storeFor()
@@ -168,7 +226,11 @@ describe('planStore', () => {
     const pending = store.updatePlan({ id: 'p1', body })
     body.title = ''
     await pending
-    expect(store.drafts[0]?.data).toEqual({ title: 'edited', content: 'y', type: 'chore' })
+    expect(store.drafts[0]?.data).toEqual({
+      title: 'edited',
+      content: 'y',
+      type: 'chore',
+    })
   })
 
   it('deletePlan also removes a draft saved for that plan', async () => {
@@ -203,7 +265,12 @@ describe('planStore', () => {
 
   it('a failed update keeps the draft under the plan id', async () => {
     mockApi('PUT', '/api/plan/p1', (e) =>
-      fail(e, 500, 'INTERNAL_ERROR', 'Something went wrong on our side. Please try again.'),
+      fail(
+        e,
+        500,
+        'INTERNAL_ERROR',
+        'Something went wrong on our side. Please try again.',
+      ),
     )
     const store = await storeFor()
     store.plans = [plan('p1')]
@@ -216,20 +283,31 @@ describe('planStore', () => {
   it('two failed new plans keep two drafts (#30)', async () => {
     mockApi('POST', '/api/plan', serverError)
     const store = await storeFor()
-    vi.spyOn(Date, 'now').mockReturnValueOnce(1).mockReturnValueOnce(2).mockReturnValue(3)
+    vi.spyOn(Date, 'now')
+      .mockReturnValueOnce(1)
+      .mockReturnValueOnce(2)
+      .mockReturnValue(3)
     await store.createPlan({ title: 'first', content: '', type: 'work' })
     await store.createPlan({ title: 'second', content: '', type: 'work' })
-    expect(store.drafts.map((d) => d.data.title).sort()).toEqual(['first', 'second'])
+    expect(store.drafts.map((d) => d.data.title).sort()).toEqual([
+      'first',
+      'second',
+    ])
     expect(draftStore().size).toBe(2)
   })
 
   it('a new-plan draft that fails again is updated, not duplicated (#30)', async () => {
     mockApi('POST', '/api/plan', serverError)
-    draftStore().set('u1:new-1', { data: { title: 'v1', content: '', type: 'work' }, timestamp: 1 })
+    draftStore().set('u1:new-1', {
+      data: { title: 'v1', content: '', type: 'work' },
+      timestamp: 1,
+    })
     const store = await storeFor('u1')
     // retrying a draft passes its key, so a second failure saves over the same draft
     await store.createPlan({ title: 'v2', content: '', type: 'work' }, 'new-1')
-    expect(store.drafts).toEqual([{ id: 'new-1', data: { title: 'v2', content: '', type: 'work' } }])
+    expect(store.drafts).toEqual([
+      { id: 'new-1', data: { title: 'v2', content: '', type: 'work' } },
+    ])
     expect([...draftStore().keys()]).toEqual(['u1:new-1'])
   })
 
@@ -237,16 +315,23 @@ describe('planStore', () => {
     mockApi('POST', '/api/plan', serverError)
     const store = await storeFor()
     forage.control.failWrites = true
-    expect(await store.createPlan({ title: 'lost', content: '', type: 'work' })).toBeNull()
+    expect(
+      await store.createPlan({ title: 'lost', content: '', type: 'work' }),
+    ).toBeNull()
     expect(store.drafts).toEqual([])
   })
 
   it("loads only the signed-in user's drafts (#29)", async () => {
     const data = { title: 'theirs', content: '', type: 'personal' }
     draftStore().set('u2:new-1', { data, timestamp: 1 })
-    draftStore().set('u1:p1', { data: { ...data, title: 'mine' }, timestamp: 2 })
+    draftStore().set('u1:p1', {
+      data: { ...data, title: 'mine' },
+      timestamp: 2,
+    })
     const store = await storeFor('u1')
-    expect(store.drafts).toEqual([{ id: 'p1', data: { ...data, title: 'mine' } }])
+    expect(store.drafts).toEqual([
+      { id: 'p1', data: { ...data, title: 'mine' } },
+    ])
   })
 
   it('clear forgets whose drafts are loaded (#29)', async () => {
@@ -254,7 +339,10 @@ describe('planStore', () => {
     const store = await storeFor('u1')
     store.clear()
     // a failure after sign-out has no user to keep a draft for
-    await store.updatePlan({ id: 'p1', body: { title: 'x', content: '', type: 'work' } })
+    await store.updatePlan({
+      id: 'p1',
+      body: { title: 'x', content: '', type: 'work' },
+    })
     expect(draftStore().size).toBe(0)
   })
 })

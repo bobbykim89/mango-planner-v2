@@ -6,7 +6,7 @@ Issue #20 asks for `app/stores/` to have a clearer structure, with the repeated 
 
 Issue #19 already gave the stores a typed API client (`useApi()` returns `data` from the `{ ok, data }` envelope and throws `ApiClientError` with a `code`). This refactor builds on that client and leaves it as it is.
 
-The user has not changed the stores themselves since. They approved the direction below as proposed. Items marked *(my call)* were decided by Claude and are open to correction.
+The user has not changed the stores themselves since. They approved the direction below as proposed. Items marked _(my call)_ were decided by Claude and are open to correction.
 
 ## Problems in the current code
 
@@ -17,12 +17,14 @@ The user has not changed the stores themselves since. They approved the directio
    - `planStore` clears all three and redirects to `/auth/login` after 1 s.
 
    None of them clears the cookie except `getCurrentUser`.
+
 3. **The stores import each other in a circle.**
    - `userStore` imports `planStore` and `profileStore`, only for logout.
    - `profileStore` imports `userStore`.
    - `planStore` imports `userStore` and `profileStore`.
 
    Each calls the others' `useXStore()` at the top of its setup function.
+
 4. **Duplication at login and signup.**
    - `authUser` and `getCurrentUser` are near-duplicates.
    - `login.vue` and `signup.vue` call `loginWithCredential`/`signupNewUser`, which fetch `/api/auth`, then call `initPiniaStore.initStores()`, which fetches `/api/auth` again and shows a second success alert ("Successfully authenticated user").
@@ -83,7 +85,7 @@ app/composables/
   useDrafts.ts       draft persistence (localforage), moved out of planStore
 ```
 
-*(My call:)* `initPiniaStore` becomes `sessionStore` (a Pinia store, because `loading`/`mounted` must hydrate from SSR). The orchestration lives there instead of in a plain composable. Callers (`init.plugin.ts`, the middleware, `index.vue`, `login.vue`, `signup.vue`) are updated.
+_(My call:)_ `initPiniaStore` becomes `sessionStore` (a Pinia store, because `loading`/`mounted` must hydrate from SSR). The orchestration lives there instead of in a plain composable. Callers (`init.plugin.ts`, the middleware, `index.vue`, `login.vue`, `signup.vue`) are updated.
 
 ### The action runner: `useStoreAction`
 
@@ -104,7 +106,7 @@ The exact signature is left to the builder.
 - **`init()`:** replaces `initStores()`.
   - When the cookie is set, it fetches the current user; when authenticated, it also fetches the profile and the plans.
   - It sets `loading`/`mounted` as today. It shows no success alert: the "Successfully authenticated user" alert on every page load goes away.
-  - A stale cookie found at startup does **not** go through `expire()`. *(My call, keeping today's behaviour:)* `init()` clears the cookie and user state and shows the server's message, but doesn't redirect. A visitor on a public page (`/about`, `/info`, `/auth/*`) stays there, and only `authRoute` sends people from protected pages to the login page. So the session check opts out of the runner's expiry path, and no server-side `navigateTo` is added to the plugin. Add an SSR test: a request with an invalid `access_token` cookie to a public page returns 200, and to `/` returns 302 to `/auth/login`.
+  - A stale cookie found at startup does **not** go through `expire()`. _(My call, keeping today's behaviour:)_ `init()` clears the cookie and user state and shows the server's message, but doesn't redirect. A visitor on a public page (`/about`, `/info`, `/auth/*`) stays there, and only `authRoute` sends people from protected pages to the login page. So the session check opts out of the runner's expiry path, and no server-side `navigateTo` is added to the plugin. Add an SSR test: a request with an invalid `access_token` cookie to a public page returns 200, and to `/` returns 302 to `/auth/login`.
   - It runs on the server and the client exactly as today (`init.plugin.ts`, including the hydration short-cut that only loads drafts on the client).
 - **`logout()`:** clears the cookie and every store, then shows "Logout Successful!".
 - **`expire()`:**
@@ -112,10 +114,11 @@ The exact signature is left to the builder.
   - shows the server's message (for example "Please sign in to continue.")
   - redirects to `/auth/login`
 
-  *(My call:)* it redirects immediately instead of waiting the current 1 s. The alert lives in a store, so it stays visible across the navigation. If two failing calls trigger it at the same time, the second does nothing.
+  _(My call:)_ it redirects immediately instead of waiting the current 1 s. The alert lives in a store, so it stays visible across the navigation. If two failing calls trigger it at the same time, the second does nothing.
+
 - **Login/signup orchestration.** `login.vue` and `signup.vue` call the user store's login/signup action and then `init()` exactly once. The user is fetched once and one success alert appears. How this is split between `userStore` and `sessionStore` is left to the builder.
-- **No more cycles.** Each domain store exposes its own `clear()` (or `$reset`-style) function. Only `sessionStore` imports the others. `userStore`, `profileStore` and `planStore` must not import or call each other. *(My call:)* the one remaining module-level loop (domain store → `useStoreAction` → `sessionStore` → domain store) is acceptable because the runner calls `useSessionStore()` only inside its expired-session branch, at runtime, never during any store's setup.
-- **Custom order.** `getPlansByOrder` combines plans with the profile's `plansOrder`, so it can't stay in `planStore`. *(My call:)* it moves to a small composable (for example `usePlansByOrder()`) that reads both stores and keeps the same sorting, with unknown IDs last. `index.vue` uses it instead of `planStore.getPlansByOrder`.
+- **No more cycles.** Each domain store exposes its own `clear()` (or `$reset`-style) function. Only `sessionStore` imports the others. `userStore`, `profileStore` and `planStore` must not import or call each other. _(My call:)_ the one remaining module-level loop (domain store → `useStoreAction` → `sessionStore` → domain store) is acceptable because the runner calls `useSessionStore()` only inside its expired-session branch, at runtime, never during any store's setup.
+- **Custom order.** `getPlansByOrder` combines plans with the profile's `plansOrder`, so it can't stay in `planStore`. _(My call:)_ it moves to a small composable (for example `usePlansByOrder()`) that reads both stores and keeps the same sorting, with unknown IDs last. `index.vue` uses it instead of `planStore.getPlansByOrder`.
 
 ### Plan store
 
@@ -126,16 +129,18 @@ The exact signature is left to the builder.
   - `toggleComplete` → `togglePlanComplete`
   - `deletePost` → `deletePlan`
 
-  Getters keep their names (`getAllPlans`, `getIncompletePlans`, `getPlansByOrder`). *(My call:)* exact names are the builder's, as long as no "Post" remains.
+  Getters keep their names (`getAllPlans`, `getIncompletePlans`, `getPlansByOrder`). _(My call:)_ exact names are the builder's, as long as no "Post" remains.
+
 - **Local updates.** These must leave `plans` in the order a reload would give. `GET /api/plan` sorts by `updatedAt`, newest first, and both PUT routes set `updatedAt`, so today's refetch moves an edited or toggled plan to the top of its group:
   - Create already prepends the returned plan.
   - Update and toggle remove the old copy and prepend the returned document. `getAllPlans` still groups incomplete before completed.
   - Delete removes the plan by the returned `id`.
 
   None of them refetch or reload drafts.
-- **`plansOrder` is kept in step:** the server prepends a new plan's ID to the profile's `plansOrder` and removes deleted IDs. *(My call:)* the client mirrors this locally, so the custom-order view matches what a reload would show. Today a new plan appears at the bottom of that view until the page is reloaded. The plan store must not import the profile store for this; the session store or the calling page does the mirroring.
+
+- **`plansOrder` is kept in step:** the server prepends a new plan's ID to the profile's `plansOrder` and removes deleted IDs. _(My call:)_ the client mirrors this locally, so the custom-order view matches what a reload would show. Today a new plan appears at the bottom of that view until the page is reloaded. The plan store must not import the profile store for this; the session store or the calling page does the mirroring.
 - **Drafts on failure:** when create or update fails, the input is still saved as a draft (keys `'new'` and the plan ID, as today). `index.vue`'s use of `drafts`, `getDraft` and `deleteDraft` keeps working.
-- **Draft data-loss fix.** *(My call; this fixes an existing bug and is required by the anti-goal.)* In `index.vue`, `onDraftSave` always deletes the open draft after saving. When the save fails, the store re-saves the draft under the same key, and the page then deletes it straight away, so the draft is lost. `onDraftSave` must delete the draft only when the save action returns `true`. Also, a draft saved after a failure must appear in the reactive `drafts` list immediately, not only after a reload (today it only showed up via the success-path refetch).
+- **Draft data-loss fix.** _(My call; this fixes an existing bug and is required by the anti-goal.)_ In `index.vue`, `onDraftSave` always deletes the open draft after saving. When the save fails, the store re-saves the draft under the same key, and the page then deletes it straight away, so the draft is lost. `onDraftSave` must delete the draft only when the save action returns `true`. Also, a draft saved after a failure must appear in the reactive `drafts` list immediately, not only after a reload (today it only showed up via the success-path refetch).
 
 ### Drafts: `useDrafts`
 
@@ -144,7 +149,7 @@ The exact signature is left to the builder.
   - the same database, store name and record shape (`{ data, timestamp }`), so existing users' drafts still load
   - the `import.meta.client` guards
   - the lazy `createInstance` from #18
-- **Where the state lives:** *(My call:)* the reactive `drafts` list stays in Pinia state, either in `planStore` or a small `draftStore`, because components read it through `storeToRefs`. The persistence code lives in the composable.
+- **Where the state lives:** _(My call:)_ the reactive `drafts` list stays in Pinia state, either in `planStore` or a small `draftStore`, because components read it through `storeToRefs`. The persistence code lives in the composable.
 - **Cleanup:** the `console.log` lines go. Failures keep using `console.error`.
 
 ### Profile store
@@ -172,6 +177,7 @@ The exact signature is left to the builder.
   - `unit`: new, with the Nuxt environment and no app build
 
   `pnpm test` runs both, and CI keeps calling `pnpm test`.
+
 - **Why happy-dom.** The jsdom environment would need jsdom ≥ 27.4, which conflicts with the `jsdom: 25.0.1` pin from #27. `@nuxt/test-utils` lists jsdom as an optional peer, so pnpm may print a peer warning; that's expected and harmless.
 - **What the unit tests cover** (store and composable tests with the API mocked, e.g. `registerEndpoint` or a mocked `$fetch`):
   - the runner's guard

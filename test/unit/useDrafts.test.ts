@@ -63,7 +63,10 @@ describe('useDrafts', () => {
 
   it('claimLegacy does not overwrite a newer draft of the same plan', async () => {
     draftStore().set('mine', { data: { ...data, title: 'old' }, timestamp: 1 })
-    draftStore().set('userA:mine', { data: { ...data, title: 'new' }, timestamp: 2 })
+    draftStore().set('userA:mine', {
+      data: { ...data, title: 'new' },
+      timestamp: 2,
+    })
     await useDrafts().claimLegacy('userA', ['mine'])
     expect([...draftStore().keys()]).toEqual(['userA:mine'])
     expect(await useDrafts().list('userA')).toEqual([

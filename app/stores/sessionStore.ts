@@ -27,7 +27,8 @@ export const useSessionStore = defineStore('session', () => {
     if (userStore.isAuthenticated) {
       await Promise.all([profileStore.fetchProfile(), planStore.fetchPlans()])
       // drafts live in the browser's IndexedDB, per user; this is a no-op on the server
-      if (userStore.currentUser) await planStore.loadDrafts(userStore.currentUser._id)
+      if (userStore.currentUser)
+        await planStore.loadDrafts(userStore.currentUser._id)
     }
     loading.value = false
     mounted.value = true

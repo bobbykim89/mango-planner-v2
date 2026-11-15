@@ -40,7 +40,12 @@ describe('userStore', () => {
 
   it('login with a wrong password keeps the user on the page', async () => {
     mockApi('POST', '/api/auth', (e) =>
-      fail(e, 401, 'AUTH_INVALID_CREDENTIALS', 'Email or password is incorrect.'),
+      fail(
+        e,
+        401,
+        'AUTH_INVALID_CREDENTIALS',
+        'Email or password is incorrect.',
+      ),
     )
     const user = useUserStore()
     expect(await user.login({ email: 'a@b.c', password: 'bad' })).toBe(false)

@@ -38,7 +38,7 @@ const handleUsernameClick = (e: Event) => {
     <!-- auth btns -->
     <div
       v-if="auth"
-      class="flex justify-center md:justify-normal items-center md:border-l-2 border-warning px-sm hover:opacity-60 transition-opacity duration-300 ease-linear"
+      class="flex items-center justify-center border-warning px-sm transition-opacity duration-300 ease-linear hover:opacity-60 md:justify-normal md:border-l-2"
     >
       <button
         type="button"
@@ -50,12 +50,12 @@ const handleUsernameClick = (e: Event) => {
           <img
             :src="cloudinaryBaseUrl + profilePicture"
             alt="profile picture"
-            class="h-md rounded-full aspect-square"
+            class="aspect-square h-md rounded-full"
           />
         </div>
         <!-- a long name is cut short so the header stays on one line; the
              button's accessible name and tooltip keep the full name -->
-        <div class="text-lg font-bold text-warning min-w-0">
+        <div class="min-w-0 text-lg font-bold text-warning">
           <span class="block max-w-64 truncate" :title="username">
             {{ username }}
           </span>
@@ -65,14 +65,14 @@ const handleUsernameClick = (e: Event) => {
     <!-- guest btns -->
     <div
       v-else
-      class="flex flex-col md:flex-row justify-center md:justify-normal items-center gap-2xs md:gap-sm md:border-l-2 border-warning px-sm text-dark-3 dark:text-light-3 md:text-warning-text"
+      class="flex flex-col items-center justify-center gap-2xs border-warning px-sm text-dark-3 md:flex-row md:justify-normal md:gap-sm md:border-l-2 md:text-warning-text dark:text-light-3"
     >
       <!-- login btn -->
       <a
         :href="loginUrl"
         :target="urlTarget"
         @click="handleAuthClick($event, 'login')"
-        class="flex items-center gap-3 text-lg font-bold hover:opacity-60 transition-opacity duration-300 ease-linear"
+        class="flex items-center gap-3 text-lg font-bold transition-opacity duration-300 ease-linear hover:opacity-60"
       >
         <svg
           aria-hidden="true"
@@ -94,7 +94,7 @@ const handleUsernameClick = (e: Event) => {
         :href="signupUrl"
         :target="urlTarget"
         @click="handleAuthClick($event, 'signup')"
-        class="flex items-center gap-3 text-lg font-bold hover:opacity-60 transition-opacity duration-300 ease-linear"
+        class="flex items-center gap-3 text-lg font-bold transition-opacity duration-300 ease-linear hover:opacity-60"
       >
         <svg
           aria-hidden="true"

@@ -50,13 +50,18 @@ export const clearApiMocks = () => {
 export const memoryLocalforage = () => {
   const stores = new Map<string, Map<string, unknown>>()
   const control = { failWrites: false }
-  const createInstance = ({ storeName = 'default' }: { storeName?: string }) => {
+  const createInstance = ({
+    storeName = 'default',
+  }: {
+    storeName?: string
+  }) => {
     if (!stores.has(storeName)) stores.set(storeName, new Map())
     const data = stores.get(storeName)!
     return {
       getItem: async <T>(key: string) => (data.get(key) as T) ?? null,
       setItem: async <T>(key: string, value: T) => {
-        if (control.failWrites) throw new DOMException('Quota exceeded', 'QuotaExceededError')
+        if (control.failWrites)
+          throw new DOMException('Quota exceeded', 'QuotaExceededError')
         data.set(key, value)
         return value
       },

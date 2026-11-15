@@ -92,18 +92,18 @@ const renderedContent = computed(() => useMarkdown(props.item.content))
 
 <template>
   <div
-    class="rounded-md overflow-hidden w-full border-l-4 drop-shadow-md"
+    class="w-full overflow-hidden rounded-md border-l-4 drop-shadow-md"
     :class="getBorderColor"
   >
     <!-- header: the title button is the keyboard/screen-reader toggle; the whole
          header stays clickable for mouse users -->
     <div
-      class="py-xs pl-sm pr-xs cursor-pointer select-none"
+      class="cursor-pointer py-xs pr-xs pl-sm select-none"
       :class="getBgColor"
       @click="toggle"
     >
-      <div class="flex justify-between items-center">
-        <div class="flex gap-4 items-center min-w-0">
+      <div class="flex items-center justify-between">
+        <div class="flex min-w-0 items-center gap-4">
           <PlanMoveMenu
             v-if="showHandle"
             :plan-id="item._id.toString()"
@@ -113,13 +113,13 @@ const renderedContent = computed(() => useMarkdown(props.item.content))
             :disabled="moveDisabled"
             @move="(target) => emit('move', item._id.toString(), target)"
           />
-          <h2 class="h3-md text-dark-3 dark:text-light-3 min-w-0">
+          <h2 class="h3-md min-w-0 text-dark-3 dark:text-light-3">
             <button
               type="button"
               :data-plan-toggle="item._id.toString()"
               v-bind="toggleAttrs"
               :aria-describedby="`plan-type-${item._id.toString()}`"
-              class="text-left w-full wrap-anywhere"
+              class="w-full text-left wrap-anywhere"
               @click.stop="toggle"
             >
               {{ item.title }}
@@ -131,7 +131,7 @@ const renderedContent = computed(() => useMarkdown(props.item.content))
           <button
             type="button"
             :data-plan-complete="item._id.toString()"
-            class="flex items-center p-3xs hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear"
+            class="flex items-center p-3xs transition-opacity duration-300 ease-linear hover:opacity-60 focus:opacity-60"
             :class="getCheckColor"
             :aria-pressed="item.complete"
             :aria-label="completeLabel"
@@ -168,7 +168,7 @@ const renderedContent = computed(() => useMarkdown(props.item.content))
       <div class="py-xs">
         <div class="flex gap-2xs">
           <div
-            class="w-full min-w-0 pl-xs pr-2xs text-dark-3 dark:text-light-3 md-content"
+            class="md-content w-full min-w-0 pr-2xs pl-xs text-dark-3 dark:text-light-3"
           >
             <div
               class="md-content"
@@ -177,11 +177,11 @@ const renderedContent = computed(() => useMarkdown(props.item.content))
             ></div>
           </div>
           <div
-            class="px-xs border-l-2 border-dark-1 dark:border-light-3 flex flex-col items-center gap-2xs text-dark-1 dark:text-light-3"
+            class="flex flex-col items-center gap-2xs border-l-2 border-dark-1 px-xs text-dark-1 dark:border-light-3 dark:text-light-3"
           >
             <!-- edit button -->
             <button
-              class="p-3xs hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear"
+              class="p-3xs transition-opacity duration-300 ease-linear hover:opacity-60 focus:opacity-60"
               type="button"
               :aria-label="`Edit &quot;${item.title}&quot;`"
               @click="handleEditClick"
@@ -205,7 +205,7 @@ const renderedContent = computed(() => useMarkdown(props.item.content))
             </button>
             <!-- delete button -->
             <button
-              class="p-3xs hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear"
+              class="p-3xs transition-opacity duration-300 ease-linear hover:opacity-60 focus:opacity-60"
               type="button"
               :aria-label="`Delete &quot;${item.title}&quot;`"
               @click="handleDeleteClick"
@@ -229,7 +229,7 @@ const renderedContent = computed(() => useMarkdown(props.item.content))
       </div>
     </Collapse>
     <div
-      class="py-1.5 px-sm cursor-pointer transition-all duration-500 text-dark-3 dark:text-light-3 grid grid-cols-3 items-center"
+      class="grid cursor-pointer grid-cols-3 items-center px-sm py-1.5 text-dark-3 transition-all duration-500 dark:text-light-3"
       :class="[getBgColor]"
       aria-hidden="true"
       @click="toggle"
@@ -240,7 +240,7 @@ const renderedContent = computed(() => useMarkdown(props.item.content))
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 448 512"
         fill="currentColor"
-        class="h-xs col-start-2 justify-self-center"
+        class="col-start-2 h-xs justify-self-center"
         :class="[
           !isOpen ? 'rotate-0' : 'rotate-180',
           'transition-transform duration-300 ease-in',
@@ -255,7 +255,7 @@ const renderedContent = computed(() => useMarkdown(props.item.content))
            available to screen readers although this bar is aria-hidden -->
       <span
         :id="`plan-type-${item._id.toString()}`"
-        class="text-xs text-dark-3 dark:text-light-3 justify-self-end"
+        class="justify-self-end text-xs text-dark-3 dark:text-light-3"
         >{{ item.type }}</span
       >
     </div>

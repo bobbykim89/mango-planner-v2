@@ -36,7 +36,10 @@ export const useDrafts = () => {
     if (!import.meta.client) return false
     try {
       // a plain copy: reactive proxies can't be stored
-      const record = { data: JSON.parse(JSON.stringify(data)), timestamp: Date.now() }
+      const record = {
+        data: JSON.parse(JSON.stringify(data)),
+        timestamp: Date.now(),
+      }
       await getDraftDb().setItem(storageKey(owner, id), record)
       return true
     } catch (error) {
@@ -56,11 +59,15 @@ export const useDrafts = () => {
     if (!import.meta.client) return []
     const prefix = storageKey(owner, '')
     try {
-      const keys = (await getDraftDb().keys()).filter((key) => key.startsWith(prefix))
+      const keys = (await getDraftDb().keys()).filter((key) =>
+        key.startsWith(prefix),
+      )
       const records = await Promise.all(
         keys.map(async (key) => {
           const record = await getDraftDb().getItem<DraftRecord>(key)
-          return record ? { id: key.slice(prefix.length), data: record.data } : null
+          return record
+            ? { id: key.slice(prefix.length), data: record.data }
+            : null
         }),
       )
       return records.filter((draft) => draft !== null)

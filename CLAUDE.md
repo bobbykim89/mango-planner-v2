@@ -11,19 +11,19 @@ Current focus: hardening **security**, improving **performance**, and fixing int
 
 ## Commands
 
-| Command | What it does |
-|---|---|
-| `pnpm install` | Install deps (runs `nuxt prepare` to generate `.nuxt/` types) |
-| `pnpm dev` | Dev server on :3000 using `.env.local` |
-| `pnpm dev:prod` | Dev server using `.env` (production credentials, so use with care) |
-| `pnpm build` / `pnpm build:local` | Production build (`build:local` loads `.env.local`) |
-| `pnpm preview` | Serve the production build |
-| `pnpm typecheck` | `nuxt typecheck` (vue-tsc across the app/server/shared project references) |
-| `pnpm lint` | ESLint (`eslint.config.mjs`: recommended JS/TS rules + Vue essentials, same base as MCL) |
-| `pnpm format` / `pnpm format:check` | Prettier write / check (`.prettierrc`, sorts Tailwind classes) |
-| `pnpm test` | All Vitest tests: the `api` project (builds the app, runs it against an in-memory MongoDB) and the `unit` project |
-| `pnpm vitest run --project unit` | Only the fast client unit tests (no build) |
-| `pnpm test:watch` | Vitest in watch mode |
+| Command                             | What it does                                                                                                      |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `pnpm install`                      | Install deps (runs `nuxt prepare` to generate `.nuxt/` types)                                                     |
+| `pnpm dev`                          | Dev server on :3000 using `.env.local`                                                                            |
+| `pnpm dev:prod`                     | Dev server using `.env` (production credentials, so use with care)                                                |
+| `pnpm build` / `pnpm build:local`   | Production build (`build:local` loads `.env.local`)                                                               |
+| `pnpm preview`                      | Serve the production build                                                                                        |
+| `pnpm typecheck`                    | `nuxt typecheck` (vue-tsc across the app/server/shared project references)                                        |
+| `pnpm lint`                         | ESLint (`eslint.config.mjs`: recommended JS/TS rules + Vue essentials, same base as MCL)                          |
+| `pnpm format` / `pnpm format:check` | Prettier write / check (`.prettierrc`, sorts Tailwind classes)                                                    |
+| `pnpm test`                         | All Vitest tests: the `api` project (builds the app, runs it against an in-memory MongoDB) and the `unit` project |
+| `pnpm vitest run --project unit`    | Only the fast client unit tests (no build)                                                                        |
+| `pnpm test:watch`                   | Vitest in watch mode                                                                                              |
 
 **Tests:** Vitest runs two projects (`vitest.config.ts`):
 

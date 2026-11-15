@@ -5,6 +5,7 @@
 **Goal:** Restructure `app/stores/` so every API action runs through one shared runner and one session store owns sign-in, startup, logout and expiry. Store state updates from API responses instead of refetching, and the stores get unit tests.
 
 **Architecture:**
+
 - A `useStoreAction()` composable wraps each action body: cookie guard, success alert, error alert, `onError` hook, and expired session → `sessionStore.expire()`.
 - `sessionStore` replaces `initPiniaStore`. It is the only store that imports other stores.
 - Draft persistence moves to `useDrafts()`, and the custom-order sorting to `usePlansByOrder()`.
@@ -51,6 +52,7 @@
 ### Task 1: Unit test project and the alert timer fix
 
 **Files:**
+
 - Modify: `package.json` and `pnpm-lock.yaml` (dev deps)
 - Modify: `vitest.config.ts`
 - Create: `.nuxtrc`, written by `@nuxt/test-utils`. Commit it.
@@ -60,6 +62,7 @@
 - Modify: `CLAUDE.md` (the Tests note)
 
 **Interfaces:**
+
 - Produces, in `test/unit/helpers.ts`:
   - `resetState(): void` sets a fresh Pinia (`setActivePinia(createPinia())`) and sets `useAuthToken().value = null`.
   - `signIn(token = 'Bearer test'): void` sets the cookie.
@@ -141,6 +144,7 @@
 ### Task 2: Action runner and session store
 
 **Files:**
+
 - Create: `app/composables/useStoreAction.ts`
 - Create: `app/stores/sessionStore.ts`
 - Delete: `app/stores/initPiniaStore.ts`
@@ -150,16 +154,20 @@
 - Test: `test/unit/useStoreAction.test.ts`, `test/unit/sessionStore.test.ts`
 
 **Interfaces:**
+
 - Produces, in `useStoreAction.ts`:
 
   ```ts
   export interface StoreActionOptions<T> {
-    requireAuth?: boolean                        // default true: return false, no request, when the cookie is empty
-    success?: string | ((result: T) => string)   // success alert ('success' colour)
+    requireAuth?: boolean // default true: return false, no request, when the cookie is empty
+    success?: string | ((result: T) => string) // success alert ('success' colour)
     onError?: (err: unknown) => void | Promise<void> // runs first on any failure
-    expireOnAuthError?: boolean                  // default true
+    expireOnAuthError?: boolean // default true
   }
-  export type RunStoreAction = <T>(fn: () => Promise<T>, opts?: StoreActionOptions<T>) => Promise<boolean>
+  export type RunStoreAction = <T>(
+    fn: () => Promise<T>,
+    opts?: StoreActionOptions<T>,
+  ) => Promise<boolean>
   export const useStoreAction: () => RunStoreAction
   ```
 
@@ -171,6 +179,7 @@
   3. Otherwise: `console.error(message)` and `setAlert(message)`.
 
   In both cases the result is `false`. `message` is `useErrorCheck().extractErrorMessage(err)`.
+
 - Produces, in `sessionStore.ts`: `useSessionStore` (id `'session'`) with:
   - `loading: Ref<boolean>` (initially `true`) and `mounted: Ref<boolean>` (initially `false`)
   - `init(): Promise<void>`. For now it calls the existing `userStore.getCurrentUser()`, then, when authenticated, the profile and plan fetches. It sets `loading = false` and `mounted = true`. Task 3 rewrites it.
@@ -233,11 +242,13 @@
 ### Task 3: User store on the runner, single sign-in fetch
 
 **Files:**
+
 - Modify: `app/stores/userStore.ts`, `app/stores/sessionStore.ts`
 - Modify: `app/pages/auth/login.vue`, `app/pages/auth/signup.vue`, `app/middleware/authRoute.ts`, `app/middleware/guestRoute.ts`, `app/layouts/default.vue`
 - Test: `test/unit/userStore.test.ts`, `test/unit/sessionStore.test.ts` (extend), `test/pages/ssr.test.ts` (extend)
 
 **Interfaces:**
+
 - Consumes: `useStoreAction`, `useSessionStore` (Task 2).
 - Produces, in `userStore`:
   - **State:** `currentUser: Ref<UserDto | null>`, `isAuthenticated: Ref<boolean>`, `fieldErrors: Ref<Record<string, string>>`
@@ -262,6 +273,7 @@
   4. `loading = false`, `mounted = true`.
 
   No success alert.
+
 - **Pages:** `login.vue` and `signup.vue` run `if (await userStore.login(cred)) { await sessionStore.init(); if (userStore.isAuthenticated) router.push({ path: '/' }) }` (signup likewise).
 - **Middleware:** reads `storeToRefs(userStore).isAuthenticated` and `storeToRefs(sessionStore).mounted`.
 
@@ -300,12 +312,14 @@
 ### Task 4: Profile store on the runner
 
 **Files:**
+
 - Modify: `app/stores/profileStore.ts`
 - Modify: `app/stores/sessionStore.ts` (calls)
 - Modify: `app/layouts/default.vue`, `app/pages/index.vue`
 - Test: `test/unit/profileStore.test.ts`
 
 **Interfaces:**
+
 - Consumes: `useStoreAction` (Task 2).
 - Produces, in `profileStore`:
   - **State:** `userProfile: Ref<ProfileDto | null>`, `darkMode: Ref<boolean>`
@@ -318,6 +332,7 @@
     - `toggleDarkMode(payload: ProfileInputDark): Promise<boolean>`: `PUT /api/profile/dark`, with success `(p) => \`Darkmode ${p.dark ? 'enabled' : 'disabled'}\``
 
     Each of these sets state from its response.
+
   - **Local mirroring:**
     - `addPlanToOrder(id: string): void` prepends `id` to `userProfile.plansOrder` if a profile exists and the ID isn't already there.
     - `removePlanFromOrder(id: string): void` removes it.
@@ -356,12 +371,14 @@
 ### Task 5: Plan store on the runner, drafts and custom order split out
 
 **Files:**
+
 - Create: `app/composables/useDrafts.ts`, `app/composables/usePlansByOrder.ts`
 - Modify: `app/stores/planStore.ts`, `app/stores/sessionStore.ts` (calls), `app/plugins/init.plugin.ts` (draft load), `app/pages/index.vue`
 - Modify: `CLAUDE.md` (the "Client state" convention)
 - Test: `test/unit/planStore.test.ts`, `test/unit/useDrafts.test.ts`, `test/unit/usePlansByOrder.test.ts`
 
 **Interfaces:**
+
 - Consumes: `useStoreAction` (Task 2), and `profileStore.addPlanToOrder`/`removePlanFromOrder`/`getPlansOrder` (Task 4).
 - Produces, in `useDrafts.ts`:
   - The lazy `createInstance` (with `driver: localforage.INDEXEDDB`, `name: 'MangoPlannerV2'`, `storeName: 'drafts'`) moves here unchanged.
