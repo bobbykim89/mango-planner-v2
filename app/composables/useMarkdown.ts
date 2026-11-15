@@ -7,6 +7,10 @@ import markedKatex from 'marked-katex-extension'
 const HEADING_OFFSET = 2
 
 const marked = new Marked(markedKatex({ throwOnError: false, displayMode: false }), {
+  // a single line break inside a paragraph stays a line break (<br>), as typed
+  // (#49: the card used white-space: pre-line for this, which also showed the
+  // newlines between blocks as blank lines)
+  breaks: true,
   renderer: {
     heading({ tokens, depth }) {
       const level = Math.min(depth + HEADING_OFFSET, 6)
