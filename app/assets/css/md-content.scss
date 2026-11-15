@@ -20,6 +20,12 @@
     color: inherit;
   }
 
+  // a heading after other content gets space above it, so it reads as the start
+  // of a new section rather than part of the text above (#49)
+  > :is(h1, h2, h3, h4, h5, h6):not(:first-child) {
+    margin-top: 0.75em;
+  }
+
   h1 {
     font-size: 2rem;
   }
@@ -63,6 +69,17 @@
       ol {
         margin: 0.25em 0;
       }
+    }
+  }
+
+  // space after a top-level list, so two lists in a row (bullets, then numbers,
+  // then a checklist) read as separate lists rather than one (#49)
+  > ul,
+  > ol {
+    margin-bottom: 0.75em;
+
+    &:last-child {
+      margin-bottom: 0;
     }
   }
 

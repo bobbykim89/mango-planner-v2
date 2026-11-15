@@ -23,6 +23,21 @@ describe('useMarkdown', () => {
     })
   })
 
+  describe('line breaks (#49)', () => {
+    it('keeps a single line break inside a paragraph as <br>', () => {
+      expect(useMarkdown('Pack the night before.\nLeave by 7am.')).toContain(
+        '<p>Pack the night before.<br>Leave by 7am.</p>',
+      )
+    })
+
+    it('still starts a new paragraph after a blank line', () => {
+      const html = useMarkdown('First\n\nSecond')
+      expect(html).toContain('<p>First</p>')
+      expect(html).toContain('<p>Second</p>')
+      expect(html).not.toContain('<br>')
+    })
+  })
+
   it('renders KaTeX math', () => {
     expect(useMarkdown('$x^2$')).toContain('class="katex"')
   })
