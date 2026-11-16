@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { useMarkdown } from '@/composables/useMarkdown'
 
-const headingTags = (html: string) => [...html.matchAll(/<(h[1-6])\b/g)].map((m) => m[1])
+const headingTags = (html: string) =>
+  [...html.matchAll(/<(h[1-6])\b/g)].map((m) => m[1])
 
 describe('useMarkdown', () => {
   describe('headings sit below the plan title, an h2 (#42)', () => {
@@ -15,11 +16,16 @@ describe('useMarkdown', () => {
     })
 
     it('shifts underlined (setext) headings too', () => {
-      expect(headingTags(useMarkdown('Title\n=====\n\nSub\n---'))).toEqual(['h3', 'h4'])
+      expect(headingTags(useMarkdown('Title\n=====\n\nSub\n---'))).toEqual([
+        'h3',
+        'h4',
+      ])
     })
 
     it('keeps inline formatting inside a heading', () => {
-      expect(useMarkdown('# **Bold** title')).toContain('<h3><strong>Bold</strong> title</h3>')
+      expect(useMarkdown('# **Bold** title')).toContain(
+        '<h3><strong>Bold</strong> title</h3>',
+      )
     })
   })
 
@@ -43,7 +49,9 @@ describe('useMarkdown', () => {
   })
 
   it('strips unsafe HTML', () => {
-    const html = useMarkdown('<img src="x" onerror="alert(1)"> <script>alert(2)</script>')
+    const html = useMarkdown(
+      '<img src="x" onerror="alert(1)"> <script>alert(2)</script>',
+    )
     expect(html).not.toContain('onerror')
     expect(html).not.toContain('<script')
   })

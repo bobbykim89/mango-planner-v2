@@ -74,7 +74,9 @@ describe('server-rendered pages', () => {
     expect(res.status).toBe(200)
 
     for (const id of ['desktop-new-title', 'desktop-new-content']) {
-      const label = res.html.match(new RegExp(`<label for="${id}"[^>]*>[\\s\\S]*?</label>`))?.[0]
+      const label = res.html.match(
+        new RegExp(`<label for="${id}"[^>]*>[\\s\\S]*?</label>`),
+      )?.[0]
       expect(label, id).toBeDefined()
       expect(label).toContain('text-dark-3')
       expect(label).toContain('dark:text-light-3')

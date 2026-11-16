@@ -65,11 +65,11 @@ const formTextColor = computed<ColorPalette>(() => {
 
 <template>
   <div class="container">
-    <div class="flex justify-center items-center min-h-[75vh]">
+    <div class="flex min-h-[75vh] items-center justify-center">
       <div
-        class="bg-light-3 dark:bg-dark-3 p-md rounded-md drop-shadow-md w-full max-w-112 mx-xs"
+        class="mx-xs w-full max-w-112 rounded-md bg-light-3 p-md drop-shadow-md dark:bg-dark-3"
       >
-        <h1 class="h2-md text-warning text-center mb-sm">Login</h1>
+        <h1 class="h2-md mb-sm text-center text-warning">Login</h1>
         <form @submit.prevent="handleFormSubmit">
           <MclFormGroup
             field-id="email"
@@ -106,21 +106,21 @@ const formTextColor = computed<ColorPalette>(() => {
               v-model="loginCred.password"
             ></MclInputText>
           </MclFormGroup>
-          <button type="submit" class="btn btn-warning btn-full">Submit</button>
+          <button type="submit" class="btn btn-full btn-warning">Submit</button>
         </form>
-        <p class="mt-sm text-dark-3 dark:text-light-3 text-center">
+        <p class="mt-sm text-center text-dark-3 dark:text-light-3">
           <span>Don't have account? Click</span>
           <NuxtLink
             to="/auth/signup"
-            class="mx-3xs font-bold mcl-link text-warning"
+            class="mcl-link mx-3xs font-bold text-warning"
             >Sign up</NuxtLink
           >
         </p>
-        <p class="mt-2xs text-dark-3 dark:text-light-3 text-center">
+        <p class="mt-2xs text-center text-dark-3 dark:text-light-3">
           <span>Forgot Password? Click</span>
           <NuxtLink
             to="/auth/request"
-            class="mx-3xs font-bold mcl-link text-warning"
+            class="mcl-link mx-3xs font-bold text-warning"
             >Here</NuxtLink
           >
         </p>

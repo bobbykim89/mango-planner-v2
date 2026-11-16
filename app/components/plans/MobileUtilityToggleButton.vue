@@ -17,7 +17,7 @@ const handleButtonClick = () => {
     :aria-label="open ? 'Hide tools' : 'Show tools'"
     :aria-expanded="open"
     aria-controls="mobile-utility"
-    class="fixed left-0 bottom-0 md:hidden bg-light-4 dark:bg-dark-4 rounded-r-xl drop-shadow-md border-y border-r border-y-light-1 border-r-light-1 dark:border-y-dark-1 dark:border-r-dark-1 z-10 py-sm pr-2xs pl-1.5 mb-xs transition-all duration-300 text-dark-3 dark:text-light-3"
+    class="fixed bottom-0 left-0 z-10 mb-xs rounded-r-xl border-y border-r border-y-light-1 border-r-light-1 bg-light-4 py-sm pr-2xs pl-1.5 text-dark-3 drop-shadow-md transition-all duration-300 md:hidden dark:border-y-dark-1 dark:border-r-dark-1 dark:bg-dark-4 dark:text-light-3"
     :class="[open ? 'left-[91.666667%]' : 'left-0']"
     @click="handleButtonClick"
   >

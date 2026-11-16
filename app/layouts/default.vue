@@ -89,7 +89,7 @@ const handleMobileMenuBgColor = computed<ColorPalette>(() => {
   return darkMode.value ? 'dark-2' : 'light-4'
 })
 
-const handleTitleClick = (e: Event, url: string, target: CtaTarget) => {
+const handleTitleClick = (e: Event, url: string, _target: CtaTarget) => {
   e.preventDefault()
   router.push({ path: url })
 }
@@ -175,7 +175,7 @@ onMounted(() => {
   <div class="relative">
     <a
       href="#main"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-2xs focus:left-2xs focus:z-[60] focus:px-sm focus:py-2xs focus:rounded-md focus:bg-warning focus:text-dark-3 focus:font-bold"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2xs focus:left-2xs focus:z-[60] focus:rounded-md focus:bg-warning focus:px-sm focus:py-2xs focus:font-bold focus:text-dark-3"
       >Skip to main content</a
     >
     <HeaderHorizontal
@@ -196,16 +196,16 @@ onMounted(() => {
             aria-label="Mango Planner home"
             class="flex shrink-0 items-center self-center md:py-3xs"
           >
-            <span class="h-md md:h-lg mr-2xs md:mr-sm align-middle">
+            <span class="mr-2xs h-md align-middle md:mr-sm md:h-lg">
               <img
                 :src="menuItemData.logo"
                 alt=""
-                class="h-full inline-block"
+                class="inline-block h-full"
               />
             </span>
-            <span class="flex flex-col justify-center ml-2">
+            <span class="ml-2 flex flex-col justify-center">
               <span
-                class="inline-block align-middle tracking-wider h2-md text-warning"
+                class="h2-md inline-block align-middle tracking-wider text-warning"
               >
                 {{ menuItemData.title }}
               </span>
@@ -246,7 +246,7 @@ onMounted(() => {
           ></LayoutAuthBlock>
         </div>
         <!-- user profile block: visible only when authenticated -->
-        <div v-if="isAuthenticated" class="text-light-3 pt-xs px-xs">
+        <div v-if="isAuthenticated" class="px-xs pt-xs text-light-3">
           <div
             class="grid gap-4"
             :class="{ 'grid-cols-2': userProfile !== null }"
@@ -282,10 +282,10 @@ onMounted(() => {
         <!-- logout button -->
         <div
           v-if="isAuthenticated"
-          class="flex justify-center items-center text-dark-3 dark:text-light-3"
+          class="flex items-center justify-center text-dark-3 dark:text-light-3"
         >
           <button
-            class="px-xs py-xs flex items-center gap-3 text-lg font-bold hover:opacity-60 transition-opacity duration-300 ease-linear"
+            class="flex items-center gap-3 px-xs py-xs text-lg font-bold transition-opacity duration-300 ease-linear hover:opacity-60"
             @click="onLogout"
           >
             <svg
@@ -308,7 +308,7 @@ onMounted(() => {
     </HeaderHorizontal>
     <div class="bg-light-4 dark:bg-dark-2">
       <main id="main" tabindex="-1" class="outline-none">
-        <div class="container pt-xs px-sm md:px-xs" data-allow-mismatch>
+        <div class="container px-sm pt-xs md:px-xs" data-allow-mismatch>
           <Alert
             :show="alert !== null"
             :color="alertColor"
@@ -322,7 +322,7 @@ onMounted(() => {
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 512 512"
                 fill="currentColor"
-                class="w-xs mr-2xs"
+                class="mr-2xs w-xs"
               >
                 <!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
                 <path
@@ -337,9 +337,9 @@ onMounted(() => {
       </main>
       <div
         v-if="$pwa?.needRefresh"
-        class="fixed bottom-0 left-0 ml-3xs mb-3xs md:ml-md md:mb-md bg-light-1 dark:bg-dark-4 p-md rounded-md drop-shadow-md text-dark-3 dark:text-light-3 max-w-[90vw]"
+        class="fixed bottom-0 left-0 mb-3xs ml-3xs max-w-[90vw] rounded-md bg-light-1 p-md text-dark-3 drop-shadow-md md:mb-md md:ml-md dark:bg-dark-4 dark:text-light-3"
       >
-        <div class="flex justify-center items-center gap-xs">
+        <div class="flex items-center justify-center gap-xs">
           <svg
             aria-hidden="true"
             focusable="false"
@@ -356,7 +356,7 @@ onMounted(() => {
           <span>New version of SW available, please reload</span>
           <button
             @click="$pwa?.updateServiceWorker()"
-            class="p-1.5 bg-warning rounded-md hover:bg-warning/75 transition-all duration-300 ease-linear"
+            class="rounded-md bg-warning p-1.5 transition-all duration-300 ease-linear hover:bg-warning/75"
           >
             <svg
               aria-hidden="true"
@@ -385,7 +385,7 @@ onMounted(() => {
       >
         <template #header="{ close }">
           <div
-            class="flex items-center py-2xs px-3xs bg-light-3 dark:bg-dark-3 drop-shadow-md"
+            class="flex items-center bg-light-3 px-3xs py-2xs drop-shadow-md dark:bg-dark-3"
           >
             <button
               @click="close"
@@ -399,7 +399,7 @@ onMounted(() => {
                 height="1em"
                 viewBox="0 0 384 512"
                 fill="currentColor"
-                class="hover:opacity-60 focus:opacity-60 transition-opacity duration-300 ease-linear h-sm"
+                class="h-sm transition-opacity duration-300 ease-linear hover:opacity-60 focus:opacity-60"
               >
                 <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
                 <path
@@ -410,7 +410,7 @@ onMounted(() => {
           </div>
         </template>
         <template #body>
-          <div class="text-light-3 py-xs px-xs">
+          <div class="px-xs py-xs text-light-3">
             <WeatherWidget
               v-if="coords.latitude !== null && coords.latitude !== Infinity"
               :latitude="coords.latitude"
@@ -439,10 +439,10 @@ onMounted(() => {
         </template>
         <template #footer>
           <div
-            class="flex justify-center items-center bg-light-3 dark:bg-dark-3"
+            class="flex items-center justify-center bg-light-3 dark:bg-dark-3"
           >
             <button
-              class="px-sm py-xs flex items-center gap-3 text-lg font-bold text-warning hover:opacity-60 transition-opacity duration-300 ease-linear"
+              class="flex items-center gap-3 px-sm py-xs text-lg font-bold text-warning transition-opacity duration-300 ease-linear hover:opacity-60"
               @click="onLogout"
             >
               <svg

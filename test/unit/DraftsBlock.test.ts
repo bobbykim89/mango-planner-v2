@@ -12,7 +12,11 @@ describe('DraftsBlock', () => {
     const wrapper = await mountSuspended(DraftsBlock, {
       props: {
         visible: true,
-        drafts: [draft('new-1', 'Groceries'), draft('new-2', 'Call mom'), draft('p1', 'Trip plan')],
+        drafts: [
+          draft('new-1', 'Groceries'),
+          draft('new-2', 'Call mom'),
+          draft('p1', 'Trip plan'),
+        ],
       },
     })
     const buttons = wrapper.findAll('button')

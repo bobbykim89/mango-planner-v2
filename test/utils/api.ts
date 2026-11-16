@@ -44,7 +44,7 @@ export const api = async (
     body,
   })
   const text = await res.text()
-  let json: any = null
+  let json: ApiResult['json']
   try {
     json = text ? JSON.parse(text) : null
   } catch {

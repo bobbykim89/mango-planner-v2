@@ -33,8 +33,8 @@ export const nextTabbable = (
   direction: 1 | -1,
   isVisible: (el: HTMLElement) => boolean = isShown,
 ): HTMLElement | null => {
-  const all = Array.from(document.querySelectorAll<HTMLElement>(TABBABLE)).filter(
-    (el) => el === from || (el.tabIndex >= 0 && isVisible(el)),
-  )
+  const all = Array.from(
+    document.querySelectorAll<HTMLElement>(TABBABLE),
+  ).filter((el) => el === from || (el.tabIndex >= 0 && isVisible(el)))
   return all[all.indexOf(from) + direction] ?? null
 }

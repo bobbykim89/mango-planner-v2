@@ -17,7 +17,9 @@ vi.mock('localforage', async () => {
   return { default: memoryLocalforage() }
 })
 const draftStore = () => {
-  const { stores } = localforage as unknown as { stores: Map<string, Map<string, unknown>> }
+  const { stores } = localforage as unknown as {
+    stores: Map<string, Map<string, unknown>>
+  }
   if (!stores.has('drafts')) stores.set('drafts', new Map())
   return stores.get('drafts')!
 }
@@ -32,11 +34,17 @@ const seedEverything = () => {
   user.isAuthenticated = true
   user.fieldErrors = { email: 'taken' }
   const profile = useProfileStore()
-  profile.userProfile = { _id: 'pr1', plansOrder: ['p1'], dark: true } as unknown as ProfileDto
+  profile.userProfile = {
+    _id: 'pr1',
+    plansOrder: ['p1'],
+    dark: true,
+  } as unknown as ProfileDto
   profile.darkMode = true
   const plan = usePlanStore()
   plan.plans = [{ _id: 'p1', title: 't' } as unknown as PlanDto]
-  plan.drafts = [{ id: 'new', data: { title: 'd', content: '', type: 'personal' } }]
+  plan.drafts = [
+    { id: 'new', data: { title: 'd', content: '', type: 'personal' } },
+  ]
 }
 
 const expectAllCleared = () => {
@@ -123,7 +131,9 @@ describe('sessionStore', () => {
     draftStore().set('u1:p1', { data, timestamp: 1 })
     draftStore().set('u2:p2', { data, timestamp: 2 })
     signIn()
-    mockApi('GET', '/api/auth', () => ok({ _id: 'u1', name: 'A', email: 'a@b.c' }))
+    mockApi('GET', '/api/auth', () =>
+      ok({ _id: 'u1', name: 'A', email: 'a@b.c' }),
+    )
     mockApi('GET', '/api/profile', () => ok(null))
     mockApi('GET', '/api/plan', () => ok([{ _id: 'p1', title: 't' }]))
     await useSessionStore().init()

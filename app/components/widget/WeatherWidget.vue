@@ -45,17 +45,17 @@ const iconSrc = computed<string | null>(() => {
 
 <template>
   <div
-    class="px-2xs py-3xs md:px-xs md:py-2xs md:bg-light-4 md:dark:bg-dark-4 rounded-md drop-shadow-md"
+    class="rounded-md px-2xs py-3xs drop-shadow-md md:bg-light-4 md:px-xs md:py-2xs md:dark:bg-dark-4"
   >
-    <div class="flex items-center gap-xs justify-center">
+    <div class="flex items-center justify-center gap-xs">
       <img
         v-if="iconSrc"
         :src="iconSrc"
         :alt="weatherData.weather.toLowerCase()"
-        class="object-center object-cover aspect-square h-xl md:h-auto"
+        class="aspect-square h-xl object-cover object-center md:h-auto"
       />
       <div
-        class="flex flex-col justify-center items-start text-dark-3 dark:text-light-3"
+        class="flex flex-col items-start justify-center text-dark-3 dark:text-light-3"
       >
         <p>{{ weatherData.city }}</p>
         <p>{{ weatherData.temperature }} &deg;F</p>

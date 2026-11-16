@@ -8,7 +8,13 @@ const { navigateToMock } = vi.hoisted(() => ({ navigateToMock: vi.fn() }))
 mockNuxtImport('navigateTo', () => navigateToMock)
 
 const profile = (over: Partial<ProfileDto> = {}) =>
-  ({ _id: 'pr1', user: 'u1', plansOrder: ['b', 'c'], dark: false, ...over }) as unknown as ProfileDto
+  ({
+    _id: 'pr1',
+    user: 'u1',
+    plansOrder: ['b', 'c'],
+    dark: false,
+    ...over,
+  }) as unknown as ProfileDto
 
 /** Counts GET /api/profile calls (a refetch the store should no longer make). */
 const countProfileFetches = () => {

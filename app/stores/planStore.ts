@@ -53,7 +53,10 @@ export const usePlanStore = defineStore('plan', () => {
     let created: PlanDto | null = null
     await run(
       async () => {
-        created = await api<PlanDto>('/api/plan', { method: 'POST', body: input })
+        created = await api<PlanDto>('/api/plan', {
+          method: 'POST',
+          body: input,
+        })
         plans.value = [created, ...plans.value]
       },
       {
@@ -69,9 +72,7 @@ export const usePlanStore = defineStore('plan', () => {
     const body = { ...payload.body }
     return run(
       async () => {
-        putFirst(
-          await api<PlanDto>(`/api/plan/${id}`, { method: 'PUT', body }),
-        )
+        putFirst(await api<PlanDto>(`/api/plan/${id}`, { method: 'PUT', body }))
       },
       {
         success: 'Successfully updated plan!',

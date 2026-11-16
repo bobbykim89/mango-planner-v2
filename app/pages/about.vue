@@ -35,23 +35,23 @@ const socialUrls = {
 
 <template>
   <div class="container">
-    <div class="px-xs py-md flex justify-center items-center min-h-[75vh]">
+    <div class="flex min-h-[75vh] items-center justify-center px-xs py-md">
       <div
-        class="p-md md:px-lg md:py-xl bg-light-3 dark:bg-dark-3 rounded-md drop-shadow-md"
+        class="rounded-md bg-light-3 p-md drop-shadow-md md:px-lg md:py-xl dark:bg-dark-3"
       >
         <div
-          class="flex flex-col md:flex-row gap-lg items-center justify-center"
+          class="flex flex-col items-center justify-center gap-lg md:flex-row"
         >
           <div>
             <img
-              class="aspect-square rounded-full border-4 border-dark-1 dark:border-light-4 max-h-96"
+              class="aspect-square max-h-96 rounded-full border-4 border-dark-1 dark:border-light-4"
               :src="AboutImage"
               alt="manguito sitting on monitor"
             />
           </div>
           <div class="text-dark-3 dark:text-light-3">
             <h1 class="h2-md mb-xs">About Mango Planner</h1>
-            <div class="font-bold text-lg mb-xs">
+            <div class="mb-xs text-lg font-bold">
               <p>Simple planner app for daily use.</p>
               <p>Version: 0.2.1</p>
               <p>Maintainer: Bobby Kim</p>
@@ -63,7 +63,7 @@ const socialUrls = {
                 :target="socialUrls.github.target"
                 rel="noreferrer"
                 aria-label="github"
-                class="hover:opacity-75 transition-opacity duration-300 ease-linear"
+                class="transition-opacity duration-300 ease-linear hover:opacity-75"
               >
                 <svg
                   aria-hidden="true"
@@ -85,7 +85,7 @@ const socialUrls = {
                 :target="socialUrls.linkedin.target"
                 rel="noreferrer"
                 aria-label="linkedin"
-                class="hover:opacity-75 transition-opacity duration-300 ease-linear"
+                class="transition-opacity duration-300 ease-linear hover:opacity-75"
               >
                 <svg
                   aria-hidden="true"
@@ -107,7 +107,7 @@ const socialUrls = {
                 :target="socialUrls.email.target"
                 rel="noreferrer"
                 aria-label="email"
-                class="hover:opacity-75 transition-opacity duration-300 ease-linear"
+                class="transition-opacity duration-300 ease-linear hover:opacity-75"
               >
                 <svg
                   aria-hidden="true"

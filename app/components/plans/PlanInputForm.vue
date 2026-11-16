@@ -73,12 +73,12 @@ const onFormSubmit = (e: Event) => {
       <!-- label colours come from dark: classes, not from useColorMode() in script:
            the server can't know the colour mode, so a colour picked in script
            renders for light mode and stays that way after hydration (#52) -->
-      <MclFormGroup
-        :field-id="`${prefix}-title`"
-        class="mb-xs"
-      >
+      <MclFormGroup :field-id="`${prefix}-title`" class="mb-xs">
         <template #label>
-          <span class="mb-2xs block text-md font-bold text-dark-3 dark:text-light-3">Title:</span>
+          <span
+            class="mb-2xs block text-md font-bold text-dark-3 dark:text-light-3"
+            >Title:</span
+          >
         </template>
         <MclInputText
           :id="`${prefix}-title`"
@@ -89,12 +89,12 @@ const onFormSubmit = (e: Event) => {
           v-model="formContent.title"
         ></MclInputText>
       </MclFormGroup>
-      <MclFormGroup
-        :field-id="`${prefix}-content`"
-        class="mb-xs"
-      >
+      <MclFormGroup :field-id="`${prefix}-content`" class="mb-xs">
         <template #label>
-          <span class="mb-2xs block text-md font-bold text-dark-3 dark:text-light-3">Content:</span>
+          <span
+            class="mb-2xs block text-md font-bold text-dark-3 dark:text-light-3"
+            >Content:</span
+          >
         </template>
         <MclTextArea
           :id="`${prefix}-content`"
@@ -106,7 +106,7 @@ const onFormSubmit = (e: Event) => {
       </MclFormGroup>
       <fieldset>
         <legend class="sr-only">Plan type</legend>
-        <div class="flex justify-center gap-md mb-sm">
+        <div class="mb-sm flex justify-center gap-md">
           <div
             class="flex items-center gap-2xs"
             v-for="(item, idx) in typeOptions"
@@ -124,7 +124,7 @@ const onFormSubmit = (e: Event) => {
             ></MclInputRadio>
             <MclFormGroup :field-id="item.id">
               <template #label>
-                <p class="text-dark-3 dark:text-light-3 font-bold">
+                <p class="font-bold text-dark-3 dark:text-light-3">
                   {{ item.text }}
                 </p>
               </template>
@@ -132,7 +132,7 @@ const onFormSubmit = (e: Event) => {
           </div>
         </div>
       </fieldset>
-      <button type="submit" class="btn btn-warning btn-full">
+      <button type="submit" class="btn btn-full btn-warning">
         {{ submitText }}
       </button>
     </form>

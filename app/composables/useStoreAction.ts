@@ -34,7 +34,11 @@ export const useStoreAction = (): RunStoreAction => {
       if (opts.expireOnAuthError === false) return false
       // the session ended meanwhile, e.g. signed out in another tab: treat it like the
       // server rejecting the session, so onError keeps the input and the user is told (#30)
-      const err = new ApiClientError(401, 'AUTH_TOKEN_MISSING', SESSION_EXPIRED_MESSAGE)
+      const err = new ApiClientError(
+        401,
+        'AUTH_TOKEN_MISSING',
+        SESSION_EXPIRED_MESSAGE,
+      )
       await opts.onError?.(err)
       await nuxtApp.runWithContext(() => useSessionStore().expire())
       return false

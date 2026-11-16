@@ -23,7 +23,9 @@ describe('offline support', () => {
 
   it('page loads go to the network and fall back to the offline page only when that fails', async () => {
     const { text } = await fetchText('/sw.js')
-    expect(text).toMatch(/NetworkOnly\(\s*\{\s*plugins:\s*\[\s*new \w+\.PrecacheFallbackPlugin\(\s*\{\s*fallbackURL:\s*"\/offline\.html"/)
+    expect(text).toMatch(
+      /NetworkOnly\(\s*\{\s*plugins:\s*\[\s*new \w+\.PrecacheFallbackPlugin\(\s*\{\s*fallbackURL:\s*"\/offline\.html"/,
+    )
     // the old fallback answered every navigation with '/', which is never
     // precached (it's server-rendered), so the service worker threw instead
     expect(text).not.toContain('createHandlerBoundToURL')

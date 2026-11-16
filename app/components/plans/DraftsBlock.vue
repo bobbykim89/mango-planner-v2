@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { DraftFormInput, PlanFormInput } from '#shared/types'
 
-const props = defineProps<{
+defineProps<{
   visible: boolean
   drafts: DraftFormInput[]
 }>()
@@ -18,9 +18,9 @@ const handleButtonClick = (id: string, data: PlanFormInput) => {
 <template>
   <div
     v-if="visible"
-    class="bg-light-2 dark:bg-dark-3 rounded-md p-sm md:p-md drop-shadow-md md:mt-md md:mb-0 mb-xs"
+    class="mb-xs rounded-md bg-light-2 p-sm drop-shadow-md md:mt-md md:mb-0 md:p-md dark:bg-dark-3"
   >
-    <p class="font-bold mb-xs dark:text-light-3 text-dark-3 tracking-wide">
+    <p class="mb-xs font-bold tracking-wide text-dark-3 dark:text-light-3">
       You have {{ drafts.length }} drafts saved.
     </p>
     <div class="flex flex-wrap gap-3">
@@ -28,8 +28,8 @@ const handleButtonClick = (id: string, data: PlanFormInput) => {
         :class="[
           isNewDraft(draft.id)
             ? 'btn-warning'
-            : 'btn-dark-1 text-light-1 dark:text-dark-3 dark:btn-light-3',
-          'btn flex gap-2 items-center justify-center',
+            : 'text-light-1 btn-dark-1 dark:text-dark-3 dark:btn-light-3',
+          'btn flex items-center justify-center gap-2',
         ]"
         v-for="draft in drafts"
         :key="draft.id"
@@ -44,7 +44,7 @@ const handleButtonClick = (id: string, data: PlanFormInput) => {
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 640 640"
           fill="currentColor"
-          class="h-xs aspect-square"
+          class="aspect-square h-xs"
         >
           <!-- !Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc. -->
           <path
@@ -58,7 +58,7 @@ const handleButtonClick = (id: string, data: PlanFormInput) => {
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 640 640"
           fill="currentColor"
-          class="h-xs aspect-square"
+          class="aspect-square h-xs"
         >
           <!-- !Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc. -->
           <path
@@ -69,7 +69,7 @@ const handleButtonClick = (id: string, data: PlanFormInput) => {
         <span class="flex min-w-0 gap-1">
           <span>{{ isNewDraft(draft.id) ? 'New' : 'Edit' }}</span>
           <span aria-hidden="true">·</span>
-          <span class="truncate max-w-40 font-normal">{{
+          <span class="max-w-40 truncate font-normal">{{
             draft.data.title
           }}</span>
         </span>

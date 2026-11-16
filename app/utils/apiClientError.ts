@@ -1,4 +1,4 @@
-import type { ApiErrorCode, ApiFieldError } from '#shared/types'
+import type { ApiErrorCode, ApiFailure, ApiFieldError } from '#shared/types'
 
 export type ApiClientErrorCode = ApiErrorCode | 'NETWORK_ERROR' | 'UNKNOWN'
 
@@ -29,7 +29,11 @@ const UNKNOWN_MESSAGE = 'Something went wrong. Please try again.'
 /** Converts whatever $fetch threw into an ApiClientError. */
 export const toApiClientError = (err: unknown): ApiClientError => {
   if (err instanceof ApiClientError) return err
-  const e = (err ?? {}) as { data?: any; statusCode?: number; status?: number }
+  const e = (err ?? {}) as {
+    data?: Partial<ApiFailure>
+    statusCode?: number
+    status?: number
+  }
   const status = e.statusCode ?? e.status ?? 0
   const data = e.data
   if (data && data.ok === false && data.error) {

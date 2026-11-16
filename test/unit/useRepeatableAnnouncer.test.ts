@@ -14,7 +14,9 @@ describe('useRepeatableAnnouncer (#40)', () => {
     expect(seen[0]).not.toBe(seen[1])
     expect(seen[1]).not.toBe(seen[2])
     // …but it reads the same: only an invisible no-break space is added
-    expect(seen.map((m) => m.replace(/ $/, ''))).toEqual(Array(3).fill('3 plans shown'))
+    expect(seen.map((m) => m.replace(/\u00a0$/, ''))).toEqual(
+      Array(3).fill('3 plans shown'),
+    )
   })
 
   it('announces a new message as is', () => {

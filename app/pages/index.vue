@@ -353,13 +353,13 @@ watch([displayStyle, searchTerm], () => {
 </script>
 
 <template>
-  <section class="container py-md lg:py-lg min-h-[75vh]">
+  <section class="container min-h-[75vh] py-md lg:py-lg">
     <h1 id="plans-heading" tabindex="-1" class="sr-only">My plans</h1>
     <!-- grid-cols-1: without an explicit column, long unbroken text (a URL) widens
          the column past the screen on mobile -->
     <div
       v-if="mounted"
-      class="grid grid-cols-1 md:grid-cols-2 gap-xs md:gap-md grid-flow-row px-sm md:px-xs relative"
+      class="relative grid grid-flow-row grid-cols-1 gap-xs px-sm md:grid-cols-2 md:gap-md md:px-xs"
     >
       <!-- mobile utility block -->
       <MobileUtilityToggleButton
@@ -382,9 +382,9 @@ watch([displayStyle, searchTerm], () => {
       <div>
         <!-- input form desktop -->
         <div
-          class="hidden md:block bg-light-2 dark:bg-dark-3 rounded-md p-md drop-shadow-md"
+          class="hidden rounded-md bg-light-2 p-md drop-shadow-md md:block dark:bg-dark-3"
         >
-          <h2 class="h3-md text-warning mb-xs">Create New Plan</h2>
+          <h2 class="h3-md mb-xs text-warning">Create New Plan</h2>
           <PlanInputForm
             prefix="desktop-new"
             @form-submit="handleNewFormSubmit"
@@ -410,7 +410,7 @@ watch([displayStyle, searchTerm], () => {
         <div class="flex justify-end">
           <!-- mobile new button -->
           <button
-            class="btn btn-warning text-dark-3 md:hidden! px-md"
+            class="btn px-md text-dark-3 btn-warning md:hidden!"
             aria-label="new"
             title="new"
             @click="openModal"
@@ -421,7 +421,7 @@ watch([displayStyle, searchTerm], () => {
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 448 512"
               fill="currentColor"
-              class="h-sm mx-auto"
+              class="mx-auto h-sm"
             >
               <!-- Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com
               License - https://fontawesome.com/license/free Copyright 2024
@@ -492,10 +492,10 @@ watch([displayStyle, searchTerm], () => {
         </AccordionGroup>
       </div>
     </div>
-    <div v-else role="status" class="min-h-[60vh] flex items-center">
+    <div v-else role="status" class="flex min-h-[60vh] items-center">
       <span class="sr-only">Loading plans</span>
       <div
-        class="loader border-light-3 dark:border-light-4 border-t-warning dark:border-t-warning border-20 rounded-full w-50 h-50 mx-auto"
+        class="loader mx-auto h-50 w-50 rounded-full border-20 border-light-3 border-t-warning dark:border-light-4 dark:border-t-warning"
       ></div>
     </div>
     <Modal
@@ -508,7 +508,7 @@ watch([displayStyle, searchTerm], () => {
     >
       <template #header="{ close, titleId }">
         <div
-          class="flex justify-between py-xs border-b-2 border-b-light-1 dark:border-b-dark-1"
+          class="flex justify-between border-b-2 border-b-light-1 py-xs dark:border-b-dark-1"
         >
           <h2 :id="titleId" class="h3-md text-warning">
             <span v-if="modalForm === 'new'">Create New Plan</span>
@@ -522,7 +522,7 @@ watch([displayStyle, searchTerm], () => {
               xmlns="http://www.w3.org/2000/svg"
               height="1em"
               viewBox="0 0 384 512"
-              class="fill-dark-3 hover:fill-dark-1 focus:fill-dark-1 dark:fill-light-2 dark:hover:fill-light-1 dark:focus:fill-light-1 transition-colors duration-300 ease-linear h-sm"
+              class="h-sm fill-dark-3 transition-colors duration-300 ease-linear hover:fill-dark-1 focus:fill-dark-1 dark:fill-light-2 dark:hover:fill-light-1 dark:focus:fill-light-1"
             >
               <!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. -->
               <path

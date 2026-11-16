@@ -1,15 +1,15 @@
 <template>
   <div
-    class="text-center bg-light-3 dark:bg-dark-3 rounded-md drop-shadow-md px-sm md:px-md py-md"
+    class="rounded-md bg-light-3 px-sm py-md text-center drop-shadow-md md:px-md dark:bg-dark-3"
   >
-    <div class="text-warning mb-sm">
+    <div class="mb-sm text-warning">
       <svg
         aria-hidden="true"
         focusable="false"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 512 512"
         fill="currentColor"
-        class="w-md mx-auto"
+        class="mx-auto w-md"
       >
         <!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
         <path
@@ -23,7 +23,7 @@
         information.
       </p>
     </div>
-    <NuxtLink to="/info" class="btn btn-warning text-dark-3"
+    <NuxtLink to="/info" class="btn text-dark-3 btn-warning"
       >Go to Info page</NuxtLink
     >
   </div>

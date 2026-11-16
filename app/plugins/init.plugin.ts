@@ -9,7 +9,8 @@ export default defineNuxtPlugin({
     // don't fetch it all again; only load what lives in the browser (IndexedDB drafts).
     if (import.meta.client && nuxtApp.isHydrating && session.mounted) {
       const { isAuthenticated, currentUser } = useUserStore()
-      if (isAuthenticated && currentUser) await usePlanStore().loadDrafts(currentUser._id)
+      if (isAuthenticated && currentUser)
+        await usePlanStore().loadDrafts(currentUser._id)
       return
     }
     await session.init()

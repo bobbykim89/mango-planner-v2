@@ -193,7 +193,7 @@ onBeforeUnmount(() => {
   <button
     ref="handleRef"
     type="button"
-    class="handle flex items-center justify-center size-7 -m-1.5 shrink-0 rounded-md cursor-grab text-dark-3/80 dark:text-light-3/80 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-warning"
+    class="handle -m-1.5 flex size-7 shrink-0 cursor-grab items-center justify-center rounded-md text-dark-3/80 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-warning dark:text-light-3/80"
     :data-move-handle="planId"
     aria-haspopup="menu"
     :aria-expanded="open"
@@ -207,7 +207,7 @@ onBeforeUnmount(() => {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 448 512"
       fill="currentColor"
-      class="min-w-xs h-xs"
+      class="h-xs min-w-xs"
     >
       <!-- !Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. -->
       <path
@@ -222,7 +222,7 @@ onBeforeUnmount(() => {
       ref="menuRef"
       role="menu"
       :aria-label="handleLabel"
-      class="fixed z-50 min-w-48 p-1 rounded-md shadow-lg ring-1 ring-black/5 bg-light-1 dark:bg-dark-3"
+      class="fixed z-50 min-w-48 rounded-md bg-light-1 p-1 shadow-lg ring-1 ring-black/5 dark:bg-dark-3"
       :style="{ top: `${position.top}px`, left: `${position.left}px` }"
       @keydown="onMenuKeydown"
     >
@@ -233,7 +233,7 @@ onBeforeUnmount(() => {
         role="menuitem"
         tabindex="-1"
         :aria-disabled="item.disabled ? 'true' : undefined"
-        class="flex gap-2.5 items-center w-full px-3 py-2.5 rounded text-left text-dark-3 dark:text-light-3 hover:bg-warning/25 focus:bg-warning/25 focus:outline-2 focus:-outline-offset-2 focus:outline-warning aria-disabled:opacity-40 aria-disabled:cursor-not-allowed aria-disabled:hover:bg-transparent"
+        class="flex w-full items-center gap-2.5 rounded px-3 py-2.5 text-left text-dark-3 hover:bg-warning/25 focus:bg-warning/25 focus:outline-2 focus:-outline-offset-2 focus:outline-warning aria-disabled:cursor-not-allowed aria-disabled:opacity-40 aria-disabled:hover:bg-transparent dark:text-light-3"
         @click="onItemClick(item)"
       >
         <svg
