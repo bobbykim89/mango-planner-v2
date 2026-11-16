@@ -24,7 +24,7 @@ export const insertLegacyUser = async ({
   const hash = await bcrypt.hash(password, 10)
   const res = await conn.connection
     .collection('users')
-    .insertOne({ name, email, password: hash, date: new Date() })
+    .insertOne({ name, email, password: hash, createdAt: new Date() })
   await conn.connection.collection('profiles').insertOne({
     user: res.insertedId,
     profilePicture: '',

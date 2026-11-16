@@ -10,7 +10,7 @@ export interface PlanModel {
   author: Types.ObjectId
   complete: boolean
   type: TypeInputLiteralType
-  date: Date
+  createdAt: Date
   updatedAt: Date
 }
 
@@ -36,7 +36,8 @@ const planSchema = new Schema<PlanModel>({
     type: String,
     required: true,
   },
-  date: {
+  // older documents stored this as `date`; scripts/migrate-created-at.ts renames them
+  createdAt: {
     type: Date,
     default: Date.now,
   },

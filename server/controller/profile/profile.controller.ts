@@ -15,7 +15,7 @@ export class ProfileController extends BaseController {
       throw apiError.PROFILE_EXISTS()
     }
     // existing plans start in their creation order
-    const plans = await Plan.find({ author: user.id }).sort({ date: -1 })
+    const plans = await Plan.find({ author: user.id }).sort({ createdAt: -1 })
     return new Profile({
       user: user.id,
       plansOrder: plans.map((plan) => plan.id),
