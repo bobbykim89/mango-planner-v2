@@ -36,6 +36,7 @@ Current focus: hardening **security**, improving **performance**, and fixing int
 app/        Nuxt app (srcDir): pages, components/{layout,plans,widget}, stores (Pinia), composables, middleware, plugins
 server/     Nitro: api/ (file-based routes), controller/ (business logic), utils/ (auto-imported), plugins/connectDb.ts
 shared/     Code used by both sides (#shared alias): models/ (Mongoose), dto/ (Zod schemas), types/
+scripts/    One-off maintenance scripts (TypeScript run directly by Node: node --env-file=.env.local scripts/<name>.ts)
 public/     PWA icons, screenshots, weather icons, offline.html
 ```
 

@@ -7,7 +7,7 @@ export interface UserModel {
   name: string
   email: string
   password: string
-  date: Date
+  createdAt: Date
 }
 
 export type UserDocument = HydratedDocument<UserModel>
@@ -26,7 +26,8 @@ const userSchema = new Schema<UserModel>({
     type: String,
     required: true,
   },
-  date: {
+  // older documents stored this as `date`; scripts/migrate-created-at.ts renames them
+  createdAt: {
     type: Date,
     default: Date.now,
   },
